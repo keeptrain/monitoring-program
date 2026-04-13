@@ -37,6 +37,7 @@ export default function ProgramPriorityReportFormPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* @ts-expect-error - Form submit type mismatch with Zod preprocess */}
             <InformationBasicFormSection form={form} />
           </CardContent>
         </Card>
@@ -46,6 +47,7 @@ export default function ProgramPriorityReportFormPage() {
             <CardDescription>Isi dokumentasi program prioritas</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* @ts-expect-error - Form submit type mismatch with Zod preprocess */}
             <DocumentationsFormSection form={form} />
           </CardContent>
         </Card>

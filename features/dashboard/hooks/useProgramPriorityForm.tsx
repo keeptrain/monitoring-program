@@ -20,6 +20,7 @@ const CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES: ProgramPriorityFormValues = {
 
 export function useProgramPriorityForm() {
   const form = useForm<ProgramPriorityFormValues>({
+    // @ts-expect-error - Resolver type mismatch with Zod preprocess
     resolver: zodResolver(programPrioritySchema),
     defaultValues: CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES,
   });
@@ -30,6 +31,7 @@ export function useProgramPriorityForm() {
 
   return {
     form,
+    // @ts-expect-error - Form submit type mismatch with Zod preprocess
     onSubmit: form.handleSubmit(onSubmit),
   };
 }
