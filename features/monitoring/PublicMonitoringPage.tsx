@@ -67,16 +67,6 @@ export default function PublicMonitoringPage() {
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Library peta akan diintegrasikan di sini.
-                  <br />
-                  Gunakan{" "}
-                  <code className="rounded border border-border bg-muted px-1 py-0.5 font-mono text-[11px]">
-                    react-leaflet
-                  </code>{" "}
-                  atau{" "}
-                  <code className="rounded border border-border bg-muted px-1 py-0.5 font-mono text-[11px]">
-                    maplibre-gl
-                  </code>
-                  .
                 </p>
               </div>
             </div>
