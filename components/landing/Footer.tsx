@@ -10,14 +10,17 @@ export default function Footer() {
             DJPB — KKP
           </span>
           <span className="text-xs text-muted-foreground">
-            Direktorat Jenderal Perbendaharaan
+            Direktorat Jenderal Perikanan Budidaya
           </span>
         </div>
 
         {/* Copyright */}
-        <p className="text-xs text-muted-foreground">
-          © {year} Kementerian Kelautan dan Perikanan RI. Hak cipta dilindungi.
-        </p>
+        <div className="text-end">
+          <p className="text-xs text-muted-foreground">
+            © {year} Kementerian Kelautan dan Perikanan RI.
+          </p>
+          <p className="text-xs text-muted-foreground">Hak cipta dilindungi.</p>
+        </div>
       </div>
     </footer>
   );
