@@ -10,7 +10,7 @@ export default function PublicMonitoringPage() {
 
       <main className="flex flex-1 flex-col">
         {/* Page header */}
-        <div className="border-b border-border bg-background px-6 py-8">
+        <div className="border-b border-border bg-background px-8 py-8">
           <div className="mx-auto max-w-6xl">
             <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Monitoring Publik
@@ -32,19 +32,17 @@ export default function PublicMonitoringPage() {
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Filter Layer
             </p>
-            {["Perikanan Tangkap", "Pelabuhan", "Budidaya", "Pengawasan"].map(
-              (layer) => (
-                <label
-                  key={layer}
-                  className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground"
-                >
-                  <span className="flex size-4 items-center justify-center border border-border bg-background">
-                    <span className="size-2 bg-foreground" />
-                  </span>
-                  {layer}
-                </label>
-              )
-            )}
+            {["Tematik", "Bioflok", "Isf", "Revitalisasi"].map((layer) => (
+              <label
+                key={layer}
+                className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground"
+              >
+                <span className="flex size-4 items-center justify-center border border-border bg-background">
+                  <span className="size-2 bg-foreground" />
+                </span>
+                {layer}
+              </label>
+            ))}
           </aside>
 
           {/* Map placeholder */}
