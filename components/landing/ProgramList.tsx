@@ -7,7 +7,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-// ─── Edit this array to add, remove, or update programs ──────────────────────
 export const PROGRAMS = [
   {
     id: 1,
@@ -52,7 +51,6 @@ export const PROGRAMS = [
       "Program distribusi alat keselamatan, pelatihan, dan jaminan sosial bagi nelayan di seluruh Indonesia.",
   },
 ];
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ProgramList() {
   return (
@@ -71,7 +69,7 @@ export default function ProgramList() {
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
             Berikut adalah program-program prioritas yang sedang dijalankan oleh
-            Direktorat Jenderal Perbendaharaan periode 2024–2029.
+            Direktorat Jenderal Perikanan Budidaya.
           </p>
         </div>
 
