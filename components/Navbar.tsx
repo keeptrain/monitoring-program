@@ -25,7 +25,9 @@ export default function Navbar() {
           <span className="flex size-8 items-center justify-center bg-primary text-background text-[10px] font-bold rounded-full">
             <FishIcon className="size-4" />
           </span>
-          <span className="hidden sm:inline">Program Prioritas DJPB</span>
+          <span className="hidden sm:inline text-xs">
+            Kementerian Kelautan <br /> dan Perikanan
+          </span>
         </Link>
 
         {/* Center nav */}
@@ -35,7 +37,7 @@ export default function Navbar() {
               key={href}
               href={href}
               className={cn(
-                "px-3 py-1.5 text-xs font-medium transition-colors",
+                "px-3 py-1.5 text-sm font-medium transition-colors",
                 pathname === href
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:text-foreground"
