@@ -25,7 +25,7 @@ const dashboardLinks = [
 
 export default function DashboardNavbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-primary text-background">
+    <header className="sticky top-0 z-50 border-b border-border bg-primary/90 text-background">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <div className="flex items-center gap-4">
