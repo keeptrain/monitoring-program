@@ -5,22 +5,63 @@ import { ProgramPriorityFormValues } from "../forms/program-priority-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
+import { uploadImageAction } from "@/app/actions/report-actions";
+import { useState } from "react";
 
 interface ReportFormProps {
   form: UseFormReturn<ProgramPriorityFormValues>;
 }
 
 export default function DocumentationsFormSection({ form }: ReportFormProps) {
+  const {
+    control,
+    formState: { errors },
+  } = form;
+
   const { fields, append, remove } = useFieldArray({
-    control: form.control,
+    control,
     name: "documentations",
   });
 
-  const {
-    register,
-    formState: { errors },
-  } = form;
+  const [uploading, setUploading] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [previews, setPreviews] = useState<{
+    [key: string]: string;
+  }>({});
+
+  const handleOnChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+    fieldId: string,
+    fieldName: "image_before_path" | "image_after_path"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Create preview
+    const objectUrl = URL.createObjectURL(file);
+    const previewKey = `${fieldId}-${fieldName}`;
+    setPreviews((prev) => ({ ...prev, [previewKey]: objectUrl }));
+
+    const uploadKey = `${index}-${fieldName}`;
+    setUploading((prev) => ({ ...prev, [uploadKey]: true }));
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const path = await uploadImageAction(formData);
+      form.setValue(`documentations.${index}.${fieldName}`, path, {
+        shouldValidate: true,
+      });
+    } catch (error) {
+      console.error("Upload failed", error);
+    } finally {
+      setUploading((prev) => ({ ...prev, [uploadKey]: false }));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -52,13 +93,36 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
                 <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
                   Foto Sebelum
                 </FieldLabel>
-                <Input
-                  {...register(`documentations.${index}.image_before_path`)}
-                  placeholder="Path foto atau deskripsi..."
-                  aria-invalid={
-                    !!errors.documentations?.[index]?.image_before_path
-                  }
-                />
+                <div className="relative">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    aria-invalid={
+                      !!errors.documentations?.[index]?.image_before_path
+                    }
+                    onChange={(e) =>
+                      handleOnChange(e, index, field.id, "image_before_path")
+                    }
+                    className={
+                      uploading[`${index}-image_before_path`] ? "pr-10" : ""
+                    }
+                  />
+                  {uploading[`${index}-image_before_path`] && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                {previews[`${field.id}-image_before_path`] && (
+                  <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={previews[`${field.id}-image_before_path`]}
+                      alt="Preview"
+                      className="size-24 object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                )}
                 <FieldError>
                   {errors.documentations?.[index]?.image_before_path?.message}
                 </FieldError>
@@ -68,13 +132,36 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
                 <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
                   Foto Sesudah
                 </FieldLabel>
-                <Input
-                  {...register(`documentations.${index}.image_after_path`)}
-                  placeholder="Path foto atau deskripsi..."
-                  aria-invalid={
-                    !!errors.documentations?.[index]?.image_after_path
-                  }
-                />
+                <div className="relative">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    aria-invalid={
+                      !!errors.documentations?.[index]?.image_after_path
+                    }
+                    onChange={(e) =>
+                      handleOnChange(e, index, field.id, "image_after_path")
+                    }
+                    className={
+                      uploading[`${index}-image_after_path`] ? "pr-10" : ""
+                    }
+                  />
+                  {uploading[`${index}-image_after_path`] && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                {previews[`${field.id}-image_after_path`] && (
+                  <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={previews[`${field.id}-image_after_path`]}
+                      alt="Preview"
+                      className="size-24 object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                )}
                 <FieldError>
                   {errors.documentations?.[index]?.image_after_path?.message}
                 </FieldError>

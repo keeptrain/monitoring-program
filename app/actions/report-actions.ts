@@ -5,7 +5,17 @@ import {
   ProgramPriorityFormValues,
 } from "@/features/dashboard/forms/program-priority-schema";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/utils/supabase";
+import { createClient, uploadToPriorityBucket } from "@/utils/supabase";
+
+export async function uploadImageAction(formData: FormData) {
+  const file = formData.get("file") as File;
+  if (!file) {
+    throw new Error("No file provided");
+  }
+
+  const path = await uploadToPriorityBucket(file);
+  return path;
+}
 
 export async function createReport(data: ProgramPriorityFormValues) {
   // Validate data on server side
