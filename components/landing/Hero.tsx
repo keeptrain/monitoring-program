@@ -36,19 +36,17 @@ export default function Hero() {
         {/* Sub-headline */}
         <p className="mx-auto max-w-xl text-base text-muted-foreground sm:text-lg">
           Platform pemantauan terpadu untuk program-program prioritas Direktorat
-          Jenderal Perbendaharaan, Kementerian Kelautan dan Perikanan Republik
-          Indonesia.
+          Jenderal Perikanan Budidaya, Kementerian Kelautan dan Perikanan
+          Republik Indonesia.
         </p>
 
         {/* CTAs */}
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Button asChild size="lg" className="w-full sm:w-auto">
-            <Link href="/monitoring">
-              Lihat Peta Monitoring
-              <ArrowRight className="ml-2 size-4" />
-            </Link>
-          </Button>
-        </div>
+        <Button asChild size="lg" className="w-full sm:w-auto">
+          <Link href="/monitoring">
+            Lihat Peta Monitoring
+            <ArrowRight className="ml-2 size-6" />
+          </Link>
+        </Button>
       </div>
 
       {/* Bottom fade */}
