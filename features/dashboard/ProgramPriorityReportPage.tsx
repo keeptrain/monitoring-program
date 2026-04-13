@@ -3,6 +3,7 @@
 import DashboardNavbar from "@/components/DashboardNavbar";
 import { Button } from "@/components/ui/button";
 import { FileBarChart2, Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function ProgramPriorityReportPage() {
   return (
@@ -24,9 +25,11 @@ export default function ProgramPriorityReportPage() {
                 Kelola dan pantau laporan capaian program prioritas DJPB.
               </p>
             </div>
-            <Button size="sm">
-              <Plus className="mr-1.5 size-3.5" />
-              Tambah Laporan
+            <Button size="sm" asChild>
+              <Link href="/dashboard/program-priority-report/form/create">
+                <Plus className="mr-1.5 size-3.5" />
+                Tambah Laporan
+              </Link>
             </Button>
           </div>
 

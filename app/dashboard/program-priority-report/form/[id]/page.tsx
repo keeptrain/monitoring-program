@@ -1,7 +1,10 @@
-export default function ProgramPriorityReportFormPage() {
-  return (
-    <div>
-      <h1>Program Priority Report Form</h1>
-    </div>
-  );
+import Component from "@/features/dashboard/ProgramPriorityReportFormPage";
+
+export default async function ProgramPriorityReportFormPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const isCreateMode = params.id === "create";
+  return <Component />;
 }

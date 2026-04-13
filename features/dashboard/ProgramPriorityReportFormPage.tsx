@@ -1,7 +1,9 @@
+import DashboardNavbar from "@/components/DashboardNavbar";
+
 export default function ProgramPriorityReportFormPage() {
   return (
-    <div>
-      <h1>Program Priority Report Form</h1>
+    <div className="flex min-h-screen flex-col">
+      <DashboardNavbar />
     </div>
   );
 }
