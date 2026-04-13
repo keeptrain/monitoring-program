@@ -23,7 +23,7 @@ interface ProgramsDjpbReports {
 
 export async function getProgramsDjpbReports() {
   const supabase = createClient();
-  const { data, error } = await supabase
+  const { data, error } = await (await supabase)
     .from<"programs_djpb_reports", ProgramsDjpbReports>("programs_djpb_reports")
     .select("*");
   if (error) {
