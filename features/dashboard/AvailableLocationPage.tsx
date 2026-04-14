@@ -4,20 +4,27 @@ import Datatable from "@/components/datatable/datatable";
 import { Button } from "@/components/ui/button";
 import { MapPin, Plus } from "lucide-react";
 import Link from "next/link";
+import { AvailableLocation } from "./actions/available-locations";
 
-const columns = ["Nama Lokasi", "Deskripsi"];
+import { Column } from "@/components/datatable/datatable";
+import { formatDateWithTime } from "@/lib/utils";
 
-export default function AvailableLocationPage() {
-  const data = [
-    {
-      name: "Lokasi 1",
-      description: "Deskripsi 1",
-    },
-    {
-      name: "Lokasi 2",
-      description: "Deskripsi 2",
-    },
-  ];
+const columns: Column<AvailableLocation>[] = [
+  { header: "Nama Lokasi", accessorKey: "name" },
+  { header: "Latitude", accessorKey: "latitude" },
+  { header: "Longitude", accessorKey: "longitude" },
+  {
+    header: "Dibuat",
+    accessorKey: "created_at",
+    cell: (row) => formatDateWithTime(row.created_at),
+  },
+];
+
+export default function AvailableLocationPage({
+  data,
+}: {
+  data: AvailableLocation[];
+}) {
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -45,10 +52,7 @@ export default function AvailableLocationPage() {
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <Datatable
-          columns={columns}
-          data={data.map((item) => [item.name, item.description])}
-        />
+        <Datatable columns={columns} data={data} />
       )}
     </div>
   );

@@ -10,13 +10,14 @@ export interface AvailableLocation {
   name: string;
   latitude?: number;
   longitude?: number;
+  created_at?: string;
 }
 
 export async function getAvailableLocations() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("available_locations")
-    .select("id, name, latitude, longitude")
+    .select("id, name, latitude, longitude, created_at")
     .order("name");
 
   if (error) {
