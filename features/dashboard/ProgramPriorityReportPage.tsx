@@ -6,13 +6,29 @@ import Link from "next/link";
 import Datatable from "@/components/datatable/datatable";
 import { ProgramPriorityReportIndex } from "./actions/program-priority-reports";
 import { ProgramPriorityColumns } from "./components/ProgramPriorityColumns";
+import { useRouter } from "next/navigation";
 
 export default function ProgramPriorityReportPage({
   data,
 }: {
   data: ProgramPriorityReportIndex[];
 }) {
+  const router = useRouter();
   const columns = ProgramPriorityColumns();
+  const handleRowClick = (
+    e: React.MouseEvent<HTMLTableRowElement>,
+    row: ProgramPriorityReportIndex
+  ) => {
+    // Prevent navigation if clicking on a button or link inside the row
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("a")) {
+      return;
+    }
+
+    if (row.id) {
+      router.push(`/dashboard/program-priority-report/${row.id}`);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -41,7 +57,7 @@ export default function ProgramPriorityReportPage({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <Datatable columns={columns} data={data} />
+        <Datatable columns={columns} data={data} onRowClick={handleRowClick} />
       )}
     </div>
   );
