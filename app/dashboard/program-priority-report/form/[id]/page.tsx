@@ -35,11 +35,15 @@ export default async function ProgramPriorityReportFormPage({
     available_location_id: report.available_location_id,
     name: report.name,
     provider_type:
-      report.provider_type === "private" || report.provider_type === "institution"
+      report.provider_type === "private" ||
+      report.provider_type === "institution"
         ? report.provider_type
         : undefined,
     percentage_of_work: report.percentage_of_work,
-    status: report.status === "HUB" || report.status === "NON-HUB" ? report.status : undefined,
+    status:
+      report.status === "HUB" || report.status === "NON-HUB"
+        ? report.status
+        : undefined,
     constraints: report.constraints,
     follow_up: report.follow_up,
     documentations:

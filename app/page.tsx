@@ -7,7 +7,7 @@ import Footer from "@/components/landing/Footer";
 export const metadata = {
   title: "Program Prioritas DJPB — Kementerian Kelautan dan Perikanan",
   description:
-    "Platform monitoring terpadu untuk program-program prioritas Direktorat Jenderal Perbendaharaan, Kementerian Kelautan dan Perikanan Republik Indonesia.",
+    "Platform monitoring terpadu untuk program-program prioritas Direktorat Jenderal Perikanan Budidaya, Kementerian Kelautan dan Perikanan Republik Indonesia.",
 };
 
 export default function Home() {
