@@ -5,8 +5,9 @@ import { FileBarChart2, Plus } from "lucide-react";
 import Link from "next/link";
 import Datatable from "@/components/datatable/datatable";
 import { ProgramPriorityReportIndex } from "./actions/program-priority-reports";
-import { ProgramPriorityColumns } from "./components/ProgramPriorityColumns";
+import { ProgramPriorityColumns } from "./components/ProgramPriorityTableColumns";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 export default function ProgramPriorityReportPage({
   data,
@@ -14,7 +15,8 @@ export default function ProgramPriorityReportPage({
   data: ProgramPriorityReportIndex[];
 }) {
   const router = useRouter();
-  const columns = ProgramPriorityColumns();
+  const getColumns = useMemo(() => ProgramPriorityColumns(), []);
+
   const handleRowClick = (
     e: React.MouseEvent<HTMLTableRowElement>,
     row: ProgramPriorityReportIndex
@@ -33,7 +35,7 @@ export default function ProgramPriorityReportPage({
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:justify-between gap-4">
         <div>
           <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Dashboard / Laporan
@@ -57,7 +59,11 @@ export default function ProgramPriorityReportPage({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <Datatable columns={columns} data={data} onRowClick={handleRowClick} />
+        <Datatable
+          columns={getColumns}
+          data={data}
+          onRowClick={handleRowClick}
+        />
       )}
     </div>
   );

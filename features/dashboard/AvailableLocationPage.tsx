@@ -5,30 +5,19 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Plus } from "lucide-react";
 import Link from "next/link";
 import { AvailableLocation } from "./actions/available-locations";
-
-import { Column } from "@/components/datatable/datatable";
-import { formatDateWithTime } from "@/lib/utils";
-
-const columns: Column<AvailableLocation>[] = [
-  { header: "Nama Lokasi", accessorKey: "name" },
-  { header: "Latitude", accessorKey: "latitude" },
-  { header: "Longitude", accessorKey: "longitude" },
-  {
-    header: "Dibuat",
-    accessorKey: "created_at",
-    cell: (row) => formatDateWithTime(row.created_at),
-  },
-];
+import { AvailableLocationTableColumns } from "./components/AvailableLocationTableColumns";
+import { useMemo } from "react";
 
 export default function AvailableLocationPage({
   data,
 }: {
   data: AvailableLocation[];
 }) {
+  const getColumns = useMemo(() => AvailableLocationTableColumns(), []);
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row items-start sm:justify-between gap-4">
         <div>
           <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
             Dashboard / Lokasi
@@ -52,7 +41,7 @@ export default function AvailableLocationPage({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <Datatable columns={columns} data={data} />
+        <Datatable columns={getColumns} data={data} />
       )}
     </div>
   );
