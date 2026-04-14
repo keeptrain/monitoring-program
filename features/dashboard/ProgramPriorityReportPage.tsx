@@ -3,8 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { FileBarChart2, Plus } from "lucide-react";
 import Link from "next/link";
+import Datatable from "@/components/datatable/datatable";
+import { ProgramPriorityReportIndex } from "./actions/program-priority-reports";
+import { ProgramPriorityColumns } from "./components/ProgramPriorityColumns";
 
-export default function ProgramPriorityReportPage() {
+export default function ProgramPriorityReportPage({
+  data,
+}: {
+  data: ProgramPriorityReportIndex[];
+}) {
+  const columns = ProgramPriorityColumns();
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -28,18 +37,28 @@ export default function ProgramPriorityReportPage() {
         </Button>
       </div>
 
-      {/* Empty state placeholder */}
-      <div className="flex flex-col items-center justify-center border border-border bg-background py-20 text-center">
-        <div className="mb-4 flex size-12 items-center justify-center border border-border">
-          <FileBarChart2 className="size-6 text-muted-foreground" />
-        </div>
-        <p className="text-sm font-medium text-foreground">
-          Belum ada laporan tersimpan
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Klik &quot;Tambah Laporan&quot; untuk mulai memasukkan data laporan.
-        </p>
+      {/* Content */}
+      {data.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <Datatable columns={columns} data={data} />
+      )}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center border border-border bg-background py-20 text-center">
+      <div className="mb-4 flex size-12 items-center justify-center border border-border">
+        <FileBarChart2 className="size-6 text-muted-foreground" />
       </div>
+      <p className="text-sm font-medium text-foreground">
+        Belum ada laporan tersimpan
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Klik &quot;Tambah Laporan&quot; untuk mulai memasukkan data laporan.
+      </p>
     </div>
   );
 }
