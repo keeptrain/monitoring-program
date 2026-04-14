@@ -7,7 +7,7 @@ import {
   ProgramPriorityFormInput,
   ProgramPriorityFormValues,
 } from "../forms/program-priority-schema";
-import { createProgramsDjpbReports } from "../actions/programs-djpb-reports";
+import { createProgramPriorityReports } from "../actions/program-priority-reports";
 
 const CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES: ProgramPriorityFormInput = {
   available_location_id: undefined,
@@ -31,7 +31,7 @@ export function useProgramPriorityForm() {
   });
 
   const onSubmit = (data: ProgramPriorityFormValues) => {
-    createProgramsDjpbReports(data);
+    createProgramPriorityReports(data);
   };
 
   return {

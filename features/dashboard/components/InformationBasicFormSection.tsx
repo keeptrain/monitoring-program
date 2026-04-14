@@ -23,7 +23,7 @@ import { AvailableLocation } from "../actions/available-locations";
 interface ReportFormProps {
   form: UseFormReturn<
     ProgramPriorityFormInput,
-    unknown,
+    undefined,
     ProgramPriorityFormValues
   >;
   availableLocations: AvailableLocation[];
@@ -88,7 +88,9 @@ export default function InformationBasicFormSection({
             Persentase Pengerjaan (%)
           </FieldLabel>
           <Input
-            {...register("percentage_of_work")}
+            {...register("percentage_of_work", {
+              maxLength: 3,
+            })}
             aria-invalid={!!errors.percentage_of_work}
             type="number"
             placeholder="0-100"

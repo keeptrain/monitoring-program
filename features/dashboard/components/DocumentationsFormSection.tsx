@@ -9,13 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Plus, Trash2, Loader2 } from "lucide-react";
-import { uploadImageAction } from "@/app/actions/report-actions";
 import { useState } from "react";
 
 interface ReportFormProps {
   form: UseFormReturn<
     ProgramPriorityFormInput,
-    unknown,
+    undefined,
     ProgramPriorityFormValues
   >;
 }
@@ -59,8 +58,8 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const path = await uploadImageAction(formData);
-      form.setValue(`documentations.${index}.${fieldName}`, path, {
+      // const path = await uploadImageAction(formData);
+      form.setValue(`documentations.${index}.${fieldName}`, "", {
         shouldValidate: true,
       });
     } catch (error) {
