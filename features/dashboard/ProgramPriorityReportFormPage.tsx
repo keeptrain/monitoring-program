@@ -12,28 +12,43 @@ import { Button } from "@/components/ui/button";
 import useProgramPriorityForm from "./hooks/useProgramPriorityForm";
 import DocumentationsFormSection from "./components/DocumentationsFormSection";
 import { AvailableLocation } from "./actions/available-locations";
+import { ProgramPriorityFormInput } from "./forms/program-priority-schema";
+import { useTransition } from "react";
 
 export default function ProgramPriorityReportFormPage({
   availableLocations,
+  initialValues,
+  reportId,
 }: {
   availableLocations: AvailableLocation[];
+  initialValues?: ProgramPriorityFormInput;
+  reportId?: number;
 }) {
-  const { form, onSubmit } = useProgramPriorityForm();
+  const [isLoading, startTransition] = useTransition();
+  const { form, onSubmit } = useProgramPriorityForm(initialValues, reportId);
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    startTransition(() => {
+      onSubmit(e);
+    });
+  };
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-8">
         <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          Dashboard / Laporan / Buat
+          Dashboard / Laporan / {reportId ? "Ubah" : "Buat"}
         </p>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Laporan Prioritas Program
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Isi formulir di bawah ini untuk membuat laporan program prioritas
-          baru.
+          {reportId
+            ? "Perbarui formulir di bawah ini untuk mengubah laporan program prioritas."
+            : "Isi formulir di bawah ini untuk membuat laporan program prioritas baru."}
         </p>
       </div>
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Informasi dasar</CardTitle>
@@ -57,8 +72,8 @@ export default function ProgramPriorityReportFormPage({
             <DocumentationsFormSection form={form} />
           </CardContent>
         </Card>
-        <Button type="submit" className="w-full mt-4">
-          Submit
+        <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+          {isLoading ? "Loading..." : reportId ? "Ubah" : "Submit"}
         </Button>
       </form>
     </div>

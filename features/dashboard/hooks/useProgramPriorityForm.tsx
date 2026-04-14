@@ -7,7 +7,10 @@ import {
   ProgramPriorityFormInput,
   ProgramPriorityFormValues,
 } from "../forms/program-priority-schema";
-import { createProgramPriorityReports } from "../actions/program-priority-reports";
+import {
+  createProgramPriorityReports,
+  updateProgramPriorityReports,
+} from "../actions/program-priority-reports";
 
 const CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES: ProgramPriorityFormInput = {
   available_location_id: undefined,
@@ -20,17 +23,25 @@ const CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES: ProgramPriorityFormInput = {
   documentations: [{ image_before_path: "", image_after_path: "" }],
 };
 
-export function useProgramPriorityForm() {
+export function useProgramPriorityForm(
+  initialValues?: ProgramPriorityFormInput,
+  reportId?: number
+) {
   const form = useForm<
     ProgramPriorityFormInput,
     undefined,
     ProgramPriorityFormValues
   >({
     resolver: zodResolver(programPrioritySchema),
-    defaultValues: CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES,
+    defaultValues: initialValues ?? CREATE_PROGRAM_PRIORITY_DEFAULT_VALUES,
   });
 
   const onSubmit = (data: ProgramPriorityFormValues) => {
+    if (reportId !== undefined) {
+      updateProgramPriorityReports(reportId, data);
+      return;
+    }
+
     createProgramPriorityReports(data);
   };
 

@@ -16,12 +16,13 @@ export interface ProgramPriorityReports {
   follow_up: string;
   documentations: {
     id: string;
-    image_before_path: string;
-    image_after_path: string;
+    image_before_path: string | null;
+    image_after_path: string | null;
     created_at: string;
     updated_at: string;
   }[];
   created_at: string;
+  updated_at: string;
 }
 
 export type ProgramPriorityReportDetail = ProgramPriorityReports & {
@@ -35,9 +36,10 @@ export type ProgramPriorityReportIndex = Pick<
   | "id"
   | "available_location_id"
   | "name"
+  | "status"
   | "percentage_of_work"
   | "created_at"
-  | "status"
+  | "updated_at"
 > & {
   available_locations: {
     name: string;
@@ -55,13 +57,13 @@ export async function getProgramPriorityReports() {
       name,
       percentage_of_work,
       status,
-      created_at,
+      updated_at,
       available_locations (
         name
       )
       `
     )
-    .order("created_at", { ascending: false });
+    .order("updated_at", { ascending: false });
 
   if (error) {
     throw error;
@@ -96,18 +98,14 @@ export async function createProgramPriorityReports(
   data: ProgramPriorityFormValues
 ) {
   const now = new Date().toISOString();
-  const documentations = data.documentations.map((doc) => ({
-    id: crypto.randomUUID(),
-    image_before_path: doc.image_before_path,
-    image_after_path: doc.image_after_path,
-    created_at: now,
-    updated_at: now,
-  }));
+  const documentations = normalizeDocumentations(data.documentations);
 
   const supabase = await createClient();
   const { error } = await supabase.from("program_priority_reports").insert({
     ...data,
     documentations,
+    created_at: now,
+    updated_at: now,
   });
 
   if (error) {
@@ -117,4 +115,44 @@ export async function createProgramPriorityReports(
 
   revalidatePath("/dashboard/program-priority-report");
   redirect("/dashboard/program-priority-report");
+}
+
+export async function updateProgramPriorityReports(
+  id: number,
+  data: ProgramPriorityFormValues
+) {
+  const documentations = normalizeDocumentations(data.documentations);
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("program_priority_reports")
+    .update({
+      ...data,
+      documentations,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating program priority report:", error);
+    return;
+  }
+
+  revalidatePath("/dashboard/program-priority-report");
+  revalidatePath(`/dashboard/program-priority-report/${id}`);
+  revalidatePath(`/dashboard/program-priority-report/form/${id}`);
+  redirect("/dashboard/program-priority-report");
+}
+
+function normalizeDocumentations(
+  data: ProgramPriorityFormValues["documentations"]
+) {
+  const now = new Date().toISOString();
+  return data.map((doc) => ({
+    id: crypto.randomUUID(),
+    image_before_path: doc.image_before_path ?? "",
+    image_after_path: doc.image_after_path ?? "",
+    created_at: now,
+    updated_at: now,
+  }));
 }
