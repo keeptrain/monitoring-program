@@ -10,9 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import useAvailableLocationForm from "./hooks/useAvailableLocationForm";
 import AvailableLocationFormSection from "./components/AvailableLocationFormSection";
+import { useTransition } from "react";
 
 export default function AvailableLocationFormPage() {
+  const [isPending, startTransition] = useTransition();
   const { form, onSubmit } = useAvailableLocationForm();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    startTransition(() => {
+      onSubmit();
+    });
+  };
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -28,7 +37,7 @@ export default function AvailableLocationFormPage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Detail Lokasi</CardTitle>
@@ -41,11 +50,8 @@ export default function AvailableLocationFormPage() {
           </CardContent>
         </Card>
 
-        <Button
-          type="submit"
-          className="w-full mt-4 h-12 text-sm font-bold uppercase tracking-widest"
-        >
-          Simpan Lokasi
+        <Button type="submit" className="w-full mt-4" disabled={isPending}>
+          {isPending ? "Menyimpan..." : "Submit"}
         </Button>
       </form>
     </div>

@@ -6,11 +6,12 @@ import {
   availableLocationSchema,
   AvailableLocationFormValues,
 } from "../forms/available-location-schema";
+import { createAvailableLocation } from "../actions/available-locations";
 
 const CREATE_LOCATION_DEFAULT_VALUES: AvailableLocationFormValues = {
   name: "",
-  latitude: undefined,
-  longitude: undefined,
+  latitude: 123,
+  longitude: 123,
 };
 
 export function useAvailableLocationForm() {
@@ -20,7 +21,7 @@ export function useAvailableLocationForm() {
   });
 
   const onSubmit = (data: AvailableLocationFormValues) => {
-    console.log("Location Form Data:", data);
+    createAvailableLocation(data);
   };
 
   return {
