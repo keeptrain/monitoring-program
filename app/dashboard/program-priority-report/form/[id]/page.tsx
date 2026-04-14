@@ -1,4 +1,5 @@
 import Component from "@/features/dashboard/ProgramPriorityReportFormPage";
+import { getAvailableLocations } from "@/features/dashboard/actions/available-locations";
 
 export default async function ProgramPriorityReportFormPage({
   params,
@@ -6,5 +7,7 @@ export default async function ProgramPriorityReportFormPage({
   params: { id: string };
 }) {
   const isCreateMode = params.id === "create";
-  return <Component />;
+  const availableLocations = await getAvailableLocations();
+
+  return <Component availableLocations={availableLocations} />;
 }

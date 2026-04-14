@@ -1,7 +1,10 @@
 "use client";
 
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { ProgramPriorityFormValues } from "../forms/program-priority-schema";
+import {
+  ProgramPriorityFormInput,
+  ProgramPriorityFormValues,
+} from "../forms/program-priority-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
@@ -10,7 +13,11 @@ import { uploadImageAction } from "@/app/actions/report-actions";
 import { useState } from "react";
 
 interface ReportFormProps {
-  form: UseFormReturn<ProgramPriorityFormValues>;
+  form: UseFormReturn<
+    ProgramPriorityFormInput,
+    unknown,
+    ProgramPriorityFormValues
+  >;
 }
 
 export default function DocumentationsFormSection({ form }: ReportFormProps) {

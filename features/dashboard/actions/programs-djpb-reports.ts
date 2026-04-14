@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/utils/supabase";
+import { ProgramPriorityFormValues } from "../forms/program-priority-schema";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 interface ProgramsDjpbReports {
   id: string;
@@ -22,12 +25,27 @@ interface ProgramsDjpbReports {
 }
 
 export async function getProgramsDjpbReports() {
-  const supabase = createClient();
-  const { data, error } = await (await supabase)
+  const supabase = await createClient();
+  const { data, error } = await supabase
     .from<"programs_djpb_reports", ProgramsDjpbReports>("programs_djpb_reports")
     .select("*");
   if (error) {
     throw error;
   }
   return data;
+}
+
+export async function createProgramsDjpbReports(
+  data: ProgramPriorityFormValues
+) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("programs_djpb_reports").insert(data);
+
+  if (error) {
+    console.error("Error creating program priority report:", error);
+    return;
+  }
+
+  revalidatePath("/dashboard/program-priority-report");
+  redirect("/dashboard/program-priority-report");
 }

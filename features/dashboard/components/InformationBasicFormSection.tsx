@@ -14,13 +14,25 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { UseFormReturn } from "react-hook-form";
-import { ProgramPriorityFormValues } from "../forms/program-priority-schema";
+import {
+  ProgramPriorityFormInput,
+  ProgramPriorityFormValues,
+} from "../forms/program-priority-schema";
+import { AvailableLocation } from "../actions/available-locations";
 
 interface ReportFormProps {
-  form: UseFormReturn<ProgramPriorityFormValues>;
+  form: UseFormReturn<
+    ProgramPriorityFormInput,
+    unknown,
+    ProgramPriorityFormValues
+  >;
+  availableLocations: AvailableLocation[];
 }
 
-export default function InformationBasicFormSection({ form }: ReportFormProps) {
+export default function InformationBasicFormSection({
+  form,
+  availableLocations,
+}: ReportFormProps) {
   const {
     register,
     formState: { errors },
@@ -34,11 +46,12 @@ export default function InformationBasicFormSection({ form }: ReportFormProps) {
             {...register("available_location_id")}
             aria-invalid={!!errors.available_location_id}
           >
-            <NativeSelectOption value="">Select status</NativeSelectOption>
-            <NativeSelectOption value="1">Todo</NativeSelectOption>
-            <NativeSelectOption value="2">In Progress</NativeSelectOption>
-            <NativeSelectOption value="3">Done</NativeSelectOption>
-            <NativeSelectOption value="4">Cancelled</NativeSelectOption>
+            <NativeSelectOption value="">Pilih Lokasi</NativeSelectOption>
+            {availableLocations.map((loc) => (
+              <NativeSelectOption key={loc.id} value={loc.id}>
+                {loc.name}
+              </NativeSelectOption>
+            ))}
           </NativeSelect>
           <FieldError>{errors.available_location_id?.message}</FieldError>
         </Field>

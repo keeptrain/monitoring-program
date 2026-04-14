@@ -45,5 +45,6 @@ export const programPrioritySchema = z.object({
   documentations: z.array(documentationSchema).min(1, "Dokumentasi dibutuhkan"),
 });
 
-export type ProgramPriorityFormValues = z.infer<typeof programPrioritySchema>;
+export type ProgramPriorityFormInput = z.input<typeof programPrioritySchema>;
+export type ProgramPriorityFormValues = z.output<typeof programPrioritySchema>;
 export type DocumentationValues = z.infer<typeof documentationSchema>;

@@ -11,8 +11,13 @@ import InformationBasicFormSection from "./components/InformationBasicFormSectio
 import { Button } from "@/components/ui/button";
 import useProgramPriorityForm from "./hooks/useProgramPriorityForm";
 import DocumentationsFormSection from "./components/DocumentationsFormSection";
+import { AvailableLocation } from "./actions/available-locations";
 
-export default function ProgramPriorityReportFormPage() {
+export default function ProgramPriorityReportFormPage({
+  availableLocations,
+}: {
+  availableLocations: AvailableLocation[];
+}) {
   const { form, onSubmit } = useProgramPriorityForm();
   return (
     <div className="mx-auto max-w-4xl">
@@ -37,8 +42,10 @@ export default function ProgramPriorityReportFormPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* @ts-expect-error - Form submit type mismatch with Zod preprocess */}
-            <InformationBasicFormSection form={form} />
+            <InformationBasicFormSection
+              form={form}
+              availableLocations={availableLocations}
+            />
           </CardContent>
         </Card>
         <Card>
@@ -47,7 +54,6 @@ export default function ProgramPriorityReportFormPage() {
             <CardDescription>Isi dokumentasi program prioritas</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* @ts-expect-error - Form submit type mismatch with Zod preprocess */}
             <DocumentationsFormSection form={form} />
           </CardContent>
         </Card>
