@@ -21,6 +21,8 @@ interface ReportFormProps {
 }
 
 export default function DocumentationsFormSection({ form }: ReportFormProps) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+
   const supabase = useMemo(
     () =>
       createBrowserClient(
@@ -32,6 +34,7 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
 
   const {
     control,
+    watch,
     formState: { errors },
   } = form;
 
@@ -39,6 +42,7 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
     control,
     name: "documentations",
   });
+  const documentations = watch("documentations");
 
   const [uploading, setUploading] = useState<{
     [key: string]: boolean;
@@ -90,112 +94,147 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
     }
   };
 
+  const getStoredPreviewUrl = (savedPath?: string): string | undefined => {
+    if (!savedPath) return undefined;
+    if (savedPath.startsWith("http://") || savedPath.startsWith("https://")) {
+      return savedPath;
+    }
+    if (!supabaseUrl) return undefined;
+
+    const normalizedPath = savedPath.replace(/^\/+/, "");
+    const match = normalizedPath.match(/^([^/]+)\/(.+)$/);
+
+    if (match && ["demo", "priority_program"].includes(match[1])) {
+      return `${supabaseUrl}/storage/v1/object/public/${match[1]}/${match[2]}`;
+    }
+
+    // Match detail page pattern first (`demo`) for legacy stored paths.
+    return `${supabaseUrl}/storage/v1/object/public/demo/${normalizedPath}`;
+  };
+
+  const getPreviewSrc = (
+    previewKey: string,
+    savedPath?: string
+  ): string | undefined =>
+    previews[previewKey] ?? getStoredPreviewUrl(savedPath);
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {fields.map((field, index) => (
-          <div
-            key={field.id}
-            className="group relative border border-border p-4 bg-background transition-colors hover:bg-muted/30"
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Dokumentasi #{index + 1}
-              </span>
-              {fields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => remove(index)}
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              )}
-            </div>
+        {fields.map((field, index) => {
+          const beforePreviewSrc = getPreviewSrc(
+            `${field.id}-image_before_path`,
+            documentations?.[index]?.image_before_path
+          );
+          const afterPreviewSrc = getPreviewSrc(
+            `${field.id}-image_after_path`,
+            documentations?.[index]?.image_after_path
+          );
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
-                  Foto Sebelum
-                </FieldLabel>
-                <div className="relative">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    aria-invalid={
-                      !!errors.documentations?.[index]?.image_before_path
-                    }
-                    onChange={(e) =>
-                      handleOnChange(e, index, field.id, "image_before_path")
-                    }
-                    className={
-                      uploading[`${index}-image_before_path`] ? "pr-10" : ""
-                    }
-                  />
-                  {uploading[`${index}-image_before_path`] && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
+          return (
+            <div
+              key={field.id}
+              className="group relative border border-border p-4 bg-background transition-colors hover:bg-muted/30"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Dokumentasi #{index + 1}
+                </span>
+                {fields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => remove(index)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
+                    Foto Sebelum
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      aria-invalid={
+                        !!errors.documentations?.[index]?.image_before_path
+                      }
+                      onChange={(e) =>
+                        handleOnChange(e, index, field.id, "image_before_path")
+                      }
+                      className={
+                        uploading[`${index}-image_before_path`] ? "pr-10" : ""
+                      }
+                    />
+                    {uploading[`${index}-image_before_path`] && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  {beforePreviewSrc && (
+                    <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={beforePreviewSrc}
+                        alt="Preview"
+                        className="size-24 object-cover transition-transform duration-300 hover:scale-110"
+                      />
                     </div>
                   )}
-                </div>
-                {previews[`${field.id}-image_before_path`] && (
-                  <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={previews[`${field.id}-image_before_path`]}
-                      alt="Preview"
-                      className="size-24 object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <FieldError>
-                  {errors.documentations?.[index]?.image_before_path?.message}
-                </FieldError>
-              </Field>
+                  <FieldError>
+                    {errors.documentations?.[index]?.image_before_path?.message}
+                  </FieldError>
+                </Field>
 
-              <Field>
-                <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
-                  Foto Sesudah
-                </FieldLabel>
-                <div className="relative">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    aria-invalid={
-                      !!errors.documentations?.[index]?.image_after_path
-                    }
-                    onChange={(e) =>
-                      handleOnChange(e, index, field.id, "image_after_path")
-                    }
-                    className={
-                      uploading[`${index}-image_after_path`] ? "pr-10" : ""
-                    }
-                  />
-                  {uploading[`${index}-image_after_path`] && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                <Field>
+                  <FieldLabel className="text-xs uppercase tracking-tight text-muted-foreground">
+                    Foto Sesudah
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      aria-invalid={
+                        !!errors.documentations?.[index]?.image_after_path
+                      }
+                      onChange={(e) =>
+                        handleOnChange(e, index, field.id, "image_after_path")
+                      }
+                      className={
+                        uploading[`${index}-image_after_path`] ? "pr-10" : ""
+                      }
+                    />
+                    {uploading[`${index}-image_after_path`] && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  {afterPreviewSrc && (
+                    <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={afterPreviewSrc}
+                        alt="Preview"
+                        className="size-24 object-cover transition-transform duration-300 hover:scale-110"
+                      />
                     </div>
                   )}
-                </div>
-                {previews[`${field.id}-image_after_path`] && (
-                  <div className="mt-2 relative max-w-fit overflow-hidden border border-border bg-muted/20">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={previews[`${field.id}-image_after_path`]}
-                      alt="Preview"
-                      className="size-24 object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <FieldError>
-                  {errors.documentations?.[index]?.image_after_path?.message}
-                </FieldError>
-              </Field>
+                  <FieldError>
+                    {errors.documentations?.[index]?.image_after_path?.message}
+                  </FieldError>
+                </Field>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <Button
