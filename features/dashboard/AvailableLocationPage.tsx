@@ -1,10 +1,23 @@
 "use client";
 
+import Datatable from "@/components/datatable/datatable";
 import { Button } from "@/components/ui/button";
 import { MapPin, Plus } from "lucide-react";
 import Link from "next/link";
 
+const columns = ["Nama Lokasi", "Deskripsi"];
+
 export default function AvailableLocationPage() {
+  const data = [
+    {
+      name: "Lokasi 1",
+      description: "Deskripsi 1",
+    },
+    {
+      name: "Lokasi 2",
+      description: "Deskripsi 2",
+    },
+  ];
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -29,17 +42,30 @@ export default function AvailableLocationPage() {
       </div>
 
       {/* Empty state placeholder */}
-      <div className="flex flex-col items-center justify-center border border-border bg-background py-20 text-center">
-        <div className="mb-4 flex size-12 items-center justify-center border border-border">
-          <MapPin className="size-6 text-muted-foreground" />
-        </div>
-        <p className="text-sm font-medium text-foreground">
-          Belum ada lokasi terdaftar
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Klik &quot;Tambah Lokasi&quot; untuk mulai menambahkan data.
-        </p>
+      {data.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <Datatable
+          columns={columns}
+          data={data.map((item) => [item.name, item.description])}
+        />
+      )}
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center border border-border bg-background py-20 text-center">
+      <div className="mb-4 flex size-12 items-center justify-center border border-border">
+        <MapPin className="size-6 text-muted-foreground" />
       </div>
+      <p className="text-sm font-medium text-foreground">
+        Belum ada lokasi terdaftar
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Klik &quot;Tambah Lokasi&quot; untuk mulai menambahkan data.
+      </p>
     </div>
   );
 }
