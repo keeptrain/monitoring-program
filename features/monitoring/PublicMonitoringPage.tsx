@@ -2,8 +2,10 @@
 
 import Navbar from "@/components/Navbar";
 import { Map, Layers, Navigation2 } from "lucide-react";
+import { useState } from "react";
 
 export default function PublicMonitoringPage() {
+  const [activeTab, setActiveTab] = useState("map");
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -36,9 +38,12 @@ export default function PublicMonitoringPage() {
               <label
                 key={layer}
                 className="flex cursor-pointer items-center gap-2.5 text-sm text-foreground"
+                onClick={() => setActiveTab(layer)}
               >
                 <span className="flex size-4 items-center justify-center border border-border bg-background">
-                  <span className="size-2 bg-foreground" />
+                  {activeTab === layer && (
+                    <span className="size-2 bg-foreground" />
+                  )}
                 </span>
                 {layer}
               </label>
