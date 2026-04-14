@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export interface ProgramPriorityReports {
-  id: string;
+  id: number;
   available_location_id: number; // Foreign Key to available_locations table
   name: string;
   provider_type: string;
@@ -23,6 +23,12 @@ export interface ProgramPriorityReports {
   }[];
   created_at: string;
 }
+
+export type ProgramPriorityReportDetail = ProgramPriorityReports & {
+  available_locations: {
+    name: string;
+  };
+};
 
 export type ProgramPriorityReportIndex = Pick<
   ProgramPriorityReports,
@@ -64,13 +70,45 @@ export async function getProgramPriorityReports() {
   return data as unknown as ProgramPriorityReportIndex[];
 }
 
+export async function getProgramPriorityReportById(id: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("program_priority_reports")
+    .select(
+      `
+      *,
+      available_locations (
+        name
+      )
+    `
+    )
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function createProgramPriorityReports(
   data: ProgramPriorityFormValues
 ) {
+  const now = new Date().toISOString();
+  const documentations = data.documentations.map((doc) => ({
+    id: crypto.randomUUID(),
+    image_before_path: doc.image_before_path,
+    image_after_path: doc.image_after_path,
+    created_at: now,
+    updated_at: now,
+  }));
+
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("program_priority_reports")
-    .insert(data);
+  const { error } = await supabase.from("program_priority_reports").insert({
+    ...data,
+    documentations,
+  });
 
   if (error) {
     console.error("Error creating program priority report:", error);

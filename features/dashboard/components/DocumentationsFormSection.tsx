@@ -1,5 +1,6 @@
 "use client";
 
+import { createBrowserClient } from "@supabase/ssr";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import {
   ProgramPriorityFormInput,
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Plus, Trash2, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface ReportFormProps {
   form: UseFormReturn<
@@ -20,6 +21,15 @@ interface ReportFormProps {
 }
 
 export default function DocumentationsFormSection({ form }: ReportFormProps) {
+  const supabase = useMemo(
+    () =>
+      createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+      ),
+    []
+  );
+
   const {
     control,
     formState: { errors },
@@ -33,6 +43,7 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
   const [uploading, setUploading] = useState<{
     [key: string]: boolean;
   }>({});
+
   const [previews, setPreviews] = useState<{
     [key: string]: string;
   }>({});
@@ -55,11 +66,21 @@ export default function DocumentationsFormSection({ form }: ReportFormProps) {
     setUploading((prev) => ({ ...prev, [uploadKey]: true }));
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const ext = file.name.split(".").pop() ?? "bin";
+      const fileName = `${crypto.randomUUID()}-${Date.now()}.${ext}`;
+      const storagePath = `reports/${fileName}`;
 
-      // const path = await uploadImageAction(formData);
-      form.setValue(`documentations.${index}.${fieldName}`, "", {
+      const { data, error } = await supabase.storage
+        .from("demo")
+        .upload(storagePath, file, {
+          upsert: false,
+        });
+
+      if (error) {
+        throw error;
+      }
+      form.setValue(`documentations.${index}.${fieldName}`, data.path, {
+        shouldDirty: true,
         shouldValidate: true,
       });
     } catch (error) {
