@@ -59,28 +59,28 @@ export default function Hero() {
             <Image
               src="/images/revitalisasi-tambak-pantura.jpg"
               alt="Hero 1"
-              width={160}
+              width={190}
               height={224}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />
             <Image
               src="/images/bioflok.jpeg"
               alt="Hero 1"
-              width={160}
+              width={200}
               height={224}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />
             <Image
-              src="/images/bioflok.jpeg"
+              src="/images/tambak-udang.jpg"
               alt="Hero 1"
-              width={160}
-              height={224}
+              width={200}
+              height={300}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />
             <Image
               src="/images/revitalisasi-tambak-pantura.jpg"
               alt="Hero 1"
-              width={160}
+              width={190}
               height={224}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />
