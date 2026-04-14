@@ -59,7 +59,7 @@ export default function Hero() {
             <Image
               src="/images/revitalisasi-tambak-pantura.jpg"
               alt="Hero 1"
-              width={190}
+              width={200}
               height={224}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />
@@ -80,7 +80,7 @@ export default function Hero() {
             <Image
               src="/images/revitalisasi-tambak-pantura.jpg"
               alt="Hero 1"
-              width={190}
+              width={200}
               height={224}
               className="border border-border shadow-sm transition-transform hover:-translate-y-2 object-cover"
             />

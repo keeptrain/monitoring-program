@@ -9,6 +9,10 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Calendar, MapPin, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") || "";
 
 export default function ProgramPriorityReportDetailPage({
   data,
@@ -122,11 +126,13 @@ export default function ProgramPriorityReportDetailPage({
                       </p>
                       <div className="aspect-video overflow-hidden border border-border bg-muted">
                         {doc.image_before_path ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/demo/${doc.image_before_path}`}
+                          <Image
+                            src={`${supabaseUrl}/storage/v1/object/public/demo/${doc.image_before_path}`}
                             alt="Visual sebelum pengerjaan"
-                            className="h-full w-full object-cover"
+                            className="object-cover"
+                            width={500}
+                            height={500}
+                            unoptimized
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center text-xs text-muted-foreground italic">
@@ -141,11 +147,13 @@ export default function ProgramPriorityReportDetailPage({
                       </p>
                       <div className="aspect-video overflow-hidden border border-border bg-muted">
                         {doc.image_after_path ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/demo/${doc.image_after_path}`}
+                          <Image
+                            src={`${supabaseUrl}/storage/v1/object/public/demo/${doc.image_after_path}`}
                             alt="Visual sesudah pengerjaan"
-                            className="h-full w-full object-cover"
+                            className="object-cover"
+                            width={500}
+                            height={500}
+                            unoptimized
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center text-xs text-muted-foreground italic">
