@@ -24,9 +24,14 @@ export type Column<T> =
 type DatatableProps<T> = {
   columns: Column<T>[];
   data: T[];
+  onRowClick?: (e: React.MouseEvent<HTMLTableRowElement>, row: T) => void;
 };
 
-export default function Datatable<T>({ columns, data }: DatatableProps<T>) {
+export default function Datatable<T>({
+  columns,
+  data,
+  onRowClick,
+}: DatatableProps<T>) {
   return (
     <Table className="border-collapse border border-border">
       <TableHeader className="bg-muted/50">
@@ -44,7 +49,11 @@ export default function Datatable<T>({ columns, data }: DatatableProps<T>) {
       <TableBody>
         {data.length > 0 ? (
           data.map((row, rowIndex) => (
-            <TableRow key={rowIndex} className="hover:bg-muted/30">
+            <TableRow
+              key={rowIndex}
+              onClick={(e) => onRowClick?.(e, row) ?? undefined}
+              className="hover:bg-muted/30"
+            >
               {columns.map((column, colIndex) => (
                 <TableCell
                   key={colIndex}
@@ -53,8 +62,8 @@ export default function Datatable<T>({ columns, data }: DatatableProps<T>) {
                   {column.cell
                     ? column.cell(row)
                     : column.accessorKey !== undefined
-                      ? String(row[column.accessorKey] ?? "-")
-                      : "-"}
+                    ? String(row[column.accessorKey] ?? "-")
+                    : "-"}
                 </TableCell>
               ))}
             </TableRow>
