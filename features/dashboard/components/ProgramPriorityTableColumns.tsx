@@ -38,6 +38,16 @@ export function ProgramPriorityColumns(): Column<ProgramPriorityReportIndex>[] {
             label: "Ubah",
             href: `/dashboard/program-priority-report/form/${row.id}`,
           },
+          {
+            type: "action",
+            key: "report",
+            label: "Laporkan",
+            onClick: (e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("asas");
+            },
+          },
         ];
         return <MoreButton menuItems={menuItems} />;
       },
