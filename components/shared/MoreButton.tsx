@@ -33,7 +33,7 @@ export type MoreButtonMenuItem =
     })
   | (BaseItem & {
       type: "action";
-      onClick: () => void;
+      onClick: (e: React.MouseEvent) => void;
       href?: never;
       asChild?: never;
       child?: never;
@@ -68,6 +68,7 @@ export function MoreButton({
           variant="ghost"
           size="icon"
           className={cn("size-8", triggerClassName)}
+          onClick={(e) => e.stopPropagation()}
         >
           <MoreHorizontalIcon className="size-4" />
         </Button>
@@ -93,6 +94,8 @@ export function MoreButton({
                 disabled={item.disabled}
                 className={item.className}
                 variant={item.destructive ? "destructive" : "default"}
+                onSelect={(e) => e.preventDefault()}
+                onClick={(e) => e.stopPropagation()}
               >
                 <Link href={item.href}>{content}</Link>
               </DropdownMenuItem>
@@ -107,6 +110,7 @@ export function MoreButton({
                 disabled={item.disabled}
                 className={item.className}
                 variant={item.destructive ? "destructive" : "default"}
+                onClick={(e) => e.stopPropagation()}
               >
                 {item.child}
               </DropdownMenuItem>
@@ -116,7 +120,10 @@ export function MoreButton({
           return (
             <DropdownMenuItem
               key={item.key}
-              onClick={item.onClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                item.onClick(e);
+              }}
               disabled={item.disabled}
               className={item.className}
               variant={item.destructive ? "destructive" : "default"}
