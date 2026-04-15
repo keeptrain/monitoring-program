@@ -34,7 +34,7 @@ export default function DashboardNavbar() {
             className="flex items-center gap-1.5 text-xs text-background/60 transition-colors hover:text-background"
           >
             <ArrowLeft className="size-3" />
-            Beranda
+            <span className="hidden sm:block">Beranda</span>
           </Link>
           <div className="h-4 w-px bg-background/20" />
           <div className="flex items-center gap-2">
