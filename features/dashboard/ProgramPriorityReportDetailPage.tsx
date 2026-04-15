@@ -2,7 +2,6 @@
 
 import { ProgramPriorityReportDetail } from "./actions/program-priority-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { formatDateWithTime } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +9,7 @@ import { ArrowLeft, Calendar, MapPin, Tag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { ProgressPercentage } from "../monitoring/components/ProgressPercentage";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") || "";
@@ -66,15 +66,7 @@ export default function ProgramPriorityReportDetailPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between gap-4">
-              <Progress
-                value={data.percentage_of_work}
-                className="h-3 flex-1"
-              />
-              <span className="text-xl font-bold tabular-nums">
-                {data.percentage_of_work}%
-              </span>
-            </div>
+            <ProgressPercentage value={data.percentage_of_work} />
           </CardContent>
         </Card>
 

@@ -1,16 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { Column } from "@/components/datatable/datatable";
 import { ProgramPriorityReportIndex } from "../actions/program-priority-reports";
 import { formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontalIcon } from "lucide-react";
-import Link from "next/link";
+import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
 
 export function ProgramPriorityColumns(): Column<ProgramPriorityReportIndex>[] {
   return [
@@ -38,26 +30,27 @@ export function ProgramPriorityColumns(): Column<ProgramPriorityReportIndex>[] {
     },
     {
       header: "Aksi",
-      cell: (row) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-8">
-              <MoreHorizontalIcon className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem asChild>
-              <Link href={`/dashboard/program-priority-report/form/${row.id}`}>
-                Ubah
-              </Link>
-            </DropdownMenuItem>
-            {/* <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              Hapus
-            </DropdownMenuItem> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: (row) => {
+        const menuItems: MoreButtonMenuItem[] = [
+          {
+            type: "link",
+            key: "edit",
+            label: "Ubah",
+            href: `/dashboard/program-priority-report/form/${row.id}`,
+          },
+          {
+            type: "action",
+            key: "report",
+            label: "Laporkan",
+            onClick: (e: React.MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("asas");
+            },
+          },
+        ];
+        return <MoreButton menuItems={menuItems} />;
+      },
     },
   ];
 }

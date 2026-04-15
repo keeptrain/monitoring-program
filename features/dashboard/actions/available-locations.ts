@@ -42,3 +42,38 @@ export async function createAvailableLocation(
   revalidatePath("/dashboard/available-location");
   redirect("/dashboard/available-location");
 }
+
+export async function getAvailableLocationById(id: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("available_locations")
+    .select("id, name, latitude, longitude, created_at")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as AvailableLocation;
+}
+
+export async function updateAvailableLocation(
+  id: number,
+  data: AvailableLocationFormValues
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("available_locations")
+    .update(data)
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error updating location:", error);
+    return;
+  }
+
+  revalidatePath("/dashboard/available-location");
+  revalidatePath(`/dashboard/available-location/form/${id}`);
+  redirect("/dashboard/available-location");
+}
