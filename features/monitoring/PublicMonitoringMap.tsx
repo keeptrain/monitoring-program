@@ -25,10 +25,11 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDocumentationsSheet } from "./hooks/useDocumentationsSheet";
 import { useState } from "react";
+import Link from "next/link";
 
 const createPinIcon = (
   IconComponent: LucideIcon,
-  bgColor: string = "bg-rose-500"
+  bgColor: string = "bg-rose-500",
 ) => {
   return L.divIcon({
     html: renderToStaticMarkup(
@@ -36,16 +37,16 @@ const createPinIcon = (
         <div className="relative flex size-10 items-center justify-center">
           <div
             className={cn(
-              "absolute size-9 rotate-45 rounded-full rounded-bl-none border-2 transition-transform hover:scale-110 shadow-sm",
-              bgColor
+              "absolute size-9 rotate-45 rounded-full rounded-bl-none border-2 shadow-sm transition-transform hover:scale-110",
+              bgColor,
             )}
           />
           {/* White inner circle */}
-          <div className="relative z-10 flex size-6 items-center bg-white justify-center rounded-full   shadow-sm">
+          <div className="relative z-10 flex size-6 items-center justify-center rounded-full bg-white shadow-sm">
             <IconComponent className="size-4 text-cyan-700" />
           </div>
         </div>
-      </div>
+      </div>,
     ),
     className: "",
     iconSize: [40, 40],
@@ -79,6 +80,8 @@ export default function PublicMonitoringMap({
     setOpen(true);
   };
 
+  const isLoading = documentationState.isLoadingDocumentation;
+
   return (
     <>
       <MapContainer
@@ -105,7 +108,7 @@ export default function PublicMonitoringMap({
               ]}
             >
               <Popup>
-                <div className="space-y-2">
+                <div className="w-40 space-y-2 sm:w-64">
                   <h3 className="text-sm">
                     {location.location_name} <br />
                     <span className="text-muted-foreground">
@@ -133,16 +136,28 @@ export default function PublicMonitoringMap({
       {open && (
         <Sheet open={open} onOpenChange={(op) => setOpen(op)}>
           <SheetContent side="bottom" className="max-h-[85vh] overflow-hidden">
-            <SheetHeader>
-              <SheetTitle>{selectedLocation?.location_name}</SheetTitle>
-              <SheetDescription>
+            <SheetHeader className="flex">
+              <SheetTitle className={cn("invisible", !isLoading && "visible")}>
+                {selectedLocation?.location_name}
+              </SheetTitle>
+              <SheetDescription
+                className={cn("invisible", !isLoading && "visible")}
+              >
                 {selectedLocation?.program_name}
               </SheetDescription>
+              <Button asChild>
+                <Link href={`/monitoring/1/detail`}>
+                  <span>Ke Halaman Detail</span>
+                  <ArrowRightIcon />
+                </Link>
+              </Button>
             </SheetHeader>
-            {documentationState.isLoadingDocumentation ? (
+            {isLoading ? (
               <LoadingPublicMonitoringDetail />
             ) : (
-              <DocumentationSection state={documentationState} />
+              <>
+                <DocumentationSection state={documentationState} />
+              </>
             )}
           </SheetContent>
         </Sheet>
@@ -153,15 +168,15 @@ export default function PublicMonitoringMap({
 
 function LoadingPublicMonitoringDetail() {
   return (
-    <div className="absolute inset-0 z-0 bg-muted/10">
+    <div className="bg-muted/10 absolute inset-0 z-0">
       <Skeleton className="h-full w-full rounded-none" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
         <div className="flex space-x-1.5">
-          <div className="size-1.5 animate-bounce rounded-full bg-foreground/30 [animation-delay:-0.3s]" />
-          <div className="size-1.5 animate-bounce rounded-full bg-foreground/30 [animation-delay:-0.15s]" />
-          <div className="size-1.5 animate-bounce rounded-full bg-foreground/30" />
+          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full [animation-delay:-0.3s]" />
+          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full [animation-delay:-0.15s]" />
+          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full" />
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/50">
+        <span className="text-muted-foreground/50 text-[10px] font-bold tracking-[0.3em] uppercase">
           Memuat Detail
         </span>
       </div>
@@ -211,8 +226,8 @@ function DocumentationSection({
   } = state;
   return (
     <div className="no-scrollbar space-y-4 overflow-y-auto px-4 pb-4">
-      <div className="flex items-center justify-between border border-border bg-background px-3 py-2">
-        <p className="text-xs text-muted-foreground">
+      <div className="border-border bg-background flex items-center justify-between border px-3 py-2">
+        <p className="text-muted-foreground text-xs">
           Dokumentasi{" "}
           {totalDocumentations && documentations.length > 0
             ? `${activeDocumentationIndex + 1}/${totalDocumentations}`
@@ -232,13 +247,13 @@ function DocumentationSection({
         </div>
       </div>
 
-      <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-        <div className="border border-border px-3 py-2">
-          <p className="font-medium text-foreground">Dibuat</p>
+      <div className="text-muted-foreground grid gap-2 text-xs sm:grid-cols-2">
+        <div className="border-border border px-3 py-2">
+          <p className="text-foreground font-medium">Dibuat</p>
           <p>{formatDateWithTime(activeDocumentation?.created_at)}</p>
         </div>
-        <div className="border border-border px-3 py-2">
-          <p className="font-medium text-foreground">Diperbarui</p>
+        <div className="border-border border px-3 py-2">
+          <p className="text-foreground font-medium">Diperbarui</p>
           <p>{formatDateWithTime(activeDocumentation?.updated_at)}</p>
         </div>
       </div>
@@ -255,6 +270,7 @@ function DocumentationSection({
           loading={isCurrentDocumentationLoading}
         />
       </div>
+      <div className="flex justify-end"></div>
     </div>
   );
 }
@@ -274,10 +290,10 @@ function DocumentationImageCard({
       : "Dokumentasi sesudah pengerjaan";
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
         {title}
       </p>
-      <div className="relative aspect-video overflow-hidden border border-border bg-muted">
+      <div className="border-border bg-muted relative aspect-video overflow-hidden border">
         {loading ? (
           <Skeleton className="h-full w-full rounded-none" />
         ) : imageUrl ? (
@@ -289,7 +305,7 @@ function DocumentationImageCard({
             unoptimized
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs italic text-muted-foreground">
+          <div className="text-muted-foreground flex h-full items-center justify-center text-xs italic">
             Tidak ada foto
           </div>
         )}
