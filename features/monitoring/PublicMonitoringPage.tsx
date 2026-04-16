@@ -2,9 +2,15 @@
 
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import type { PublicAvailableLocation } from "@/features/dashboard/actions/public-available-locations";
 import { cn } from "@/lib/utils";
-import { FilterIcon, LucideIcon, Navigation2, XIcon } from "lucide-react";
+import {
+  BiohazardIcon,
+  FilterIcon,
+  LucideIcon,
+  Navigation2,
+  ShrimpIcon,
+  XIcon,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -14,8 +20,10 @@ import {
 } from "@/components/ui/sheet";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import type { PublicMonitoringMapProps } from "./PublicMonitoringMap";
 import { LoadingLazyMap } from "./components/LoadingLazyMap";
+import { LocationType } from "../dashboard/actions/available-locations";
+import type { PublicMonitoringMapProps } from "./PublicMonitoringMap";
+import { useGetPublicLocationsByType } from "./api/getPublicLocationsByType";
 
 const LazyMap = dynamic<PublicMonitoringMapProps>(
   () => import("./PublicMonitoringMap"),
@@ -25,13 +33,23 @@ const LazyMap = dynamic<PublicMonitoringMapProps>(
   },
 );
 
-export default function PublicMonitoringPage({
-  locations,
-}: {
-  locations: PublicAvailableLocation[];
-}) {
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+// const LazyGallery = dynamic(() => import("./components/Gallery"), {
+//   ssr: false,
+//   loading: () => <LoadingLazyMap />,
+// });
+
+const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
+  {
+    biofloc_thematic: { label: "Tematik Bioflok", icon: BiohazardIcon },
+    isf: { label: "Integrated Shrimp Farming", icon: ShrimpIcon },
+  };
+
+export default function PublicMonitoringPage() {
+  const [activeTab, setActiveTab] = useState<LocationType | null>(null);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+
+  const { data: locations } = useGetPublicLocationsByType(activeTab);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
@@ -52,8 +70,8 @@ export default function PublicMonitoringPage({
 
           {/* Map placeholder */}
           <div className="relative flex flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
-            {activeTab ? (
-              <LazyMap locations={locations} />
+            {activeTab && locations ? (
+              <LazyMap locations={locations} type={activeTab} />
             ) : (
               <EmptyFilterState />
             )}
@@ -119,14 +137,12 @@ function Header() {
   );
 }
 
-const PRIORITY_PROGRAM = ["Tematik", "Bioflok", "Isf", "Revitalisasi"];
-
 function FilterLayerContent({
   activeTab,
   onTabChange,
 }: {
-  activeTab: string | null;
-  onTabChange: (tab: string) => void;
+  activeTab: LocationType | null;
+  onTabChange: (tab: LocationType) => void;
 }) {
   return (
     <>
@@ -134,16 +150,17 @@ function FilterLayerContent({
         <FilterIcon className="size-4" /> Filter Layer
       </p>
       <div className="mx-4 flex flex-col gap-1 sm:mx-0 lg:gap-4">
-        {PRIORITY_PROGRAM.map((layer) => (
+        {Object.entries(FILTER_STATE).map(([key, value]) => (
           <label
-            key={layer}
+            key={key}
             className="text-foreground flex cursor-pointer items-center gap-2.5 py-2 text-sm lg:py-0"
-            onClick={() => onTabChange(layer)}
+            onClick={() => onTabChange(key as LocationType)}
           >
             <span className="border-border bg-background flex size-4 items-center justify-center border">
-              {activeTab === layer && <span className="bg-foreground size-2" />}
+              {activeTab === key && <span className="bg-foreground size-2" />}
             </span>
-            {layer}
+            <value.icon className="size-4" />
+            {value.label}
           </label>
         ))}
       </div>

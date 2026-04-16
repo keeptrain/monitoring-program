@@ -21,7 +21,7 @@ export type PublicDocumentationResponse = {
 export async function getPublicAvailableDocumentations(
   reportId: number,
   offset: number = 0,
-  limit: number = 5
+  limit: number = 5,
 ): Promise<PublicDocumentationResponse> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
