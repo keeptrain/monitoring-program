@@ -4,8 +4,9 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   MapPin,
-  FileBarChart2,
   ArrowLeft,
+  LeafIcon,
+  WavesIcon,
 } from "lucide-react";
 
 const dashboardLinks = [
@@ -16,29 +17,35 @@ const dashboardLinks = [
     description: "Kelola data lokasi yang tersedia untuk program",
   },
   {
-    href: "/dashboard/program-priority-report",
-    label: "Laporan Prioritas",
-    icon: FileBarChart2,
-    description: "Kelola laporan program prioritas DJPB",
+    href: "/dashboard/thematic",
+    label: "Program Tematik",
+    icon: LeafIcon,
+    description: "Kelola program tematik DJPB",
+  },
+  {
+    href: "/dashboard/isf",
+    label: "Program Isf",
+    icon: WavesIcon,
+    description: "Kelola program isf DJPB",
   },
 ];
 
 export default function DashboardNavbar() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-cyan-800 text-background">
+    <header className="border-border text-background sticky top-0 z-50 border-b bg-cyan-800">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-xs text-background/60 transition-colors hover:text-background"
+            className="text-background/60 hover:text-background flex items-center gap-1.5 text-xs transition-colors"
           >
             <ArrowLeft className="size-3" />
             <span className="hidden sm:block">Beranda</span>
           </Link>
-          <div className="h-4 w-px bg-background/20" />
+          <div className="bg-background/20 h-4 w-px" />
           <div className="flex items-center gap-2">
-            <LayoutDashboard className="size-4 text-background" />
+            <LayoutDashboard className="text-background size-4" />
             <span className="text-sm font-semibold tracking-tight">
               Dashboard Admin
             </span>

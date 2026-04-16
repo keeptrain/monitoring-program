@@ -5,9 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDateWithTime } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Calendar, MapPin, Tag } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Calendar, MapPin, Tag } from "lucide-react";
+import { LinkBackButton } from "@/components/shared/LinkBackButton";
 import Image from "next/image";
 import { ProgressPercentage } from "../monitoring/components/ProgressPercentage";
 
@@ -25,12 +24,8 @@ export default function ProgramPriorityReportDetailPage({
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon-xs" asChild>
-              <Link href="/dashboard/program-priority-report">
-                <ArrowLeft className="size-4" />
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            <LinkBackButton href="/dashboard/program-priority-report" />
+            <h1 className="text-foreground text-2xl font-bold tracking-tight">
               {data.name}
             </h1>
           </div>
@@ -41,7 +36,7 @@ export default function ProgramPriorityReportDetailPage({
             {data.status}
           </Badge>
         </div>
-        <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div className="text-muted-foreground mt-4 flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-1.5">
             <MapPin className="size-4" />
             {data.available_locations?.name}
@@ -77,7 +72,7 @@ export default function ProgramPriorityReportDetailPage({
               <CardTitle className="text-sm font-medium">Kendala</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
                 {data.constraints || "Tidak ada kendala yang dilaporkan."}
               </p>
             </CardContent>
@@ -89,7 +84,7 @@ export default function ProgramPriorityReportDetailPage({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
                 {data.follow_up || "Belum ada rencana tindak lanjut."}
               </p>
             </CardContent>
@@ -113,10 +108,10 @@ export default function ProgramPriorityReportDetailPage({
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                         Sebelum
                       </p>
-                      <div className="aspect-video overflow-hidden border border-border bg-muted">
+                      <div className="border-border bg-muted aspect-video overflow-hidden border">
                         {doc.image_before_path ? (
                           <Image
                             src={`${supabaseUrl}/storage/v1/object/public/demo/${doc.image_before_path}`}
@@ -127,17 +122,17 @@ export default function ProgramPriorityReportDetailPage({
                             unoptimized
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-xs text-muted-foreground italic">
+                          <div className="text-muted-foreground flex h-full items-center justify-center text-xs italic">
                             Tidak ada foto
                           </div>
                         )}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
                         Sesudah
                       </p>
-                      <div className="aspect-video overflow-hidden border border-border bg-muted">
+                      <div className="border-border bg-muted aspect-video overflow-hidden border">
                         {doc.image_after_path ? (
                           <Image
                             src={`${supabaseUrl}/storage/v1/object/public/demo/${doc.image_after_path}`}
@@ -148,7 +143,7 @@ export default function ProgramPriorityReportDetailPage({
                             unoptimized
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-xs text-muted-foreground italic">
+                          <div className="text-muted-foreground flex h-full items-center justify-center text-xs italic">
                             Tidak ada foto
                           </div>
                         )}
@@ -158,7 +153,7 @@ export default function ProgramPriorityReportDetailPage({
                 </div>
               ))}
               {(!data.documentations || data.documentations.length === 0) && (
-                <div className="py-10 text-center text-sm text-muted-foreground italic">
+                <div className="text-muted-foreground py-10 text-center text-sm italic">
                   Belum ada dokumentasi visual untuk laporan ini.
                 </div>
               )}

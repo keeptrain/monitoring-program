@@ -20,3 +20,13 @@ export function formatDateWithTime(dateString?: string | null) {
     .replace("pukul", "")
     .trim();
 }
+
+export const handleGeoCoordinateValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  const sanitized = value
+    .replace(/[^0-9.-]/g, "") // Only allow digits, dot, and minus
+    .replace(/(?!^)-/g, "") // Minus only at the start
+    .replace(/(\..*?)\..*/g, "$1"); // Only one decimal point
+
+  e.target.value = sanitized;
+};
