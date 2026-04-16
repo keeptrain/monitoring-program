@@ -135,7 +135,10 @@ export default function PublicMonitoringMap({
             ) : (
               <MonitoringDetailContent data={detailData} />
             )}
-            <Button asChild>
+            <Button
+              asChild
+              className={cn("invisible", !isLoading && "visible")}
+            >
               <Link href={`/monitoring/1/detail`}>
                 <span>Ke Halaman Detail</span>
                 <ArrowRightIcon />
