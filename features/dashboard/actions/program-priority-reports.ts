@@ -61,7 +61,7 @@ export async function getProgramPriorityReports() {
       available_locations (
         name
       )
-      `
+      `,
     )
     .order("updated_at", { ascending: false });
 
@@ -82,7 +82,7 @@ export async function getProgramPriorityReportById(id: number) {
       available_locations (
         name
       )
-    `
+    `,
     )
     .eq("id", id)
     .single();
@@ -95,7 +95,7 @@ export async function getProgramPriorityReportById(id: number) {
 }
 
 export async function createProgramPriorityReports(
-  data: ProgramPriorityFormValues
+  data: ProgramPriorityFormValues,
 ) {
   const now = new Date().toISOString();
   const documentations = normalizeDocumentations(data.documentations);
@@ -119,7 +119,7 @@ export async function createProgramPriorityReports(
 
 export async function updateProgramPriorityReports(
   id: number,
-  data: ProgramPriorityFormValues
+  data: ProgramPriorityFormValues,
 ) {
   const documentations = normalizeDocumentations(data.documentations);
 
@@ -145,7 +145,7 @@ export async function updateProgramPriorityReports(
 }
 
 function normalizeDocumentations(
-  data: ProgramPriorityFormValues["documentations"]
+  data: ProgramPriorityFormValues["documentations"],
 ) {
   const now = new Date().toISOString();
   return data.map((doc) => ({

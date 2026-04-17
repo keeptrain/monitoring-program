@@ -2,7 +2,6 @@ import { getPublicAvailableLocations } from "@/features/dashboard/actions/public
 import PublicMonitoringPage from "@/features/monitoring/PublicMonitoringPage";
 
 export default async function MonitoringPage() {
-  const locations = await getPublicAvailableLocations();
-
-  return <PublicMonitoringPage locations={locations} />;
+  await getPublicAvailableLocations();
+  return <PublicMonitoringPage />;
 }

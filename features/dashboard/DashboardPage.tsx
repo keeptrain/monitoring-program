@@ -9,34 +9,34 @@ export default function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="mb-10">
-        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
           Admin Panel
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-foreground text-2xl font-semibold tracking-tight">
           Dashboard
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-2 text-sm">
           Kelola data program prioritas dan lokasi pelaksanaan.
         </p>
       </div>
 
       {/* Quick-access cards */}
-      <div className="grid gap-px border border-border bg-border sm:grid-cols-2">
+      <div className="border-border bg-border grid gap-px border sm:grid-cols-2">
         {dashboardLinks.map(({ href, label, icon: Icon, description }) => (
           <Link
             key={href}
             href={href}
-            className="group flex flex-col justify-between gap-6 bg-background p-8 transition-colors hover:bg-muted/60"
+            className="group bg-background hover:bg-muted/60 flex flex-col justify-between gap-6 p-8 transition-colors"
           >
             <div className="flex items-start justify-between">
-              <div className="flex size-10 items-center justify-center border border-border transition-colors group-hover:border-foreground">
-                <Icon className="size-5 text-foreground" />
+              <div className="border-border group-hover:border-foreground flex size-10 items-center justify-center border transition-colors">
+                <Icon className="text-foreground size-5" />
               </div>
-              <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
+              <ArrowRight className="text-muted-foreground group-hover:text-foreground size-4 transition-transform group-hover:translate-x-1" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-foreground">{label}</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <h2 className="text-foreground text-sm font-semibold">{label}</h2>
+              <p className="text-muted-foreground mt-1 text-xs">
                 {description}
               </p>
             </div>

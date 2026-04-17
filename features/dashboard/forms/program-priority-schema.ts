@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const documentationSchema = z.object({
+  id: z.string().optional(),
   image_before_path: z.string().min(1, "Foto sebelum wajib diunggah"),
   image_after_path: z.string().min(1, "Foto sesudah wajib diunggah"),
 });

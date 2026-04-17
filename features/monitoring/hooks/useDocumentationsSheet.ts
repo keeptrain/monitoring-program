@@ -22,11 +22,11 @@ const supabaseUrl =
 
 export const useDocumentationsSheet = (locationId?: number) => {
   const [documentations, setDocumentations] = useState<PublicDocumentation[]>(
-    []
+    [],
   );
   const [activeDocumentationIndex, setActiveDocumentationIndex] = useState(0);
   const [totalDocumentations, setTotalDocumentations] = useState<number | null>(
-    null
+    null,
   );
   const [nextOffset, setNextOffset] = useState(0);
   const [hasMoreDocumentations, setHasMoreDocumentations] = useState(false);
@@ -47,7 +47,7 @@ export const useDocumentationsSheet = (locationId?: number) => {
       try {
         const response = await fetch(
           `/api/monitoring/program-priority-reports/${reportId}/documentations?offset=${offset}&limit=${DOCS_BATCH_SIZE}`,
-          { cache: "no-store" }
+          { cache: "no-store" },
         );
 
         if (!response.ok) {
@@ -65,7 +65,7 @@ export const useDocumentationsSheet = (locationId?: number) => {
         setHasMoreDocumentations(result.has_more);
         setNextOffset(result.offset + result.documentations.length);
         setDocumentations((prev) =>
-          append ? [...prev, ...result.documentations] : result.documentations
+          append ? [...prev, ...result.documentations] : result.documentations,
         );
 
         return result.documentations.length;
@@ -73,7 +73,7 @@ export const useDocumentationsSheet = (locationId?: number) => {
         setIsLoadingDocumentation(false);
       }
     },
-    []
+    [],
   );
 
   // Initial fetch when locationId changes

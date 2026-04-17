@@ -36,13 +36,13 @@ export default function ProgramPriorityReportFormPage({
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-8">
-        <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
           Dashboard / Laporan / {reportId ? "Ubah" : "Buat"}
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-foreground text-2xl font-semibold tracking-tight">
           Laporan Prioritas Program
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           {reportId
             ? "Perbarui formulir di bawah ini untuk mengubah laporan program prioritas."
             : "Isi formulir di bawah ini untuk membuat laporan program prioritas baru."}
@@ -72,7 +72,7 @@ export default function ProgramPriorityReportFormPage({
             <DocumentationsFormSection form={form} />
           </CardContent>
         </Card>
-        <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+        <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
           {isLoading ? "Loading..." : reportId ? "Ubah" : "Submit"}
         </Button>
       </form>
