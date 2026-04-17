@@ -15,38 +15,20 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm">
+    <header className="border-border bg-background/90 sticky top-0 z-50 border-b backdrop-blur-sm">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground"
+          className="text-foreground flex items-center gap-2 text-sm font-semibold tracking-tight"
         >
-          <span className="flex size-8 items-center justify-center bg-primary text-background text-[10px] font-bold rounded-full">
+          <span className="bg-primary text-background flex size-8 items-center justify-center rounded-full text-[10px] font-bold">
             <FishIcon className="size-4" />
           </span>
-          <span className="hidden sm:inline text-xs">
+          <span className="hidden text-xs sm:inline">
             Kementerian Kelautan <br /> dan Perikanan
           </span>
         </Link>
-
-        {/* Center nav */}
-        <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "px-3 py-1.5 text-sm font-medium transition-colors",
-                pathname === href
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
