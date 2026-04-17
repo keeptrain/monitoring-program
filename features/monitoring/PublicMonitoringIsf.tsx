@@ -281,7 +281,7 @@ function ResourceStatItem({
   href: string;
 }) {
   return (
-    <Card className="bg-muted/40 hover:bg-muted/60 overflow-hidden border-none shadow-sm transition-all">
+    <Card className="bg-muted/40 hover:bg-muted/60 transition-all">
       <CardContent>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
