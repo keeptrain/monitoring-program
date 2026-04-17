@@ -13,11 +13,11 @@ import {
 } from "@/components/ui/sheet";
 import {
   TrendingUpIcon,
-  UsersIcon,
   HardHat,
   LucideIcon,
   ArrowRight,
   TractorIcon,
+  UsersRoundIcon,
 } from "lucide-react";
 import IsfPublicMonitoringDetail from "../isf/components/IsfPublicMonitoringDetail";
 import { Progress } from "@/components/ui/progress";
@@ -135,7 +135,7 @@ export default function PublicMonitoringIsf() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-10">
             {/* Ketenagakerjaan Card */}
             <ResourceStatItem
-              icon={UsersIcon}
+              icon={UsersRoundIcon}
               title="Ketenagakerjaan"
               subTitle="Terverifikasi Lapangan"
               statusLabel="Live Status"
@@ -238,8 +238,8 @@ function ResourceStatItem({
       <CardContent>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-              <Icon className="text-primary size-5" />
+            <div className="flex size-10 items-center justify-center rounded-lg">
+              <Icon className="text-primary size-6" />
             </div>
             <span className="block text-sm font-semibold uppercase">
               {title}
@@ -247,7 +247,7 @@ function ResourceStatItem({
           </div>
           <Button asChild variant="outline" size="sm">
             <Link href={href}>
-              Lihat Detail
+              Detail
               <ArrowRight className="size-3.5" />
             </Link>
           </Button>
