@@ -23,6 +23,7 @@ import { iconIsf, iconThematic } from "./components/MapPinIcon";
 import { MonitoringDetailTypeMap } from "./actions/public-location";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
 import ThematicPublicMonitoringDetail from "../thematic/components/ThematicPublicMonitoringDetail";
+import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
 
 const SHEET_CONTENTS: {
   [K in Exclude<LocationType, "isf">]: React.ComponentType<{
@@ -30,6 +31,7 @@ const SHEET_CONTENTS: {
   }>;
 } = {
   biofloc_thematic: ThematicPublicMonitoringDetail,
+  minapadi_thematic: ThematicPublicMonitoringDetail,
 };
 
 const INDONESIA_CENTER: [number, number] = [-2.5, 118];
@@ -146,24 +148,6 @@ export default function PublicMonitoringMap({
         </Sheet>
       )}
     </>
-  );
-}
-
-function LoadingPublicMonitoringDetail() {
-  return (
-    <div className="bg-muted/10 absolute inset-0 z-0">
-      <Skeleton className="h-full w-full rounded-none" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-        <div className="flex space-x-1.5">
-          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full [animation-delay:-0.3s]" />
-          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full [animation-delay:-0.15s]" />
-          <div className="bg-foreground/30 size-1.5 animate-bounce rounded-full" />
-        </div>
-        <span className="text-muted-foreground/50 text-[10px] font-bold tracking-[0.3em] uppercase">
-          Memuat Detail
-        </span>
-      </div>
-    </div>
   );
 }
 

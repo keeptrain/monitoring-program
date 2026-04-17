@@ -28,7 +28,7 @@ export const useGetPublicLocationsByType = (type: LocationType | null) =>
             },
           ];
     },
-    enabled: !!type,
+    enabled: !!type && type !== "isf",
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

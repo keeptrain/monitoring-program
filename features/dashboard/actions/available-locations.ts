@@ -100,7 +100,7 @@ export async function createAvailableLocation(
   revalidatePath("/dashboard/available-location");
   redirect("/dashboard/available-location");
 }
-export type LocationType = "biofloc_thematic" | "isf";
+export type LocationType = "biofloc_thematic" | "minapadi_thematic" | "isf";
 
 export async function createLocationFromProgram(
   supabase: SupabaseClient,

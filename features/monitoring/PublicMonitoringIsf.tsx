@@ -16,9 +16,9 @@ import {
   TrendingUpIcon,
   UsersIcon,
   HardHat,
-  DrillIcon,
   LucideIcon,
   ArrowRight,
+  TractorIcon,
 } from "lucide-react";
 import IsfPublicMonitoringDetail from "../isf/components/IsfPublicMonitoringDetail";
 import { Progress } from "@/components/ui/progress";
@@ -205,7 +205,7 @@ export default function PublicMonitoringIsf() {
             {/* Alat Berat Card */}
             <Card className="bg-muted/40 hover:bg-muted/60 overflow-hidden border-none shadow-sm transition-all">
               <ResourceStatItem
-                icon={DrillIcon}
+                icon={TractorIcon}
                 title="Alat Berat"
                 subTitle="Unit Terintegrasi"
                 statusLabel="Operational"

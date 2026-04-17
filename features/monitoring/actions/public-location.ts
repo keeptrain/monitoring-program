@@ -12,6 +12,7 @@ import {
  */
 export type MonitoringDetailTypeMap = {
   biofloc_thematic: PublicThematicProgram;
+  minapadi_thematic: PublicThematicProgram;
   isf: null; // Add PublicIsfProgram here when available
 };
 

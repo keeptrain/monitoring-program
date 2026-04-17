@@ -8,6 +8,7 @@ import {
   FilterIcon,
   LucideIcon,
   Navigation2,
+  PlaneTakeoffIcon,
   ShrimpIcon,
   XIcon,
 } from "lucide-react";
@@ -41,6 +42,7 @@ const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
 const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
   {
     biofloc_thematic: { label: "Tematik Bioflok", icon: BiohazardIcon },
+    minapadi_thematic: { label: "Tematik Minapadi", icon: PlaneTakeoffIcon },
     isf: { label: "Integrated Shrimp Farming", icon: ShrimpIcon },
   };
 
@@ -64,11 +66,11 @@ export default function PublicMonitoringPage() {
 
           {/* Map placeholder */}
           <div className="relative flex flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
-            {activeTab && locations ? (
+            {activeTab && (locations || activeTab === "isf") ? (
               activeTab === "isf" ? (
                 <LazyIsf />
               ) : (
-                <LazyMap locations={locations} type={activeTab} />
+                <LazyMap locations={locations!} type={activeTab} />
               )
             ) : (
               <EmptyFilterState />
