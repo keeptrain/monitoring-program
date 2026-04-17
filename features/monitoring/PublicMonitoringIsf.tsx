@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { STEPS, STEP_COLORS } from "../isf/constants/isf-step";
 import { cn } from "@/lib/utils";
 import {
@@ -39,6 +39,22 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { useGetPublicIsfMonitoringDashboard } from "./api/getPublicLocationsByType";
+
+const LINE_SERIES: Array<{
+  key: `z${1 | 2 | 3 | 4 | 5 | 6 | 7}`;
+  color: string;
+  dash: string;
+  dotRadius: number;
+}> = [
+  { key: "z1", color: "#3b82f6", dash: "0", dotRadius: 5 },
+  { key: "z2", color: "#10b981", dash: "6 4", dotRadius: 4 },
+  { key: "z3", color: "#f59e0b", dash: "0", dotRadius: 5 },
+  { key: "z4", color: "#f43f5e", dash: "8 4", dotRadius: 4 },
+  { key: "z5", color: "#8b5cf6", dash: "0", dotRadius: 5 },
+  { key: "z6", color: "#06b6d4", dash: "4 4", dotRadius: 4 },
+  { key: "z7", color: "#14b8a6", dash: "10 4", dotRadius: 3 },
+];
 
 const PIN_LOCATIONS: Record<number, { x: string; y: string }> = {
   1: { x: "15%", y: "45%" },
@@ -50,54 +66,23 @@ const PIN_LOCATIONS: Record<number, { x: string; y: string }> = {
   7: { x: "90%", y: "65%" },
 };
 
-const ISF_PROGRESS_DUMMY_DATA = [
-  {
-    name: "Minggu 1",
-    z1: 4.5,
-    z2: 2.5,
-    z3: 3.2,
-    z4: 3.8,
-    z5: 4.1,
-    z6: 2.8,
-    z7: 3.5,
-  },
-  {
-    name: "Minggu 2",
-    z1: 3.2,
-    z2: 4.8,
-    z3: 2.8,
-    z4: 4.2,
-    z5: 3.9,
-    z6: 4.5,
-    z7: 2.2,
-  },
-  {
-    name: "Minggu 3",
-    z1: 3.8,
-    z2: 2.1,
-    z3: 4.5,
-    z4: 4.5,
-    z5: 2.4,
-    z6: 3.1,
-    z7: 4.8,
-  },
-  {
-    name: "Minggu 4",
-    z1: 4.5,
-    z2: 3.2,
-    z3: 5.2,
-    z4: 4.8,
-    z5: 4.9,
-    z6: 5.5,
-    z7: 3.1,
-  },
-];
-
 export default function PublicMonitoringIsf() {
   const [selectedStep, setSelectedStep] = useState<(typeof STEPS)[0] | null>(
     null,
   );
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { data: dashboard, isLoading } = useGetPublicIsfMonitoringDashboard();
+
+  const zoneProgressMap = useMemo(
+    () =>
+      new Map(
+        (dashboard?.zones ?? []).map((zone) => [
+          zone.step_id,
+          zone.progress_percent,
+        ]),
+      ),
+    [dashboard?.zones],
+  );
 
   const handlePinClick = (stepId: number) => {
     const step = STEPS.find((s) => s.id === stepId);
@@ -126,6 +111,7 @@ export default function PublicMonitoringIsf() {
             {STEPS.map((step) => {
               const pos = PIN_LOCATIONS[step.id];
               if (!pos) return null;
+              const progress = zoneProgressMap.get(step.id) ?? 0;
 
               return (
                 <button
@@ -150,7 +136,7 @@ export default function PublicMonitoringIsf() {
                       <span className="text-[10px] font-bold">{step.id}</span>
                     </div>
                     <div className="bg-background/90 border-border text-foreground absolute top-full mt-2 hidden min-w-max border px-2 py-1 text-[10px] font-semibold tracking-wide uppercase shadow-lg backdrop-blur lg:group-hover:block">
-                      {step.name}
+                      {step.name} ({progress}%)
                     </div>
                   </div>
                 </button>
@@ -169,11 +155,15 @@ export default function PublicMonitoringIsf() {
 
           <Separator className="opacity-50" />
 
-          <IsfOverallSummary />
+          <IsfOverallSummary
+            overallProgress={dashboard?.overall_progress ?? 0}
+            pieData={dashboard?.pie_chart ?? []}
+            zones={dashboard?.zones ?? []}
+          />
 
           <Separator className="opacity-50" />
 
-          <IsfProgressChart />
+          <IsfProgressChart data={dashboard?.line_chart ?? []} />
         </div>
 
         {/* Bottom Row: Specialized Reports Cards */}
@@ -186,17 +176,21 @@ export default function PublicMonitoringIsf() {
               subTitle="Terverifikasi Lapangan"
               statusLabel="Live Status"
               statusBg="bg-primary"
-              value="45 ORANG"
+              value={`${dashboard?.workforce_total ?? 0} ORANG`}
               valueDesc="Total pekerja aktif hari ini"
               trend={
                 <div className="flex items-center gap-1.5">
                   <TrendingUpIcon className="size-4 text-emerald-500" />
                   <span className="text-xs font-bold text-emerald-500 uppercase">
-                    +12% Kenaikan
+                    {dashboard?.active_zone_count ?? 0} Zona Aktif
                   </span>
                 </div>
               }
-              updateText="Update: 17 April 2024"
+              updateText={
+                dashboard?.updated_at
+                  ? `Update: ${new Date(dashboard.updated_at).toLocaleDateString("id-ID")}`
+                  : "Update: -"
+              }
               href="/monitoring/labor"
             />
 
@@ -209,12 +203,12 @@ export default function PublicMonitoringIsf() {
               statusBg="bg-blue-600"
               subTitleColor="text-blue-600"
               value="12 UNIT"
-              valueDesc="Aktif di 7 zona pengerjaan"
+              valueDesc={`Aktif di ${dashboard?.active_zone_count ?? 0} zona pengerjaan`}
               trend={
                 <div className="flex items-center gap-1.5">
                   <HardHat className="text-primary size-4" />
                   <span className="text-primary text-xs font-bold uppercase">
-                    8 Exc, 4 Bulldozer
+                    {dashboard?.total_logs ?? 0} laporan masuk
                   </span>
                 </div>
               }
@@ -251,6 +245,9 @@ export default function PublicMonitoringIsf() {
           <IsfPublicMonitoringDetail
             data={{ name: selectedStep?.name || "" }}
           />
+          {isLoading ? (
+            <p className="text-muted-foreground mt-4 text-xs">Memuat data...</p>
+          ) : null}
         </SheetContent>
       </Sheet>
     </div>
@@ -333,11 +330,11 @@ function ResourceStatItem({
 
 function IsfLegendaZona() {
   return (
-    <div className="flex w-full flex-col items-center justify-center space-y-5">
+    <div className="flex w-full flex-col items-center justify-center space-y-6">
       <p className="text-primary text-xs font-black tracking-[0.2em] uppercase">
         Legenda Zona
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 px-4">
+      <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
         {STEPS.map((s) => (
           <div key={s.id} className="flex items-center gap-2.5">
             <div
@@ -356,7 +353,20 @@ function IsfLegendaZona() {
   );
 }
 
-function IsfOverallSummary() {
+function IsfOverallSummary({
+  overallProgress,
+  pieData,
+  zones,
+}: {
+  overallProgress: number;
+  pieData: Array<{
+    step_id: number;
+    name: string;
+    value: number;
+    fill: string;
+  }>;
+  zones: Array<{ step_id: number; progress_percent: number }>;
+}) {
   return (
     <div className="flex w-full flex-col items-center justify-center space-y-8">
       <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
@@ -369,30 +379,29 @@ function IsfOverallSummary() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={STEPS.map((s) => ({
-                  ...s,
-                  fill:
-                    s.id === 1
-                      ? "#3b82f6"
-                      : s.id === 2
-                        ? "#10b981"
-                        : s.id === 3
-                          ? "#f59e0b"
-                          : s.id === 4
-                            ? "#f43f5e"
-                            : s.id === 5
-                              ? "#8b5cf6"
-                              : s.id === 6
-                                ? "#06b6d4"
-                                : "#14b8a6",
-                }))}
-                dataKey="id"
+                data={[
+                  ...pieData,
+                  {
+                    step_id: 99,
+                    name: "Sisa",
+                    value: Math.max(
+                      0,
+                      zones.length * 100 - overallProgress * zones.length,
+                    ),
+                    fill: "#f1f5f9",
+                  },
+                ]}
+                dataKey="value"
                 nameKey="name"
                 cx="50%"
                 cy="50%"
-                outerRadius={90}
-                innerRadius={75}
+                outerRadius={100}
+                innerRadius={80}
                 stroke="none"
+                startAngle={90}
+                endAngle={450}
+                cornerRadius={4}
+                paddingAngle={2}
               >
                 <Label
                   content={({ viewBox }) => {
@@ -412,7 +421,7 @@ function IsfOverallSummary() {
                           y={cy - 2}
                           className="fill-primary text-2xl font-black italic"
                         >
-                          82%
+                          {overallProgress}%
                         </tspan>
                         <tspan
                           x={cx}
@@ -433,10 +442,12 @@ function IsfOverallSummary() {
         {/* Right: Progress Grid */}
         <div className="grid flex-1 grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
           {STEPS.map((s) => {
-            const mockProgress = [20, 14, 36, 12, 8, 4, 0][s.id - 1] || 0;
+            const progress =
+              zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
+              0;
             return (
-              <div key={s.id} className="space-y-1.5">
-                <div className="flex justify-between gap-3 text-[11px] font-bold tracking-tight uppercase">
+              <div key={s.id} className="space-y-2">
+                <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
                   <div className="flex items-center gap-2">
                     <div
                       className={cn(
@@ -447,10 +458,10 @@ function IsfOverallSummary() {
                     <span className="text-foreground/70">Zona {s.id}</span>
                   </div>
                   <span className="text-primary font-semibold tabular-nums">
-                    {mockProgress}%
+                    {progress}%
                   </span>
                 </div>
-                <Progress value={mockProgress} className="h-2" />
+                <Progress value={progress} className="h-2" />
               </div>
             );
           })}
@@ -460,7 +471,20 @@ function IsfOverallSummary() {
   );
 }
 
-function IsfProgressChart() {
+function IsfProgressChart({
+  data,
+}: {
+  data: Array<{
+    name: string;
+    z1?: number;
+    z2?: number;
+    z3?: number;
+    z4?: number;
+    z5?: number;
+    z6?: number;
+    z7?: number;
+  }>;
+}) {
   return (
     <div className="flex w-full flex-col items-center justify-center space-y-8">
       <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
@@ -470,7 +494,7 @@ function IsfProgressChart() {
       <div className="h-[300px] w-full max-w-4xl">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={ISF_PROGRESS_DUMMY_DATA}
+            data={data}
             margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
           >
             <CartesianGrid
@@ -489,8 +513,8 @@ function IsfProgressChart() {
               axisLine={false}
               tickLine={false}
               tick={{ fill: "#999", fontSize: 11, fontWeight: 600 }}
-              domain={[0, 10]}
-              ticks={[0, 5, 10]}
+              domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
             />
             <Tooltip
               contentStyle={{
@@ -512,62 +536,24 @@ function IsfProgressChart() {
                 </span>
               )}
             />
-            <Line
-              type="monotone"
-              dataKey="z1"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#3b82f6", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z2"
-              stroke="#10b981"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#10b981", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z3"
-              stroke="#f59e0b"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#f59e0b", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z4"
-              stroke="#f43f5e"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#f43f5e", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z5"
-              stroke="#8b5cf6"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#8b5cf6", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z6"
-              stroke="#06b6d4"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#06b6d4", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="z7"
-              stroke="#14b8a6"
-              strokeWidth={3}
-              dot={{ r: 4, fill: "#14b8a6", strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6 }}
-            />
+            {LINE_SERIES.map((series) => (
+              <Line
+                key={series.key}
+                type="monotone"
+                dataKey={series.key}
+                stroke={series.color}
+                strokeDasharray={series.dash}
+                strokeWidth={3}
+                dot={{
+                  r: series.dotRadius,
+                  fill: "#ffffff",
+                  strokeWidth: 2,
+                  stroke: series.color,
+                }}
+                activeDot={{ r: series.dotRadius + 2 }}
+                connectNulls
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>

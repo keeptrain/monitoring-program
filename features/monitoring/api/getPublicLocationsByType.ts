@@ -3,6 +3,10 @@ import {
   LocationType,
 } from "@/features/dashboard/actions/available-locations";
 import { PublicAvailableLocation } from "@/features/dashboard/actions/public-available-locations";
+import {
+  getPublicIsfMonitoringDashboard,
+  PublicIsfMonitoringDashboard,
+} from "@/features/monitoring/actions/public-location";
 import { useQuery } from "@tanstack/react-query";
 
 export const getFilterStateQueryKey = (type: LocationType | null) => [
@@ -15,20 +19,18 @@ export const useGetPublicLocationsByType = (type: LocationType | null) =>
     queryKey: getFilterStateQueryKey(type),
     queryFn: async (): Promise<PublicAvailableLocation[]> => {
       if (!type) return [];
-      const result = await getAvailableLocationsByType(type);
-      return type === "biofloc_thematic"
-        ? result
-        : [
-            {
-              id: 1,
-              location_name: "asdas",
-              percentage_of_work: 100,
-              position: { latitude: -6.930958, longitude: 107.467557 },
-              program_name: "asas",
-            },
-          ];
+      return getAvailableLocationsByType(type);
     },
     enabled: !!type && type !== "isf",
+    staleTime: 3 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+
+export const useGetPublicIsfMonitoringDashboard = () =>
+  useQuery({
+    queryKey: ["public-isf-monitoring-dashboard"],
+    queryFn: async (): Promise<PublicIsfMonitoringDashboard> =>
+      getPublicIsfMonitoringDashboard(),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

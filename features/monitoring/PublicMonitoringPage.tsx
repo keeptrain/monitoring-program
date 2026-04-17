@@ -47,7 +47,7 @@ const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
   };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
+  const [activeTab, setActiveTab] = useState<LocationType | null>(null);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const { data: locations } = useGetPublicLocationsByType(activeTab);
