@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { STEPS, STEP_COLORS } from "../isf/constants/isf-step";
 import { cn } from "@/lib/utils";
 import {
@@ -12,7 +12,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  ShrimpIcon,
   TrendingUpIcon,
   UsersIcon,
   HardHat,
@@ -40,49 +39,15 @@ import {
   Legend,
 } from "recharts";
 import { useGetPublicIsfMonitoringDashboard } from "./api/getPublicLocationsByType";
-
-const LINE_SERIES: Array<{
-  key: `z${1 | 2 | 3 | 4 | 5 | 6 | 7}`;
-  color: string;
-  dash: string;
-  dotRadius: number;
-}> = [
-  { key: "z1", color: "#3b82f6", dash: "0", dotRadius: 5 },
-  { key: "z2", color: "#10b981", dash: "6 4", dotRadius: 4 },
-  { key: "z3", color: "#f59e0b", dash: "0", dotRadius: 5 },
-  { key: "z4", color: "#f43f5e", dash: "8 4", dotRadius: 4 },
-  { key: "z5", color: "#8b5cf6", dash: "0", dotRadius: 5 },
-  { key: "z6", color: "#06b6d4", dash: "4 4", dotRadius: 4 },
-  { key: "z7", color: "#14b8a6", dash: "10 4", dotRadius: 3 },
-];
-
-const PIN_LOCATIONS: Record<number, { x: string; y: string }> = {
-  1: { x: "15%", y: "45%" },
-  2: { x: "28%", y: "52%" },
-  3: { x: "42%", y: "40%" },
-  4: { x: "55%", y: "62%" },
-  5: { x: "70%", y: "48%" },
-  6: { x: "82%", y: "35%" },
-  7: { x: "90%", y: "65%" },
-};
+import { LINE_SERIES, PIN_LOCATIONS } from "./utils/monitoring-constants";
 
 export default function PublicMonitoringIsf() {
+  const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
   const [selectedStep, setSelectedStep] = useState<(typeof STEPS)[0] | null>(
     null,
   );
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const { data: dashboard, isLoading } = useGetPublicIsfMonitoringDashboard();
 
-  const zoneProgressMap = useMemo(
-    () =>
-      new Map(
-        (dashboard?.zones ?? []).map((zone) => [
-          zone.step_id,
-          zone.progress_percent,
-        ]),
-      ),
-    [dashboard?.zones],
-  );
+  const { data: dashboard, isLoading } = useGetPublicIsfMonitoringDashboard();
 
   const handlePinClick = (stepId: number) => {
     const step = STEPS.find((s) => s.id === stepId);
@@ -111,7 +76,6 @@ export default function PublicMonitoringIsf() {
             {STEPS.map((step) => {
               const pos = PIN_LOCATIONS[step.id];
               if (!pos) return null;
-              const progress = zoneProgressMap.get(step.id) ?? 0;
 
               return (
                 <button
@@ -136,7 +100,7 @@ export default function PublicMonitoringIsf() {
                       <span className="text-[10px] font-bold">{step.id}</span>
                     </div>
                     <div className="bg-background/90 border-border text-foreground absolute top-full mt-2 hidden min-w-max border px-2 py-1 text-[10px] font-semibold tracking-wide uppercase shadow-lg backdrop-blur lg:group-hover:block">
-                      {step.name} ({progress}%)
+                      {step.name}
                     </div>
                   </div>
                 </button>
@@ -219,37 +183,31 @@ export default function PublicMonitoringIsf() {
         </div>
       </div>
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right">
-          <SheetHeader>
-            <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full text-white",
-                  selectedStep && STEP_COLORS[selectedStep.id],
-                )}
-              >
-                <ShrimpIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <SheetTitle className="text-xl font-bold uppercase italic">
-                  Zona {selectedStep?.id}
-                </SheetTitle>
-                <SheetDescription className="text-xs font-medium tracking-widest uppercase">
-                  {selectedStep?.name}
-                </SheetDescription>
-              </div>
-            </div>
-          </SheetHeader>
+      {/* Sheet */}
+      {sheetOpen !== null && selectedStep && (
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetContent
+            side="right"
+            className="data-[side=right]:sm:max-w-[600px]"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-xl">
+                Zona {selectedStep.id}
+              </SheetTitle>
+              <SheetDescription className="text-xs font-medium tracking-widest uppercase">
+                {selectedStep.name}
+              </SheetDescription>
+            </SheetHeader>
 
-          <IsfPublicMonitoringDetail
-            data={{ name: selectedStep?.name || "" }}
-          />
-          {isLoading ? (
-            <p className="text-muted-foreground mt-4 text-xs">Memuat data...</p>
-          ) : null}
-        </SheetContent>
-      </Sheet>
+            <IsfPublicMonitoringDetail data={{ name: selectedStep.name }} />
+            {isLoading ? (
+              <p className="text-muted-foreground mt-4 text-xs">
+                Memuat data...
+              </p>
+            ) : null}
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   );
 }
@@ -257,12 +215,10 @@ export default function PublicMonitoringIsf() {
 function ResourceStatItem({
   icon: Icon,
   title,
-  subTitle,
   value,
   valueDesc,
   trend,
   updateText,
-  subTitleColor = "text-emerald-600",
   href,
 }: {
   icon: LucideIcon;
@@ -285,19 +241,9 @@ function ResourceStatItem({
             <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
               <Icon className="text-primary size-5" />
             </div>
-            <div className="flex flex-col items-start">
-              <span className="block text-sm font-semibold uppercase">
-                {title}
-              </span>
-              <span
-                className={cn(
-                  "text-[10px] font-medium uppercase",
-                  subTitleColor,
-                )}
-              >
-                {subTitle}
-              </span>
-            </div>
+            <span className="block text-sm font-semibold uppercase">
+              {title}
+            </span>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link href={href}>
