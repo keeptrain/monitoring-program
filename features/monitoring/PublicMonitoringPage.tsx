@@ -33,10 +33,10 @@ const LazyMap = dynamic<PublicMonitoringMapProps>(
   },
 );
 
-// const LazyGallery = dynamic(() => import("./components/Gallery"), {
-//   ssr: false,
-//   loading: () => <LoadingLazyMap />,
-// });
+const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
+  ssr: false,
+  loading: () => <LoadingLazyMap />,
+});
 
 const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
   {
@@ -61,17 +61,15 @@ export default function PublicMonitoringPage() {
         {/* Map area */}
         <div className="bg-muted/30 relative flex flex-1">
           {/* Sidebar controls (placeholder) */}
-          <aside className="border-border bg-background hidden w-64 shrink-0 border-r p-4 lg:flex lg:flex-col lg:gap-4">
-            <FilterLayerContent
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-          </aside>
 
           {/* Map placeholder */}
           <div className="relative flex flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
             {activeTab && locations ? (
-              <LazyMap locations={locations} type={activeTab} />
+              activeTab === "isf" ? (
+                <LazyIsf />
+              ) : (
+                <LazyMap locations={locations} type={activeTab} />
+              )
             ) : (
               <EmptyFilterState />
             )}
@@ -145,8 +143,8 @@ function FilterLayerContent({
   onTabChange: (tab: LocationType) => void;
 }) {
   return (
-    <>
-      <p className="text-muted-foreground mx-4 flex items-center gap-2 text-xs font-medium tracking-widest uppercase sm:mx-0">
+    <div className="mx-4">
+      <p className="text-muted-foreground mx-4 mb-4 flex items-center gap-2 text-xs font-medium tracking-widest uppercase sm:mx-0">
         <FilterIcon className="size-4" /> Filter Layer
       </p>
       <div className="mx-4 flex flex-col gap-1 sm:mx-0 lg:gap-4">
@@ -164,7 +162,7 @@ function FilterLayerContent({
           </label>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -172,14 +170,14 @@ const TOOLBAR_MAP_ICONS: LucideIcon[] = [FilterIcon, Navigation2];
 
 function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
   return (
-    <div className="border-border bg-background absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 border p-1">
+    <div className="border-border bg-background absolute bottom-6 z-10 flex items-center gap-1 border p-1">
       {TOOLBAR_MAP_ICONS.map((Icon, i) => (
         <button
           key={i}
           onClick={Icon === FilterIcon ? onFilterClick : undefined}
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center transition-colors",
-            Icon === FilterIcon ? "flex h-9 gap-2 px-3 lg:hidden" : "size-9",
+            Icon === FilterIcon ? "flex h-9 gap-2 px-3" : "size-9",
           )}
         >
           <Icon className="size-4" />
@@ -196,7 +194,7 @@ function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
 
 function EmptyFilterState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-6 text-center">
+    <div className="flex -translate-y-8 flex-col items-center justify-center gap-4 px-6 text-center">
       <div className="bg-muted/50 text-muted-foreground/50 group-hover:bg-muted group-hover:text-muted-foreground flex size-14 items-center justify-center rounded-full transition-colors">
         <FilterIcon className="size-6" />
       </div>

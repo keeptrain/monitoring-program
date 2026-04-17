@@ -23,15 +23,13 @@ import { iconIsf, iconThematic } from "./components/MapPinIcon";
 import { MonitoringDetailTypeMap } from "./actions/public-location";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
 import ThematicPublicMonitoringDetail from "../thematic/components/ThematicPublicMonitoringDetail";
-import IsfPublicMonitoringDetail from "../isf/components/IsfPublicMonitoringDetail";
 
 const SHEET_CONTENTS: {
-  [K in LocationType]: React.ComponentType<{
+  [K in Exclude<LocationType, "isf">]: React.ComponentType<{
     data: MonitoringDetailTypeMap[K];
   }>;
 } = {
   biofloc_thematic: ThematicPublicMonitoringDetail,
-  isf: IsfPublicMonitoringDetail,
 };
 
 const INDONESIA_CENTER: [number, number] = [-2.5, 118];
@@ -42,7 +40,7 @@ const INDONESIA_BOUNDS: [[number, number], [number, number]] = [
 
 export type PublicMonitoringMapProps = {
   locations: PublicAvailableLocation[];
-  type: LocationType;
+  type: Exclude<LocationType, "isf">;
 };
 
 export default function PublicMonitoringMap({
@@ -166,28 +164,6 @@ function LoadingPublicMonitoringDetail() {
         </span>
       </div>
     </div>
-  );
-}
-
-function ArrowButton({
-  disabled,
-  direction,
-  onClick,
-}: {
-  disabled: boolean;
-  onClick: () => void;
-  direction: "left" | "right";
-}) {
-  const Icon = direction === "left" ? ArrowLeftIcon : ArrowRightIcon;
-  return (
-    <Button
-      disabled={disabled}
-      size="icon-sm"
-      variant="outline"
-      onClick={onClick}
-    >
-      <Icon className="size-4" />
-    </Button>
   );
 }
 
