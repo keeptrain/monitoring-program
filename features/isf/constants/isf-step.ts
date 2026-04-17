@@ -1,11 +1,11 @@
 export const STEPS = [
   { id: 1, name: "Jaringan Intake" },
   { id: 2, name: "Pipa Transmisi" },
-  { id: 3, name: "Reservoir" },
-  { id: 4, name: "Distribusi" },
-  { id: 5, name: "Sambungan Rumah" },
-  { id: 6, name: "Uji Coba" },
-  { id: 7, name: "Serah Terima" },
+  { id: 3, name: "Tandon" },
+  { id: 4, name: "Kawasan Budi Daya" },
+  { id: 5, name: "IPAL Kawasan" },
+  { id: 6, name: "Fasilitas Kawasan" },
+  { id: 7, name: "Kawasan Industri Pendukung" },
 ];
 
 export const STEP_COLORS: Record<number, string> = {

@@ -13,8 +13,7 @@ import { useState } from "react";
 export default function IsfSCurveFormSection({
   form,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  form: UseFormReturn<IsfReportFormInput, any, IsfReportFormValues>;
+  form: UseFormReturn<IsfReportFormInput, undefined, IsfReportFormValues>;
 }) {
   const [uploading, setUploading] = useState(false);
 

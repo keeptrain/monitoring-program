@@ -8,23 +8,35 @@ import { PencilIcon, Trash2Icon } from "lucide-react";
 
 export interface IsfReport {
   id: number;
+  step_id: number;
+  progress_date: string;
+  progress_percent: number;
   name: string;
-  created_at: string;
-  updated_at: string;
-  progress: number;
   status: string;
+  updated_at: string;
 }
 
-export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
+export function getIsfProgramReportsColumns(
+  onDelete?: (row: IsfReport) => void,
+): Column<IsfReport>[] {
   return [
+    {
+      header: "Dilaporkan Pada",
+      accessorKey: "progress_date",
+      cell: (row) => (
+        <span className="text-muted-foreground text-xs font-medium italic">
+          {formatDateWithTime(row.progress_date)}
+        </span>
+      ),
+    },
     { header: "Nama Laporan", accessorKey: "name" },
     {
       header: "Progress",
-      accessorKey: "progress",
+      accessorKey: "progress_percent",
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <Progress value={row.progress} className="w-20" />
-          <span className="text-[10px] font-bold">{row.progress}%</span>
+          <Progress value={row.progress_percent} className="w-20" />
+          <span className="text-[10px] font-bold">{row.progress_percent}%</span>
         </div>
       ),
     },
@@ -47,15 +59,7 @@ export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
         );
       },
     },
-    {
-      header: "Dibuat pada",
-      accessorKey: "created_at",
-      cell: (row) => (
-        <span className="text-muted-foreground text-xs font-medium italic">
-          {formatDateWithTime(row.created_at)}
-        </span>
-      ),
-    },
+
     {
       header: "Diperbarui",
       accessorKey: "updated_at",
@@ -80,8 +84,10 @@ export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
             type: "action",
             key: "delete",
             label: "Hapus",
-            onClick: () => console.log("Delete", row.id),
+            onClick: () => onDelete?.(row),
+            disabled: !onDelete,
             icon: <Trash2Icon className="text-destructive size-4" />,
+            destructive: true,
           },
         ];
         return <MoreButton menuItems={menuItems} />;
