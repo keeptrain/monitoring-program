@@ -1,57 +1,53 @@
 "use client";
 
-import { Progress } from "@/components/ui/progress";
-import {
-  CalendarIcon,
-  MapPinIcon,
-  UsersIcon,
-  CheckCircle2,
-} from "lucide-react";
+import { TractorIcon, UsersIcon } from "lucide-react";
+import { PieChart, Pie, ResponsiveContainer, Label } from "recharts";
 
 export default function IsfPublicMonitoringDetail({
   data,
 }: {
   data: { name: string };
 }) {
-  // Mock data for the public view
-  const mockStats = [
-    { label: "Tanggal Mulai", value: "12 Jan 2024", icon: CalendarIcon },
-    { label: "Lokasi", value: "Kawasan ISF Kebumen", icon: MapPinIcon },
-    { label: "Tenaga Kerja", value: "45 Orang", icon: UsersIcon },
-    { label: "Status", value: "Selesai", icon: CheckCircle2 },
-  ];
-
   return (
     <div className="mx-4 space-y-8">
-      {/* Progress Section */}
-      <div className="space-y-3">
-        <div className="flex items-end justify-between">
-          <p className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
-            Progres Pengerjaan
-          </p>
-          <span className="text-primary text-2xl font-black italic">100%</span>
-        </div>
-        <Progress value={100} className="h-2" />
-      </div>
+      {/* Last Updated Status */}
+      <LastUpdateStatus />
 
-      {/* Grid Info */}
-      <div className="grid grid-cols-2 gap-4">
-        {mockStats.map((stat, i) => (
-          <div key={i} className="border-border bg-muted/20 border p-3">
-            <div className="mb-1.5 flex items-center gap-2">
-              <stat.icon className="text-muted-foreground size-3" />
-              <p className="text-muted-foreground text-[9px] font-bold tracking-tighter uppercase">
-                {stat.label}
+      <div className="flex w-full items-center gap-12">
+        <div className="size-56 shrink-0">
+          <ZoneProgressChart progress={85} />
+        </div>
+
+        <div className="flex flex-col gap-8">
+          <div className="space-y-2">
+            <p className="text-muted-foreground font-bold tracking-widest uppercase">
+              Tenaga Kerja
+            </p>
+            <div className="flex items-center gap-3">
+              <UsersIcon className="size-6" />
+              <p className="text-3xl font-bold">
+                45 <span className="text-sm">Orang</span>
               </p>
             </div>
-            <p className="text-xs font-black tracking-tight">{stat.value}</p>
           </div>
-        ))}
+
+          <div className="space-y-2">
+            <p className="text-muted-foregroundfont-bold tracking-widest uppercase">
+              Alat Berat
+            </p>
+            <div className="flex items-center gap-3">
+              <TractorIcon className="size-6" />
+              <p className="text-3xl font-bold">
+                12 <span className="text-sm">Unit</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Description */}
       <div className="space-y-2">
-        <p className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
+        <p className="text-muted-foreground tracking-widest uppercase">
           Ringkasan Aktivitas
         </p>
         <p className="text-foreground/80 text-sm leading-relaxed">
@@ -60,26 +56,62 @@ export default function IsfPublicMonitoringDetail({
           sesuai standar operasional yang ditetapkan.
         </p>
       </div>
+    </div>
+  );
+}
 
-      {/* Documentation Placeholder */}
-      <div className="space-y-4 border-t border-dashed pt-4">
-        <p className="text-muted-foreground text-[10px] font-black tracking-widest uppercase">
-          Dokumentasi Terakhir
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          {[1, 2].map((i) => (
-            <div
-              key={i}
-              className="bg-muted border-border group relative aspect-square overflow-hidden border"
-            >
-              <div className="absolute inset-0 bg-slate-900/10 transition-colors group-hover:bg-transparent" />
-              <div className="text-muted-foreground flex h-full w-full items-center justify-center text-[10px] font-bold uppercase">
-                Foto Lapangan
-              </div>
-            </div>
-          ))}
+function LastUpdateStatus() {
+  return (
+    <div className="flex flex-col items-start gap-4 border-y border-dashed py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col items-start gap-3 text-base">
+        <div className="relative flex size-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex size-2 rounded-full bg-emerald-500"></span>
         </div>
+        <p>Data Terakhir Diperbarui</p>
+      </div>
+      <div className="flex flex-col items-end text-lg">
+        <p className="text-foreground uppercase">17 April 2024</p>
+        <p className="text-muted-foreground uppercase">15:45 WIB</p>
       </div>
     </div>
+  );
+}
+function ZoneProgressChart({ progress }: { progress: number }) {
+  const data = [
+    { name: "Progress", value: progress, fill: "#3b82f6" },
+    { name: "Sisa", value: 100 - progress, fill: "#f1f5f9" },
+  ];
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={data}
+          innerRadius={75}
+          outerRadius={95}
+          startAngle={90}
+          endAngle={450}
+        >
+          <Label
+            content={({ viewBox }) => {
+              const { cx, cy } = viewBox as { cx: number; cy: number };
+              return (
+                <text
+                  x={cx}
+                  y={cy}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                >
+                  <tspan x={cx} y={cy} className="fill-primary text-4xl">
+                    {progress}%
+                  </tspan>
+                </text>
+              );
+            }}
+          />
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
   );
 }

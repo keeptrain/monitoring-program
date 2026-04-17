@@ -139,6 +139,9 @@ export async function getIsfStepSummaries(): Promise<IsfStepSummary[]> {
 }
 
 export async function createIsfProgramLog(data: IsfReportFormValues) {
+  if (data.progress_date > new Date().toISOString().split("T")[0]) {
+    throw new Error("Tanggal laporan tidak boleh kurang dari minggu ini.");
+  }
   await assertProgressNotRegressing(data.step_id, data.progress_percent);
 
   const supabase = await createClient();
