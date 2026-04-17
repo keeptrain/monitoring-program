@@ -21,7 +21,18 @@ export function formatDateWithTime(dateString?: string | null) {
     .trim();
 }
 
-export const handleGeoCoordinateValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+export const handleInputNumberValueChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+) => {
+  const value = e.target.value;
+  const sanitized = value.replace(/[^0-9]/g, ""); // Only allow digits
+
+  e.target.value = sanitized;
+};
+
+export const handleGeoCoordinateValueChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+) => {
   const value = e.target.value;
   const sanitized = value
     .replace(/[^0-9.-]/g, "") // Only allow digits, dot, and minus
