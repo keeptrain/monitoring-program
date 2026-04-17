@@ -255,7 +255,7 @@ function ResourceStatItem({
 
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col items-start gap-1">
-            <p className="text-xl font-semibold">{value}</p>
+            <p className="text-lg font-semibold">{value}</p>
             <p className="text-muted-foreground text-xs font-medium">
               {valueDesc}
             </p>
@@ -263,7 +263,7 @@ function ResourceStatItem({
           <div className="flex flex-col items-start gap-4 sm:items-end sm:gap-2">
             <div className="flex flex-col items-start gap-1 sm:items-end">
               {trend}
-              <p className="text-muted-foreground text-[10px] font-medium uppercase">
+              <p className="text-muted-foreground font-medium uppercase">
                 {updateText}
               </p>
             </div>
