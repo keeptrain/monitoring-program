@@ -14,22 +14,30 @@ import IsfDetailRingkasanFormSection from "../components/IsfDetailRingkasanFormS
 import IsfSCurveFormSection from "../components/IsfSCurveFormSection";
 import IsfDocumentationsFormSection from "../components/IsfDocumentationsFormSection";
 import { Loader2 } from "lucide-react";
+import { IsfProgramLog } from "../types/isf";
 
 export default function IsfReportForm({
   initialStep,
+  initialData,
 }: {
   initialStep?: string;
+  initialData?: IsfProgramLog;
 }) {
-  const { form, onSubmit, isPending } = useIsfReportForm(initialStep);
+  const { form, onSubmit, isPending } = useIsfReportForm(
+    initialStep,
+    initialData,
+  );
 
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 space-y-1">
         <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-          Dashboard / ISF / Laporan / Buat
+          Dashboard / ISF / Laporan / {initialData ? "Ubah" : "Buat"}
         </p>
         <h2 className="text-foreground text-2xl font-semibold tracking-tight">
-          Tambah Laporan untuk Zona {initialStep}
+          {initialData
+            ? `Ubah Laporan Zona ${initialData.step_id}`
+            : `Tambah Laporan untuk Zona ${initialStep ?? "-"}`}
         </h2>
         <p className="text-muted-foreground text-sm">
           Silahkan isi aktivitas program Integrated Shrimp Farming (ISF) di
@@ -86,7 +94,7 @@ export default function IsfReportForm({
 
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-          Simpan Laporan
+          {initialData ? "Simpan Perubahan" : "Simpan Laporan"}
         </Button>
       </form>
     </div>

@@ -1,24 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import { STEPS, STEP_COLORS } from "./constants/isf-step";
+import { STEP_COLORS } from "./constants/isf-step";
+import { IsfStepSummary } from "./types/isf";
 
-interface IsfProgram {
-  id: number;
-  name: string;
-  updatedAt: string;
-  progress: number;
-}
-
-const DUMMY_PROGRAMS: IsfProgram[] = STEPS.map((step) => ({
-  ...step,
-  updatedAt: "2024-04-16",
-  progress: Math.floor(Math.random() * 100),
-}));
-
-export default function IsfProgramPage() {
+export default function IsfProgramPage({ data }: { data: IsfStepSummary[] }) {
   return (
     <div className="mx-auto max-w-4xl">
       <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
@@ -36,23 +24,22 @@ export default function IsfProgramPage() {
       </div>
 
       <div className="grid gap-4">
-        {DUMMY_PROGRAMS.map((program) => (
-          <ProgramItemCard key={program.id} program={program} />
+        {data.map((program) => (
+          <ProgramItemCard key={program.step_id} program={program} />
         ))}
       </div>
     </div>
   );
 }
 
-function ProgramItemCard({ program }: { program: IsfProgram }) {
-  const currentProgress = program.progress;
-  const stepNumber = program.id;
-
+function ProgramItemCard({ program }: { program: IsfStepSummary }) {
+  const currentProgress = program.progress_percent;
+  const stepNumber = program.step_id;
   const stepColorClass = STEP_COLORS[stepNumber] || "bg-primary";
 
   return (
     <Link
-      href={`/dashboard/isf/${program.id}`}
+      href={`/dashboard/isf/${program.step_id}`}
       className="bg-background border-border group hover:bg-muted/30 focus-visible:ring-primary relative flex items-center justify-between border p-5 transition-all outline-none focus-visible:ring-2"
     >
       <div className="flex items-center gap-6">
@@ -63,10 +50,10 @@ function ProgramItemCard({ program }: { program: IsfProgram }) {
             stepColorClass,
           )}
         >
-          <span className="text-[7px] leading-none font-black uppercase opacity-90">
+          <span className="text-[10px] leading-none font-bold uppercase opacity-90">
             Zona
           </span>
-          <span className="text-lg leading-none font-black italic">
+          <span className="text-lg leading-none font-bold italic">
             {stepNumber}
           </span>
         </div>
@@ -80,12 +67,10 @@ function ProgramItemCard({ program }: { program: IsfProgram }) {
             <span className="bg-muted text-muted-foreground px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase">
               Terakhir diperbarui
             </span>
-            <span className="text-muted-foreground text-[10px] font-medium italic">
-              {new Date(program.updatedAt).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+            <span className="text-muted-foreground text-xs font-medium italic">
+              {program.updated_at
+                ? formatDateWithTime(program.updated_at)
+                : "-"}
             </span>
           </div>
         </div>
@@ -99,16 +84,16 @@ function ProgramItemCard({ program }: { program: IsfProgram }) {
               {Math.round(currentProgress)}%
             </p>
           </div>
-          <Progress value={currentProgress} className="h-2 w-24" />
+          <Progress value={currentProgress} className="h-2 w-35" />
         </div>
 
         {/* Action Button */}
         <Button
           size="icon"
           variant="outline"
-          className="h-10 w-10 rounded-full border-2"
+          className="size-10 rounded-full border-2"
         >
-          <ArrowRightIcon className="h-4 w-4" />
+          <ArrowRightIcon className="size-4" />
         </Button>
       </div>
     </Link>

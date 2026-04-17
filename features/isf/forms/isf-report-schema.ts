@@ -19,12 +19,10 @@ export const isfReportSchema = z.object({
   total_worker: z.coerce.number().min(1, "Serapan tenaga kerja harus diisi"),
   production: z.string().min(1, "Produksi harus diisi"),
   outcome: z.string().min(1, "Outcome harus diisi"),
-  constraints: z.string().optional(),
-  follow_up: z.string().optional(),
-  s_curve_path: z.string().min(1, "Kurva S wajib diunggah"),
-  documentations: z
-    .array(isfDocumentationSchema)
-    .min(1, "Dokumentasi dibutuhkan"),
+  constraints: z.string().optional().default(""),
+  follow_up: z.string().optional().default(""),
+  s_curve_path: z.string().optional().default(""),
+  documentations: z.array(isfDocumentationSchema).optional().default([]),
 });
 
 export type IsfReportFormInput = z.input<typeof isfReportSchema>;
