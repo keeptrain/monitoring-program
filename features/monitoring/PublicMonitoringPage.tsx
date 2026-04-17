@@ -47,7 +47,7 @@ const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
   };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>(null);
+  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const { data: locations } = useGetPublicLocationsByType(activeTab);
@@ -116,7 +116,7 @@ function Header() {
           : "max-h-0 border-b-0 border-transparent py-0 opacity-0",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
+      <div className="mx-auto flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
             Monitoring Publik
