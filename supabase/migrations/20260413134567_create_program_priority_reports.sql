@@ -8,5 +8,6 @@ CREATE TABLE program_priority_reports (
   constraints TEXT NOT NULL,
   follow_up TEXT NOT NULL,
   documentations JSONB DEFAULT '[]',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
