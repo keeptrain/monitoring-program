@@ -386,7 +386,7 @@ function IsfOverallSummary({
         </div>
 
         {/* Right: Progress Grid */}
-        <div className="grid flex-1 grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
+        <div className="grid w-full flex-1 grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
           {/* Kolom Kiri: Zona 1-4 */}
           <div className="space-y-4">
             {STEPS.filter((s) => s.id <= 4).map((s) => {
