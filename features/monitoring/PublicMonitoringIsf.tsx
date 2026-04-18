@@ -117,7 +117,7 @@ export default function PublicMonitoringIsf() {
           {/* 1. Legenda Zona - Sub-component */}
           <IsfLegendaZona />
 
-          <Separator className="opacity-50" />
+          <Separator />
 
           <IsfOverallSummary
             overallProgress={dashboard?.overall_progress ?? 0}
@@ -125,7 +125,7 @@ export default function PublicMonitoringIsf() {
             zones={dashboard?.zones ?? []}
           />
 
-          <Separator className="opacity-50" />
+          <Separator />
 
           <IsfProgressChart data={dashboard?.line_chart ?? []} />
         </div>
@@ -321,9 +321,9 @@ function IsfOverallSummary({
 
       <div className="flex w-full flex-col items-center justify-center gap-12 sm:flex-row lg:gap-20">
         {/* Left: Pie Chart */}
-        <div className="flex size-64 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+        <div style={{ width: 300, height: 200 }}>
+          <ResponsiveContainer>
+            <PieChart width={300} height={200}>
               <Pie
                 data={[
                   ...pieData,
@@ -387,30 +387,61 @@ function IsfOverallSummary({
 
         {/* Right: Progress Grid */}
         <div className="grid flex-1 grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
-          {STEPS.map((s) => {
-            const progress =
-              zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
-              0;
-            return (
-              <div key={s.id} className="space-y-2">
-                <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={cn(
-                        "size-1.5 rounded-full shadow-sm",
-                        STEP_COLORS[s.id] || "bg-primary",
-                      )}
-                    />
-                    <span className="text-foreground/70">Zona {s.id}</span>
+          {/* Kolom Kiri: Zona 1-4 */}
+          <div className="space-y-4">
+            {STEPS.filter((s) => s.id <= 4).map((s) => {
+              const progress =
+                zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
+                0;
+              return (
+                <div key={s.id} className="space-y-2">
+                  <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={cn(
+                          "size-1.5 rounded-full shadow-sm",
+                          STEP_COLORS[s.id] || "bg-primary",
+                        )}
+                      />
+                      <span className="text-foreground/70">Zona {s.id}</span>
+                    </div>
+                    <span className="text-primary font-semibold tabular-nums">
+                      {progress}%
+                    </span>
                   </div>
-                  <span className="text-primary font-semibold tabular-nums">
-                    {progress}%
-                  </span>
+                  <Progress value={progress} className="h-2 w-full" />
                 </div>
-                <Progress value={progress} className="h-2" />
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Kolom Kanan: Zona 5-7 */}
+          <div className="space-y-4">
+            {STEPS.filter((s) => s.id >= 5).map((s) => {
+              const progress =
+                zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
+                0;
+              return (
+                <div key={s.id} className="space-y-2">
+                  <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={cn(
+                          "size-1.5 rounded-full shadow-sm",
+                          STEP_COLORS[s.id] || "bg-primary",
+                        )}
+                      />
+                      <span className="text-foreground/70">Zona {s.id}</span>
+                    </div>
+                    <span className="text-primary font-semibold tabular-nums">
+                      {progress}%
+                    </span>
+                  </div>
+                  <Progress value={progress} className="h-2 w-full" />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -432,17 +463,14 @@ function IsfProgressChart({
   }>;
 }) {
   return (
-    <div className="flex w-full flex-col items-center justify-center space-y-8">
+    <div className="flex flex-col items-center justify-center gap-8">
       <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
         Grafik Progress
       </p>
 
-      <div className="h-[300px] w-full max-w-4xl">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={data}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-          >
+      <div style={{ width: "100%", height: 300 }}>
+        <ResponsiveContainer>
+          <LineChart data={data}>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}

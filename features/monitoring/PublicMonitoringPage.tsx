@@ -4,10 +4,10 @@ import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  ArrowUpIcon,
   BiohazardIcon,
   FilterIcon,
   LucideIcon,
-  Navigation2,
   PlaneTakeoffIcon,
   ShrimpIcon,
   XIcon,
@@ -121,7 +121,7 @@ function Header() {
           <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
             Monitoring Publik
           </p>
-          <h1 className="text-foreground text-lg font-semibold tracking-tight">
+          <h1 className="text-foreground font-semibold tracking-tight">
             Peta Sebaran Program Prioritas
           </h1>
         </div>
@@ -168,7 +168,7 @@ function FilterLayerContent({
   );
 }
 
-const TOOLBAR_MAP_ICONS: LucideIcon[] = [FilterIcon, Navigation2];
+const TOOLBAR_MAP_ICONS: LucideIcon[] = [FilterIcon, ArrowUpIcon];
 
 function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
   return (
