@@ -2,7 +2,6 @@
 
 import { createClient } from "@/utils/supabase";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { IsfReportFormValues } from "../forms/isf-report-schema";
 import {
   IsfProgramLog,
@@ -10,6 +9,7 @@ import {
   IsfStepSummary,
 } from "../types/isf";
 import { STEPS } from "../constants/isf-step";
+import { insertDocumentations } from "@/features/documentation/actions";
 
 async function assertProgressNotRegressing(
   stepId: number,
@@ -145,17 +145,41 @@ export async function createIsfProgramLog(data: IsfReportFormValues) {
   await assertProgressNotRegressing(data.step_id, data.progress_percent);
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: createdLog, error } = await supabase
     .from("isf_program_logs")
-    .insert(toDbPayload(data));
+    .insert(toDbPayload(data))
+    .select("id, step_id")
+    .single();
 
   if (error) {
     throw error;
   }
 
+  if (!createdLog) {
+    throw new Error("Gagal membuat laporan ISF.");
+  }
+
+  if (data.documentations.length > 0) {
+    const savedDocumentations = await insertDocumentations(
+      supabase,
+      createdLog.id as number,
+      "isf",
+      data.documentations,
+    );
+    if (!savedDocumentations.success) {
+      throw new Error(
+        savedDocumentations.error ??
+          "Gagal menyimpan dokumentasi ISF saat create.",
+      );
+    }
+  }
+
   revalidatePath("/dashboard/isf");
   revalidatePath(`/dashboard/isf/${data.step_id}`);
-  redirect(`/dashboard/isf/${data.step_id}`);
+  return {
+    id: createdLog.id as number,
+    stepId: createdLog.step_id as number,
+  };
 }
 
 export async function updateIsfProgramLog(
@@ -177,11 +201,26 @@ export async function updateIsfProgramLog(
     throw error;
   }
 
+  if (data.documentations.length > 0) {
+    const savedDocumentations = await insertDocumentations(
+      supabase,
+      id,
+      "isf",
+      data.documentations,
+    );
+    if (!savedDocumentations.success) {
+      throw new Error(
+        savedDocumentations.error ??
+          "Gagal menyimpan dokumentasi ISF saat update.",
+      );
+    }
+  }
+
   revalidatePath("/dashboard/isf");
   revalidatePath(`/dashboard/isf/${data.step_id}`);
   revalidatePath(`/dashboard/isf/report/${id}`);
   revalidatePath(`/dashboard/isf/report/${id}/edit`);
-  redirect(`/dashboard/isf/${data.step_id}`);
+  return { id, stepId: data.step_id };
 }
 
 export async function deleteIsfProgramLog(id: number, stepId: number) {

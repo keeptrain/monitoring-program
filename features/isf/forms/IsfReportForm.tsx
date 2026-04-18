@@ -12,9 +12,9 @@ import { useIsfReportForm } from "../hooks/useIsfReportForm";
 import IsfInformationBasicFormSection from "../components/IsfInformationBasicFormSection";
 import IsfDetailRingkasanFormSection from "../components/IsfDetailRingkasanFormSection";
 import IsfSCurveFormSection from "../components/IsfSCurveFormSection";
-import IsfDocumentationsFormSection from "../components/IsfDocumentationsFormSection";
 import { Loader2 } from "lucide-react";
 import { IsfProgramLog } from "../types/isf";
+import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 
 export default function IsfReportForm({
   initialStep,
@@ -23,7 +23,7 @@ export default function IsfReportForm({
   initialStep?: string;
   initialData?: IsfProgramLog;
 }) {
-  const { form, onSubmit, isPending } = useIsfReportForm(
+  const { form, onSubmit, isPending, documentationError } = useIsfReportForm(
     initialStep,
     initialData,
   );
@@ -88,7 +88,11 @@ export default function IsfReportForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <IsfDocumentationsFormSection form={form} />
+            <DocumentationsFormSection
+              form={form}
+              externalErrorMessage={documentationError}
+              storageBasePath="isf"
+            />
           </CardContent>
         </Card>
 

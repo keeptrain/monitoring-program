@@ -1,8 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import {
-  isfDocumentationSchema,
   isfReportSchema,
   IsfReportFormInput,
   IsfReportFormValues,
@@ -13,6 +12,7 @@ import {
   updateIsfProgramLog,
 } from "../actions/isf-program-logs";
 import { IsfProgramLog } from "../types/isf";
+import { documentationFormSchema } from "@/features/documentation/documentation-schema";
 
 const DEFAULT_VALUES: IsfReportFormInput = {
   progress_date: new Date().toISOString().split("T")[0],
@@ -36,6 +36,9 @@ export function useIsfReportForm(
   initialData?: IsfProgramLog,
 ) {
   const [isPending, startTransition] = useTransition();
+  const [documentationError, setDocumentationError] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
 
   const form = useForm<IsfReportFormInput, undefined, IsfReportFormValues>({
@@ -56,9 +59,9 @@ export function useIsfReportForm(
 
   const onSubmit = (values: IsfReportFormValues) => {
     startTransition(async () => {
+      setDocumentationError(null);
       try {
-        const parsedDocumentations = isfDocumentationSchema
-          .array()
+        const parsedDocumentations = documentationFormSchema.shape.documentations
           .safeParse(values.documentations ?? []);
 
         const payload: IsfReportFormValues = {
@@ -72,23 +75,29 @@ export function useIsfReportForm(
         };
 
         if (initialData?.id) {
-          await updateIsfProgramLog(initialData.id, payload);
+          const updated = await updateIsfProgramLog(initialData.id, payload);
+
+          router.push(`/dashboard/isf/${updated.stepId}`);
+          router.refresh();
           return;
         }
 
-        await createIsfProgramLog(payload);
+        const created = await createIsfProgramLog(payload);
+
+        router.push(`/dashboard/isf/${created.stepId}`);
+        router.refresh();
       } catch (error) {
         if (
           error instanceof Error &&
           !error.message.includes("NEXT_REDIRECT")
         ) {
           console.error("Failed to submit ISF report:", error);
-          alert(error.message);
+          setDocumentationError(error.message);
         }
         router.refresh();
       }
     });
   };
 
-  return { form, onSubmit, isPending };
+  return { form, onSubmit, isPending, documentationError };
 }

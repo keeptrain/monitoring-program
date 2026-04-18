@@ -41,3 +41,13 @@ export const handleGeoCoordinateValueChange = (
 
   e.target.value = sanitized;
 };
+
+export function generateUniqueFileName(file: File): string {
+  // generate random string with 4 characters
+  const randomStr = Math.random().toString(36).substring(2, 6);
+  // get file extension
+  const fileExt = (file.name.split(".").pop() || "bin").toLowerCase();
+  // generate file name with format: timestamp-randomStr.ext
+  const fileName = `${Date.now()}-${randomStr}.${fileExt}`;
+  return fileName;
+}

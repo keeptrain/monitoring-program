@@ -1,11 +1,7 @@
+import { documentationFormSchema } from "@/features/documentation/documentation-schema";
 import { z } from "zod";
 
-export const isfDocumentationSchema = z.object({
-  image_before_path: z.string().min(1, "Foto sebelum wajib diunggah"),
-  image_after_path: z.string().min(1, "Foto sesudah wajib diunggah"),
-});
-
-export const isfReportSchema = z.object({
+const isfReportBaseSchema = z.object({
   progress_date: z.string().min(1, "Tanggal harus diisi"),
   step_id: z.coerce.number().min(1).max(7, "Tahapan tidak valid"),
   status: z.string().min(1, "Status harus dipilih"),
@@ -22,7 +18,10 @@ export const isfReportSchema = z.object({
   constraints: z.string().optional().default(""),
   follow_up: z.string().optional().default(""),
   s_curve_path: z.string().optional().default(""),
-  documentations: z.array(isfDocumentationSchema).optional().default([]),
+});
+
+export const isfReportSchema = isfReportBaseSchema.extend({
+  documentations: documentationFormSchema.shape.documentations.optional().default([]),
 });
 
 export type IsfReportFormInput = z.input<typeof isfReportSchema>;
