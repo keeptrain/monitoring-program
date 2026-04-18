@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useTransition } from "react";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import Link from "next/link";
 import Datatable from "@/components/datatable/datatable";
 import {
   IsfReport,
@@ -12,49 +11,40 @@ import {
 import { STEPS } from "./constants/isf-step";
 import { useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
+import { IsfReportDateWindow } from "./utils/report-date-window";
 
 export default function IsfStepProgramPage({
   step,
   data,
+  availableDate,
 }: {
   step: number;
   data: IsfReport[];
+  availableDate: IsfReportDateWindow;
 }) {
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const stepData = STEPS.find((s) => s.id === step);
+  const {
+    minDate,
+    maxDate,
+    canCreate: isCanCreateReport,
+    errorMessage,
+  } = availableDate;
 
-  const handleDelete = useCallback(
-    (row: IsfReport) => {
-      const confirmed = window.confirm("Hapus laporan ini?");
-      if (!confirmed) {
-        return;
-      }
+  const columns = useMemo(() => getIsfProgramReportsColumns(), []);
 
-      startTransition(async () => {
-        try {
-          const response = await fetch(
-            `/api/isf/program-logs/${row.id}?stepId=${step}`,
-            {
-              method: "DELETE",
-            },
-          );
-          if (!response.ok) {
-            throw new Error("Failed to delete ISF log");
-          }
-          router.refresh();
-        } catch (error) {
-          console.error("Failed to delete ISF log:", error);
-        }
-      });
-    },
-    [router, step],
-  );
+  const handleCreateHref = useMemo(() => {
+    const params = new URLSearchParams({ step: String(step) });
 
-  const columns = useMemo(
-    () => getIsfProgramReportsColumns(handleDelete),
-    [handleDelete],
-  );
+    if (minDate) {
+      params.set("minDate", minDate);
+    }
+    if (maxDate) {
+      params.set("maxDate", maxDate);
+    }
+
+    return `/dashboard/isf/create?${params.toString()}`;
+  }, [maxDate, minDate, step]);
 
   const handleRowClick = (
     e: MouseEvent<HTMLTableRowElement>,
@@ -82,18 +72,24 @@ export default function IsfStepProgramPage({
             {stepData?.name}.
           </p>
         </div>
-        <Button size="sm" asChild>
-          <Link href={`/dashboard/isf/create?step=${step}`}>
-            <PlusIcon className="mr-1.5 size-3.5" />
+        <div className="space-y-1">
+          <Button
+            disabled={!isCanCreateReport}
+            onClick={() => router.push(handleCreateHref)}
+          >
+            <PlusIcon className="size-4" />
             Tambah Laporan
-          </Link>
-        </Button>
+          </Button>
+        </div>
       </div>
 
+      {!isCanCreateReport && (
+        <p className="text-muted-foreground text-xs">
+          {errorMessage ?? "Belum ada tanggal laporan yang tersedia."}
+        </p>
+      )}
+
       <Datatable columns={columns} data={data} onRowClick={handleRowClick} />
-      {isPending ? (
-        <p className="text-muted-foreground mt-3 text-xs">Memproses...</p>
-      ) : null}
     </div>
   );
 }

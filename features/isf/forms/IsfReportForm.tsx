@@ -19,13 +19,19 @@ import DocumentationsFormSection from "@/features/documentation/DocumentationsFo
 export default function IsfReportForm({
   initialStep,
   initialData,
+  initialMinDate,
+  initialMaxDate,
 }: {
   initialStep?: string;
   initialData?: IsfProgramLog;
+  initialMinDate?: string;
+  initialMaxDate?: string;
 }) {
   const { form, onSubmit, isPending, documentationError } = useIsfReportForm(
     initialStep,
     initialData,
+    initialMinDate,
+    initialMaxDate,
   );
 
   return (
@@ -54,7 +60,11 @@ export default function IsfReportForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <IsfInformationBasicFormSection form={form} />
+            <IsfInformationBasicFormSection
+              form={form}
+              minDate={initialData ? undefined : initialMinDate}
+              maxDate={initialData ? undefined : initialMaxDate}
+            />
           </CardContent>
         </Card>
 

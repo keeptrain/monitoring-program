@@ -13,7 +13,12 @@ export default async function IsfStepPage({
     return notFound();
   }
 
-  const logs = await getIsfProgramLogsByStep(stepNumber);
-  const data = logs.map((row) => ({ ...row, step_id: stepNumber }));
-  return <IsfStepProgramPage step={stepNumber} data={data} />;
+  const result = await getIsfProgramLogsByStep(stepNumber);
+  return (
+    <IsfStepProgramPage
+      step={stepNumber}
+      data={result.data}
+      availableDate={result.availableDate}
+    />
+  );
 }

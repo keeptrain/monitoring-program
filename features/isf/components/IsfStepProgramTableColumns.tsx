@@ -1,14 +1,13 @@
 import React from "react";
 import { Column } from "@/components/datatable/datatable";
-import { formatDateWithTime } from "@/lib/utils";
+import { formatDate, formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
-import { PencilIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon } from "lucide-react";
 
 export interface IsfReport {
   id: number;
-  step_id: number;
   progress_date: string;
   progress_percent: number;
   name: string;
@@ -16,16 +15,14 @@ export interface IsfReport {
   updated_at: string;
 }
 
-export function getIsfProgramReportsColumns(
-  onDelete?: (row: IsfReport) => void,
-): Column<IsfReport>[] {
+export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
   return [
     {
       header: "Dilaporkan Pada",
       accessorKey: "progress_date",
       cell: (row) => (
         <span className="text-muted-foreground text-xs font-medium italic">
-          {formatDateWithTime(row.progress_date)}
+          {formatDate(row.progress_date)}
         </span>
       ),
     },
@@ -79,15 +76,6 @@ export function getIsfProgramReportsColumns(
             label: "Ubah",
             href: `/dashboard/isf/report/${row.id}/edit`,
             icon: <PencilIcon className="size-4" />,
-          },
-          {
-            type: "action",
-            key: "delete",
-            label: "Hapus",
-            onClick: () => onDelete?.(row),
-            disabled: !onDelete,
-            icon: <Trash2Icon className="text-destructive size-4" />,
-            destructive: true,
           },
         ];
         return <MoreButton menuItems={menuItems} />;

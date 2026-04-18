@@ -3,7 +3,7 @@ CREATE TABLE isf_program_logs (
   step_id INTEGER NOT NULL CHECK (step_id BETWEEN 1 AND 7),
 
   progress_percent INTEGER CHECK (progress_percent BETWEEN 0 AND 100),
-  progress_date TIMESTAMPTZ NOT NULL,
+  progress_date DATE NOT NULL,
 
   name TEXT NOT NULL,
   status TEXT NOT NULL,

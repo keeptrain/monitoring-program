@@ -58,7 +58,10 @@ export default function PublicMonitoringIsf() {
   };
 
   return (
-    <div className="bg-background no-scrollbar absolute inset-0 flex h-full w-full flex-col overflow-y-auto">
+    <div
+      id="public-monitoring-container"
+      className="bg-background no-scrollbar absolute inset-0 flex h-full w-full flex-col overflow-y-auto"
+    >
       <div className="flex flex-1 flex-col p-6 lg:flex-row lg:gap-8 lg:p-10">
         {/* Main Map Area */}
         <div className="flex flex-1 items-center justify-center">

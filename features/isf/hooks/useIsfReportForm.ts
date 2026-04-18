@@ -15,7 +15,7 @@ import { IsfProgramLog } from "../types/isf";
 import { documentationFormSchema } from "@/features/documentation/documentation-schema";
 
 const DEFAULT_VALUES: IsfReportFormInput = {
-  progress_date: new Date().toISOString().split("T")[0],
+  progress_date: "",
   step_id: 1,
   status: "",
   progress_percent: 0,
@@ -34,6 +34,8 @@ const DEFAULT_VALUES: IsfReportFormInput = {
 export function useIsfReportForm(
   initialStep?: string,
   initialData?: IsfProgramLog,
+  initialMinDate?: string,
+  initialMaxDate?: string,
 ) {
   const [isPending, startTransition] = useTransition();
   const [documentationError, setDocumentationError] = useState<string | null>(
@@ -61,8 +63,32 @@ export function useIsfReportForm(
     startTransition(async () => {
       setDocumentationError(null);
       try {
-        const parsedDocumentations = documentationFormSchema.shape.documentations
-          .safeParse(values.documentations ?? []);
+        if (!initialData) {
+          if (
+            initialMinDate &&
+            values.progress_date &&
+            values.progress_date < initialMinDate
+          ) {
+            throw new Error(
+              `Tanggal laporan tidak boleh lebih kecil dari batas: ${initialMinDate}.`,
+            );
+          }
+
+          if (
+            initialMaxDate &&
+            values.progress_date &&
+            values.progress_date > initialMaxDate
+          ) {
+            throw new Error(
+              `Tanggal laporan tidak boleh melebihi batas: ${initialMaxDate}.`,
+            );
+          }
+        }
+
+        const parsedDocumentations =
+          documentationFormSchema.shape.documentations.safeParse(
+            values.documentations ?? [],
+          );
 
         const payload: IsfReportFormValues = {
           ...values,

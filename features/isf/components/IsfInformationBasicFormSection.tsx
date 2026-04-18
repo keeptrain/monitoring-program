@@ -15,8 +15,12 @@ import { handleInputNumberValueChange } from "@/lib/utils";
 
 export default function IsfInformationBasicFormSection({
   form,
+  minDate,
+  maxDate,
 }: {
   form: UseFormReturn<IsfReportFormInput, undefined, IsfReportFormValues>;
+  minDate?: string;
+  maxDate?: string;
 }) {
   return (
     <div className="space-y-4">
@@ -34,7 +38,8 @@ export default function IsfInformationBasicFormSection({
           <FieldLabel>Tanggal Laporan</FieldLabel>
           <Input
             type="date"
-            min={getMondayOfCurrentWeek()}
+            min={minDate}
+            max={maxDate}
             {...form.register("progress_date")}
             aria-invalid={!!form.formState.errors.progress_date}
           />
@@ -129,16 +134,4 @@ export default function IsfInformationBasicFormSection({
       </div>
     </div>
   );
-}
-
-function getMondayOfCurrentWeek() {
-  const today = new Date();
-  const day = today.getDay(); // 0 (Minggu) s/d 6 (Sabtu)
-
-  // Jika hari ini Minggu (0), kita mundur 6 hari ke Senin lalu.
-  // Jika hari lain, kita mundur (day - 1) hari.
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-
-  const monday = new Date(today.setDate(diff));
-  return monday.toISOString().split("T")[0]; // Format YYYY-MM-DD
 }

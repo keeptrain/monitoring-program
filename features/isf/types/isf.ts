@@ -1,3 +1,5 @@
+import { IsfReportDateWindow } from "../utils/report-date-window";
+
 export interface IsfProgramLog {
   id: number;
   step_id: number;
@@ -18,14 +20,13 @@ export interface IsfProgramLog {
 
 export type IsfProgramLogListItem = Pick<
   IsfProgramLog,
-  | "id"
-  | "name"
-  | "status"
-  | "progress_date"
-  | "progress_percent"
-  | "created_at"
-  | "updated_at"
+  "id" | "name" | "status" | "progress_date" | "progress_percent" | "updated_at"
 >;
+
+export interface IsfProgramLogsByStepResult {
+  data: IsfProgramLogListItem[];
+  availableDate: IsfReportDateWindow;
+}
 
 export interface IsfStepSummary {
   step_id: number;

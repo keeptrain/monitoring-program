@@ -6,10 +6,12 @@ import { IsfReportFormValues } from "../forms/isf-report-schema";
 import {
   IsfProgramLog,
   IsfProgramLogListItem,
+  IsfProgramLogsByStepResult,
   IsfStepSummary,
 } from "../types/isf";
 import { STEPS } from "../constants/isf-step";
 import { insertDocumentations } from "@/features/documentation/actions";
+import { getReportBounds } from "../utils/report-date-window";
 
 async function assertProgressNotRegressing(
   stepId: number,
@@ -61,30 +63,38 @@ function toDbPayload(data: IsfReportFormValues) {
 
 export async function getIsfProgramLogsByStep(
   stepId: number,
-): Promise<IsfProgramLogListItem[]> {
+): Promise<IsfProgramLogsByStepResult> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("isf_program_logs")
     .select(
-      "id, name, status, progress_date, progress_percent, created_at, updated_at",
+      "id, name, status, progress_date, progress_percent, updated_at, created_at",
     )
     .eq("step_id", stepId)
-    .order("progress_percent", { ascending: true })
+    .order("progress_date", { ascending: false })
     .order("created_at", { ascending: false });
 
   if (error) {
+    console.error("Error fetching ISF program logs by step:", error);
     throw error;
   }
 
-  return (data ?? []).map((item) => ({
+  const mappedData: IsfProgramLogListItem[] = (data ?? []).map((item) => ({
     id: item.id,
     name: item.name,
     status: item.status,
     progress_percent: item.progress_percent,
     progress_date: item.progress_date,
-    created_at: item.created_at,
     updated_at: item.updated_at,
   }));
+
+  const latestReport = data?.[0];
+  const dateWindow = getReportBounds(latestReport?.progress_date ?? null);
+
+  return {
+    data: mappedData,
+    availableDate: dateWindow,
+  };
 }
 
 export async function getIsfProgramLogById(id: number): Promise<IsfProgramLog> {
@@ -139,9 +149,26 @@ export async function getIsfStepSummaries(): Promise<IsfStepSummary[]> {
 }
 
 export async function createIsfProgramLog(data: IsfReportFormValues) {
-  if (data.progress_date > new Date().toISOString().split("T")[0]) {
-    throw new Error("Tanggal laporan tidak boleh kurang dari minggu ini.");
+  const createWindow = await getCreateDateWindow(data.step_id);
+  if (!createWindow.canCreate) {
+    throw new Error(
+      createWindow.errorMessage ??
+        "Laporan minggu ini dan minggu depan sudah terisi.",
+    );
   }
+
+  if (data.progress_date > createWindow.maxDate) {
+    throw new Error(
+      `Tanggal laporan tidak boleh melebihi batas: ${createWindow.maxDate}.`,
+    );
+  }
+
+  if (createWindow.minDate && data.progress_date < createWindow.minDate) {
+    throw new Error(
+      `Tanggal laporan tidak boleh lebih kecil dari batas: ${createWindow.minDate}.`,
+    );
+  }
+
   await assertProgressNotRegressing(data.step_id, data.progress_percent);
 
   const supabase = await createClient();
@@ -236,4 +263,37 @@ export async function deleteIsfProgramLog(id: number, stepId: number) {
 
   revalidatePath("/dashboard/isf");
   revalidatePath(`/dashboard/isf/${stepId}`);
+}
+
+interface IsfCreateDateWindow {
+  minDate: string | null;
+  maxDate: string;
+  canCreate: boolean;
+  errorMessage?: string;
+}
+
+async function getCreateDateWindow(
+  stepId: number,
+): Promise<IsfCreateDateWindow> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("isf_program_logs")
+    .select("progress_date")
+    .eq("step_id", stepId)
+    .order("progress_date", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  const dateWindow = getReportBounds(data?.progress_date ?? null);
+
+  return {
+    minDate: dateWindow.minDate,
+    maxDate: dateWindow.maxDate,
+    canCreate: dateWindow.canCreate,
+    errorMessage: dateWindow.errorMessage,
+  };
 }

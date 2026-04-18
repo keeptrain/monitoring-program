@@ -176,7 +176,20 @@ function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
       {TOOLBAR_MAP_ICONS.map((Icon, i) => (
         <button
           key={i}
-          onClick={Icon === FilterIcon ? onFilterClick : undefined}
+          onClick={
+            Icon === FilterIcon
+              ? onFilterClick
+              : () => {
+                  const container = document.getElementById(
+                    "public-monitoring-container",
+                  );
+                  if (container) {
+                    container.scrollTo({ top: 0, behavior: "smooth" });
+                  } else {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }
+          }
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center transition-colors",
             Icon === FilterIcon ? "flex h-9 gap-2 px-3" : "size-9",
