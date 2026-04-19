@@ -7,7 +7,9 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
-import { PieChart, Pie, Label, ResponsiveContainer } from "recharts";
+import { WeekDetailInfo } from "./isf-detail/WeekDetailInfo";
+import { LazyDocumentationSection } from "./isf-detail/LazyDocumentationSection";
+import { ProgressPieChartZoneIsf } from "./isf-detail/ProgressPieChartZoneIsf";
 
 type MonitoringDetailClientProps = {
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -53,11 +55,19 @@ export default function MonitoringDetailClient({
     );
     return {
       id: mondayDate,
+      dbId: report?.id,
       weekNumber: index + 1,
       name: `Minggu ${index + 1}`,
       hasReport: !!report,
       progress: report?.progress_percent || 0,
       progressDate: report?.progress_date || null,
+      provider_name: report?.provider_name || "-",
+      production: report?.production || "-",
+      intervention: report?.intervention || "-",
+      total_worker: report?.total_worker || 0,
+      outcome: report?.outcome || "-",
+      constraints: report?.constraints || "-",
+      follow_up: report?.follow_up || "-",
     };
   });
 
@@ -65,7 +75,7 @@ export default function MonitoringDetailClient({
   const activeWeekData = weeks.find((w: any) => w.id === selectedWeek);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Weekly Selection Grid */}
       <div className="grid grid-cols-3 gap-4 md:grid-cols-5">
         {weeks.map((week: any) => (
@@ -96,59 +106,41 @@ export default function MonitoringDetailClient({
       </div>
 
       {/* Konten Detail & Chart */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="h-[180px] w-[180px]">
-          <ZoneProgressChart progress={activeWeekData?.progress || 0} />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="flex flex-col items-center gap-4">
+          <div className="size-44">
+            <ProgressPieChartZoneIsf progress={activeWeekData?.progress || 0} />
+          </div>
+          {activeWeekData?.hasReport && (
+            <div className="mt-4 w-full text-center">
+              <p className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
+                Tenaga Kerja
+              </p>
+              <p className="mt-1 text-sm font-semibold text-zinc-900">
+                {activeWeekData.total_worker}{" "}
+                <span className="text-xs font-medium text-zinc-500">Orang</span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Detail Info */}
+        <div className="md:col-span-2">
+          {activeWeekData?.hasReport && (
+            <WeekDetailInfo data={activeWeekData} />
+          )}
         </div>
       </div>
+
+      {/* Lazy Documentation Section */}
+      {activeWeekData?.hasReport && activeWeekData?.dbId && (
+        <LazyDocumentationSection
+          key={activeWeekData.dbId}
+          type="isf"
+          programId={activeWeekData.dbId}
+        />
+      )}
     </div>
-  );
-}
-
-function ZoneProgressChart({ progress }: { progress: number }) {
-  const chartData = [
-    { name: "Progress", value: progress, fill: "var(--primary)" },
-    { name: "Sisa", value: 100 - progress, fill: "#f1f5f9" },
-  ];
-
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={chartData}
-          innerRadius={65}
-          outerRadius={85}
-          startAngle={90}
-          endAngle={450}
-          dataKey="value"
-          stroke="none"
-          isAnimationActive={true}
-          animationDuration={800}
-        >
-          <Label
-            content={({ viewBox }) => {
-              const { cx, cy } = viewBox as { cx: number; cy: number };
-              return (
-                <text
-                  x={cx}
-                  y={cy}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                >
-                  <tspan
-                    x={cx}
-                    y={cy}
-                    className="fill-primary text-3xl font-black tracking-tighter italic"
-                  >
-                    {progress}%
-                  </tspan>
-                </text>
-              );
-            }}
-          />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
   );
 }
 

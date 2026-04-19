@@ -78,7 +78,9 @@ export async function getIsfPerMonthByZone(zoneNumber: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("isf_program_logs")
-    .select("*")
+    .select(
+      "id, progress_date, progress_percent, reporting_week, provider_name, production, intervention, total_worker, outcome, constraints, follow_up",
+    )
     .eq("step_id", zoneNumber)
     .order("progress_date", { ascending: false });
 
@@ -93,6 +95,13 @@ export async function getIsfPerMonthByZone(zoneNumber: number) {
       progress_date: row.progress_date,
       reporting_week: row.reporting_week,
       progress_percent: row.progress_percent,
+      provider_name: row.provider_name,
+      production: row.production,
+      intervention: row.intervention,
+      total_worker: row.total_worker,
+      outcome: row.outcome,
+      constraints: row.constraints,
+      follow_up: row.follow_up,
       month: new Date(row.reporting_week).getMonth() + 1,
     };
   });
