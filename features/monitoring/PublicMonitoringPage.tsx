@@ -3,13 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  ArrowRightIcon,
   ArrowUpIcon,
-  BiohazardIcon,
   FilterIcon,
+  Grid3x2Icon,
   LucideIcon,
-  PlaneTakeoffIcon,
+  Maximize2Icon,
   ShrimpIcon,
+  WheatIcon,
   XIcon,
 } from "lucide-react";
 import {
@@ -46,12 +46,12 @@ const FILTER_STATE: Record<
   biofloc_thematic: {
     label: "Tematik Bioflok",
     sub: "Budidaya Ikan Sistem Bioflok",
-    icon: BiohazardIcon,
+    icon: Grid3x2Icon,
   },
   minapadi_thematic: {
     label: "Tematik Minapadi",
     sub: "Budidaya Padi dan Ikan Terintegrasi",
-    icon: PlaneTakeoffIcon,
+    icon: WheatIcon,
   },
   isf: {
     label: "Integrated Shrimp Farming",
@@ -124,29 +124,29 @@ function EmptyFilterState({
   onSelect: (tab: LocationType) => void;
 }) {
   return (
-    <div className="mx-auto">
+    <div className="mx-auto py-8">
       <div className="mb-8 text-center">
         <p className="text-muted-foreground">Data Visualisasi</p>
         <h1 className="text-3xl text-zinc-900">Pilih Program Prioritas</h1>
       </div>
-      <div className="bg-border grid gap-px border sm:grid-cols-2 lg:grid-cols-3">
+      <div className="bg-border grid gap-px border lg:grid-cols-3">
         {Object.entries(FILTER_STATE).map(([key, value]) => (
           <button
             key={key}
             onClick={() => onSelect(key as LocationType)}
-            className="group bg-background hover:bg-muted/40 flex flex-col justify-between gap-12 p-8 text-left transition-all"
+            className="group bg-background flex flex-col justify-between gap-8 p-8 text-left transition-all hover:bg-zinc-50"
           >
             <div className="flex items-start justify-between">
               <div className="border-border group-hover:border-foreground flex size-12 items-center justify-center border transition-colors">
                 <value.icon className="text-foreground size-6" />
               </div>
-              <ArrowRightIcon className="text-muted-foreground group-hover:text-foreground size-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+              <Maximize2Icon className="text-muted-foreground group-hover:text-foreground size-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
             </div>
             <div>
-              <h2 className="text-foreground text-sm font-semibold">
+              <h2 className="text-foreground text-base font-semibold">
                 {value.label}
               </h2>
-              <p className="text-muted-foreground mt-1 text-[10px] leading-relaxed font-medium">
+              <p className="text-muted-foreground mt-1 leading-relaxed font-medium">
                 {value.sub}
               </p>
             </div>

@@ -5,7 +5,7 @@ import { FishIcon, LogInIcon } from "lucide-react";
 export default function Navbar() {
   return (
     <header className="border-border bg-background/90 sticky top-0 z-50 border-b backdrop-blur-sm">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
           href="/"
