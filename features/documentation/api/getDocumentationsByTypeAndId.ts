@@ -7,7 +7,6 @@ export const getDocumentationByTypeAndIdQueryKey = (
 ) => ["documentations", type, id];
 
 export const useGetDocumentationsByTypeAndId = (type: string, id: number) => {
-  console.log(type, id);
   return useQuery({
     queryKey: getDocumentationByTypeAndIdQueryKey(type, id),
     queryFn: async () => await getDocumentationsByTypeAndId(type, id),

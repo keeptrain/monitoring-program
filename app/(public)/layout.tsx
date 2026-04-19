@@ -1,5 +1,4 @@
 import Navbar from "@/components/Navbar";
-import { Header } from "@/features/monitoring/PublicMonitoringPage";
 
 export default function PublicLayout({
   children,
@@ -9,10 +8,7 @@ export default function PublicLayout({
   return (
     <div className="grid min-h-screen grid-rows-[auto_1fr]">
       <Navbar />
-      <main className="bg-background flex flex-col">
-        <Header />
-        {children}
-      </main>
+      <main className="bg-background flex flex-col">{children}</main>
     </div>
   );
 }
