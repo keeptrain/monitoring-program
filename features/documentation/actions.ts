@@ -289,4 +289,78 @@ export async function getDocumentationsByProgramId(
   return groupedByProgram.get(params.programId) ?? null;
 }
 
+/**
+ * Returns ALL documentation groups for a single program_id.
+ * Each group_id produces a separate ProgramDocumentationGroup.
+ */
+export async function getDocumentationGroupsByProgramId(
+  supabase: SupabaseClient,
+  params: DocumentationProgramIdQueryParams,
+): Promise<ProgramDocumentationGroup[]> {
+  const normalizedProgramType = documentationProgramTypeSchema.parse(
+    params.programType,
+  );
+  const programId = params.programId;
+
+  if (!Number.isInteger(programId) || programId <= 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("documentations")
+    .select("id, program_id, group_id, type, path, created_at")
+    .eq("program_type", normalizedProgramType)
+    .eq("program_id", programId)
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  // Group by group_id
+  const groupMap = new Map<string, ProgramDocumentationGroup>();
+
+  for (const row of (data ?? []) as DocumentationQueryRow[]) {
+    const groupKey = String(row.group_id ?? row.id);
+    const normalizedPath = normalizeStoragePath(row.path);
+    const publicUrl = toPublicStorageUrl(normalizedPath);
+
+    const existing = groupMap.get(groupKey);
+    if (!existing) {
+      groupMap.set(groupKey, {
+        programId: row.program_id,
+        groupId: row.group_id,
+        beforePaths: row.type === "before" ? [normalizedPath] : [],
+        afterPaths: row.type === "after" ? [normalizedPath] : [],
+        beforeUrls: row.type === "before" ? [publicUrl] : [],
+        afterUrls: row.type === "after" ? [publicUrl] : [],
+        allUrls: [publicUrl],
+      });
+    } else {
+      if (row.type === "before") {
+        existing.beforePaths.push(normalizedPath);
+        existing.beforeUrls.push(publicUrl);
+      } else {
+        existing.afterPaths.push(normalizedPath);
+        existing.afterUrls.push(publicUrl);
+      }
+      existing.allUrls.push(publicUrl);
+    }
+  }
+
+  return Array.from(groupMap.values());
+}
+
+export async function getDocumentationGroupsByTypeAndId(
+  type: string,
+  id: number,
+): Promise<ProgramDocumentationGroup[]> {
+  const supabase = await createClient();
+  return getDocumentationGroupsByProgramId(supabase, {
+    programType: type,
+    programId: id,
+  });
+}
+
 export { saveDocumentationsAction as insertDocumentations };
