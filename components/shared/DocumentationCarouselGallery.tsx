@@ -10,6 +10,8 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import Image from "next/image";
+import { useGetDocumentationsByTypeAndId } from "@/features/documentation/api/getDocumentationsByTypeAndId";
+import { Skeleton } from "../ui/skeleton";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") || "";
@@ -20,11 +22,12 @@ export type DocumentationImage = {
 };
 
 type DocumentationCarouselGalleryProps = {
+  type: string;
+  id: number;
   beforeImage?: DocumentationImage | null;
   afterImages?: DocumentationImage[];
   beforeLabel?: string;
   afterLabel?: string;
-  className?: string;
 };
 
 function toPublicImageUrl(src: string) {
@@ -35,33 +38,30 @@ function toPublicImageUrl(src: string) {
 }
 
 export default function DocumentationCarouselGallery({
-  beforeImage,
-  afterImages = [],
+  id,
+  type,
   beforeLabel = "Sebelum",
   afterLabel = "Sesudah",
-  className = "",
 }: DocumentationCarouselGalleryProps) {
+  const { data: documentations, isPending: documentationsPending } =
+    useGetDocumentationsByTypeAndId(type, id);
+
+  if (documentationsPending) {
+    return <DocumentationCarouselGallerySkeleton />;
+  }
+
+  const beforeImages: DocumentationImage[] =
+    documentations?.beforeUrls.map((url) => ({ src: url })) ?? [];
+  const afterImages: DocumentationImage[] =
+    documentations?.afterUrls.map((url) => ({ src: url })) ?? [];
+
   return (
-    <div className={`grid grid-cols-1 gap-4 lg:grid-cols-2 ${className}`}>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <section className="space-y-2">
         <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           {beforeLabel}
         </p>
-        <div className="border-border bg-muted/20 relative aspect-4/3 w-full overflow-hidden rounded-sm border">
-          {beforeImage?.src ? (
-            <Image
-              src={toPublicImageUrl(beforeImage.src)}
-              alt={beforeImage.alt ?? beforeLabel}
-              fill
-              className="object-cover"
-              unoptimized
-            />
-          ) : (
-            <div className="text-muted-foreground flex h-full items-center justify-center px-4 text-center text-xs">
-              Foto {beforeLabel.toLowerCase()} belum tersedia
-            </div>
-          )}
-        </div>
+        <CarouselDApiDemo images={beforeImages} emptyLabel={beforeLabel} />
       </section>
 
       <section className="space-y-2">
@@ -132,8 +132,18 @@ export function CarouselDApiDemo({
         <CarouselNext className="bg-background/90 right-2 z-10" />
       </Carousel>
       <div className="text-muted-foreground text-center text-xs">
-        Slide {current} / {count}
+        Gambar {current} / {count}
       </div>
+    </div>
+  );
+}
+
+function DocumentationCarouselGallerySkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {[1, 2].map((i) => (
+        <Skeleton key={i} className="aspect-4/3 w-full" />
+      ))}
     </div>
   );
 }

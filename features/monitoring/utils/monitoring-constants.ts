@@ -4,13 +4,13 @@ export const LINE_SERIES: Array<{
   dash: string;
   dotRadius: number;
 }> = [
-  { key: "z1", color: "#3b82f6", dash: "0", dotRadius: 5 },
-  { key: "z2", color: "#10b981", dash: "6 4", dotRadius: 4 },
-  { key: "z3", color: "#f59e0b", dash: "0", dotRadius: 5 },
-  { key: "z4", color: "#f43f5e", dash: "8 4", dotRadius: 4 },
-  { key: "z5", color: "#8b5cf6", dash: "0", dotRadius: 5 },
-  { key: "z6", color: "#06b6d4", dash: "4 4", dotRadius: 4 },
-  { key: "z7", color: "#14b8a6", dash: "10 4", dotRadius: 3 },
+  { key: "z1", color: "#3b82f6", dash: "0", dotRadius: 4 },
+  { key: "z2", color: "#10b981", dash: "0", dotRadius: 4 },
+  { key: "z3", color: "#f59e0b", dash: "0", dotRadius: 4 },
+  { key: "z4", color: "#f43f5e", dash: "0", dotRadius: 4 },
+  { key: "z5", color: "#8b5cf6", dash: "0", dotRadius: 4 },
+  { key: "z6", color: "#06b6d4", dash: "0", dotRadius: 4 },
+  { key: "z7", color: "#14b8a6", dash: "0", dotRadius: 4 },
 ];
 
 export const PIN_LOCATIONS: Record<number, { x: string; y: string }> = {

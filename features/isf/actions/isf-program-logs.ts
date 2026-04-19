@@ -203,6 +203,8 @@ export async function createIsfProgramLog(data: IsfReportFormValues) {
 
   revalidatePath("/dashboard/isf");
   revalidatePath(`/dashboard/isf/${data.step_id}`);
+  revalidatePath("/monitoring");
+  
   return {
     id: createdLog.id as number,
     stepId: createdLog.step_id as number,

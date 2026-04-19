@@ -11,35 +11,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  TrendingUpIcon,
-  HardHat,
-  LucideIcon,
-  ArrowRight,
-  TractorIcon,
-  UsersRoundIcon,
-} from "lucide-react";
-import IsfPublicMonitoringDetail from "../isf/components/IsfPublicMonitoringDetail";
-import { Progress } from "@/components/ui/progress";
+import { LucideIcon, ArrowRight, ClipboardXIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  Label,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
-import { useGetPublicIsfMonitoringDashboard } from "./api/getPublicLocationsByType";
-import { LINE_SERIES, PIN_LOCATIONS } from "./utils/monitoring-constants";
+import { useGetPublicMonitoringIsf } from "./api/getPublicLocationsByType";
+import { PIN_LOCATIONS } from "./utils/monitoring-constants";
+import OverallSummaryIsf from "./components/OverallSummaryIsf";
+import ProgressChartIsf from "./components/ProgressChartIsf";
+import PublicMonitoringIsfDetailSheet from "./components/PublicMonitoringIsfDetailSheet";
 
 export default function PublicMonitoringIsf() {
   const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
@@ -47,7 +28,11 @@ export default function PublicMonitoringIsf() {
     null,
   );
 
-  const { data: dashboard, isLoading } = useGetPublicIsfMonitoringDashboard();
+  const { data, isLoading } = useGetPublicMonitoringIsf();
+
+  const selectedZone = selectedStep
+    ? data?.data.find((zone) => zone?.step_id === selectedStep.id)
+    : undefined;
 
   const handlePinClick = (stepId: number) => {
     const step = STEPS.find((s) => s.id === stepId);
@@ -76,39 +61,13 @@ export default function PublicMonitoringIsf() {
             />
 
             {/* Pin Points */}
-            {STEPS.map((step) => {
-              const pos = PIN_LOCATIONS[step.id];
-              if (!pos) return null;
-
-              return (
-                <button
-                  key={step.id}
-                  onClick={() => handlePinClick(step.id)}
-                  className="group absolute z-10 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-125"
-                  style={{ left: pos.x, top: pos.y }}
-                >
-                  <div className="relative flex items-center justify-center">
-                    <div
-                      className={cn(
-                        "absolute h-10 w-10 animate-ping rounded-full opacity-40",
-                        STEP_COLORS[step.id] || "bg-primary",
-                      )}
-                    />
-                    <div
-                      className={cn(
-                        "relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-white shadow-xl",
-                        STEP_COLORS[step.id] || "bg-primary",
-                      )}
-                    >
-                      <span className="text-[10px] font-bold">{step.id}</span>
-                    </div>
-                    <div className="bg-background/90 border-border text-foreground absolute top-full mt-2 hidden min-w-max border px-2 py-1 text-[10px] font-semibold tracking-wide uppercase shadow-lg backdrop-blur lg:group-hover:block">
-                      {step.name}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+            {STEPS.map((step) => (
+              <IsfPinPoint
+                key={step.id}
+                step={step}
+                onClick={() => handlePinClick(step.id)}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -118,26 +77,143 @@ export default function PublicMonitoringIsf() {
         {/* Top Row: Symmetrical Legend, Pie, and Summary */}
         <div className="flex flex-col gap-10 py-6 md:py-4">
           {/* 1. Legenda Zona - Sub-component */}
-          <IsfLegendaZona />
+          <LegendaZona />
 
           <Separator />
 
-          <IsfOverallSummary
-            overallProgress={dashboard?.overall_progress ?? 0}
-            pieData={dashboard?.pie_chart ?? []}
-            zones={dashboard?.zones ?? []}
-          />
+          {data && <OverallSummaryIsf data={data} />}
 
           <Separator />
 
-          <IsfProgressChart data={dashboard?.line_chart ?? []} />
+          <ProgressChartIsf />
         </div>
 
         {/* Bottom Row: Specialized Reports Cards */}
-        <div className="py-24">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-10">
-            {/* Ketenagakerjaan Card */}
-            <ResourceStatItem
+        <div className="py-24"></div>
+      </div>
+
+      {/* Sheet */}
+      {sheetOpen !== null && selectedStep && (
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+          <SheetContent
+            side="right"
+            className="data-[side=right]:sm:max-w-[600px]"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-xl">
+                Zona {selectedStep.id}
+              </SheetTitle>
+              <SheetDescription className="text-xs font-medium tracking-widest uppercase">
+                {selectedStep.name}
+              </SheetDescription>
+            </SheetHeader>
+            {!selectedZone && !isLoading ? (
+              <EmptyZoneDetail />
+            ) : (
+              selectedZone && (
+                <PublicMonitoringIsfDetailSheet data={selectedZone} />
+              )
+            )}
+            {isLoading && (
+              <p className="text-muted-foreground mt-4 text-xs">
+                Memuat data...
+              </p>
+            )}
+          </SheetContent>
+        </Sheet>
+      )}
+    </div>
+  );
+}
+
+function EmptyZoneDetail() {
+  return (
+    <div className="flex h-[calc(100vh-200px)] flex-col items-center justify-center space-y-4 px-6 text-center">
+      <div className="bg-muted flex size-16 items-center justify-center rounded-full">
+        <ClipboardXIcon className="text-muted-foreground size-8" />
+      </div>
+      <div className="space-y-1">
+        <p className="text-foreground text-base font-semibold">
+          Belum Ada Data Laporan
+        </p>
+        <p className="text-muted-foreground text-sm leading-relaxed">
+          Zona ini belum melakukan penginputan laporan <br /> monitoring untuk
+          periode ini.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function LegendaZona() {
+  return (
+    <div className="flex w-full flex-col items-center justify-center space-y-6">
+      <p className="text-primary text-xs font-black tracking-[0.2em] uppercase">
+        Legenda Zona
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+        {STEPS.map((s) => (
+          <div key={s.id} className="flex items-center gap-2.5">
+            <div
+              className={cn(
+                "size-2.5 rounded-full shadow-sm",
+                STEP_COLORS[s.id] || "bg-primary",
+              )}
+            />
+            <span className="text-foreground/70 text-xs font-bold tracking-tight uppercase">
+              {s.id}. {s.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function IsfPinPoint({
+  step,
+  onClick,
+}: {
+  step: (typeof STEPS)[0];
+  onClick: () => void;
+}) {
+  const pos = PIN_LOCATIONS[step.id];
+  if (!pos) return null;
+
+  return (
+    <button
+      onClick={onClick}
+      className="group absolute z-10 -translate-x-1/2 -translate-y-1/2 transition-all duration-300 hover:scale-125"
+      style={{ left: pos.x, top: pos.y }}
+    >
+      <div className="relative flex items-center justify-center">
+        <div
+          className={cn(
+            "absolute h-10 w-10 animate-ping rounded-full opacity-40",
+            STEP_COLORS[step.id] || "bg-primary",
+          )}
+        />
+        <div
+          className={cn(
+            "relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white text-white shadow-xl",
+            STEP_COLORS[step.id] || "bg-primary",
+          )}
+        >
+          <span className="text-[10px] font-bold">{step.id}</span>
+        </div>
+        <div className="bg-background/90 border-border text-foreground absolute top-full mt-2 hidden min-w-max border px-2 py-1 text-[10px] font-semibold tracking-wide uppercase shadow-lg backdrop-blur lg:group-hover:block">
+          {step.name}
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function SpecializedCard() {
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-10">
+      {/* Ketenagakerjaan Card */}
+      {/* <ResourceStatItem
               icon={UsersRoundIcon}
               title="Ketenagakerjaan"
               subTitle="Terverifikasi Lapangan"
@@ -159,10 +235,10 @@ export default function PublicMonitoringIsf() {
                   : "Update: -"
               }
               href="/monitoring/labor"
-            />
+            /> */}
 
-            {/* Alat Berat Card */}
-            <ResourceStatItem
+      {/* Alat Berat Card */}
+      {/* <ResourceStatItem
               icon={TractorIcon}
               title="Alat Berat"
               subTitle="Unit Terintegrasi"
@@ -181,36 +257,7 @@ export default function PublicMonitoringIsf() {
               }
               updateText="Status: Standby & Run"
               href="/monitoring/equipment"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Sheet */}
-      {sheetOpen !== null && selectedStep && (
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetContent
-            side="right"
-            className="data-[side=right]:sm:max-w-[600px]"
-          >
-            <SheetHeader>
-              <SheetTitle className="text-xl">
-                Zona {selectedStep.id}
-              </SheetTitle>
-              <SheetDescription className="text-xs font-medium tracking-widest uppercase">
-                {selectedStep.name}
-              </SheetDescription>
-            </SheetHeader>
-
-            <IsfPublicMonitoringDetail data={{ name: selectedStep.name }} />
-            {isLoading ? (
-              <p className="text-muted-foreground mt-4 text-xs">
-                Memuat data...
-              </p>
-            ) : null}
-          </SheetContent>
-        </Sheet>
-      )}
+            /> */}
     </div>
   );
 }
@@ -274,266 +321,5 @@ function ResourceStatItem({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function IsfLegendaZona() {
-  return (
-    <div className="flex w-full flex-col items-center justify-center space-y-6">
-      <p className="text-primary text-xs font-black tracking-[0.2em] uppercase">
-        Legenda Zona
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-        {STEPS.map((s) => (
-          <div key={s.id} className="flex items-center gap-2.5">
-            <div
-              className={cn(
-                "size-2.5 rounded-full shadow-sm",
-                STEP_COLORS[s.id] || "bg-primary",
-              )}
-            />
-            <span className="text-foreground/70 text-xs font-bold tracking-tight uppercase">
-              {s.id}. {s.name}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function IsfOverallSummary({
-  overallProgress,
-  pieData,
-  zones,
-}: {
-  overallProgress: number;
-  pieData: Array<{
-    step_id: number;
-    name: string;
-    value: number;
-    fill: string;
-  }>;
-  zones: Array<{ step_id: number; progress_percent: number }>;
-}) {
-  return (
-    <div className="flex w-full flex-col items-center justify-center space-y-8">
-      <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
-        Overall Summary
-      </p>
-
-      <div className="flex w-full flex-col items-center justify-center gap-12 sm:flex-row lg:gap-20">
-        {/* Left: Pie Chart */}
-        <div style={{ width: 300, height: 200 }}>
-          <ResponsiveContainer>
-            <PieChart width={300} height={200}>
-              <Pie
-                data={[
-                  ...pieData,
-                  {
-                    step_id: 99,
-                    name: "Sisa",
-                    value: Math.max(
-                      0,
-                      zones.length * 100 - overallProgress * zones.length,
-                    ),
-                    fill: "#f1f5f9",
-                  },
-                ]}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                innerRadius={80}
-                stroke="none"
-                startAngle={90}
-                endAngle={450}
-                cornerRadius={4}
-                paddingAngle={2}
-              >
-                <Label
-                  content={({ viewBox }) => {
-                    const { cx, cy } = viewBox as {
-                      cx: number;
-                      cy: number;
-                    };
-                    return (
-                      <text
-                        x={cx}
-                        y={cy}
-                        textAnchor="middle"
-                        dominantBaseline="central"
-                      >
-                        <tspan
-                          x={cx}
-                          y={cy - 2}
-                          className="fill-primary text-2xl font-black italic"
-                        >
-                          {overallProgress}%
-                        </tspan>
-                        <tspan
-                          x={cx}
-                          y={cy + 18}
-                          className="fill-muted-foreground text-[10px] font-bold tracking-widest uppercase"
-                        >
-                          Total
-                        </tspan>
-                      </text>
-                    );
-                  }}
-                />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Right: Progress Grid */}
-        <div className="grid w-full flex-1 grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
-          {/* Kolom Kiri: Zona 1-4 */}
-          <div className="space-y-4">
-            {STEPS.filter((s) => s.id <= 4).map((s) => {
-              const progress =
-                zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
-                0;
-              return (
-                <div key={s.id} className="space-y-2">
-                  <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={cn(
-                          "size-1.5 rounded-full shadow-sm",
-                          STEP_COLORS[s.id] || "bg-primary",
-                        )}
-                      />
-                      <span className="text-foreground/70">Zona {s.id}</span>
-                    </div>
-                    <span className="text-primary font-semibold tabular-nums">
-                      {progress}%
-                    </span>
-                  </div>
-                  <Progress value={progress} className="h-2 w-full" />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Kolom Kanan: Zona 5-7 */}
-          <div className="space-y-4">
-            {STEPS.filter((s) => s.id >= 5).map((s) => {
-              const progress =
-                zones.find((zone) => zone.step_id === s.id)?.progress_percent ??
-                0;
-              return (
-                <div key={s.id} className="space-y-2">
-                  <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={cn(
-                          "size-1.5 rounded-full shadow-sm",
-                          STEP_COLORS[s.id] || "bg-primary",
-                        )}
-                      />
-                      <span className="text-foreground/70">Zona {s.id}</span>
-                    </div>
-                    <span className="text-primary font-semibold tabular-nums">
-                      {progress}%
-                    </span>
-                  </div>
-                  <Progress value={progress} className="h-2 w-full" />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IsfProgressChart({
-  data,
-}: {
-  data: Array<{
-    name: string;
-    z1?: number;
-    z2?: number;
-    z3?: number;
-    z4?: number;
-    z5?: number;
-    z6?: number;
-    z7?: number;
-  }>;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-8">
-      <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
-        Grafik Progress
-      </p>
-
-      <div style={{ width: "100%", height: 300 }}>
-        <ResponsiveContainer>
-          <LineChart data={data}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#eee"
-            />
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#999", fontSize: 11, fontWeight: 600 }}
-              dy={10}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#999", fontSize: 11, fontWeight: 600 }}
-              domain={[0, 100]}
-              ticks={[0, 25, 50, 75, 100]}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-                borderRadius: "8px",
-                border: "none",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                fontSize: "12px",
-                fontWeight: "bold",
-              }}
-            />
-            <Legend
-              verticalAlign="bottom"
-              height={48}
-              iconType="plainline"
-              formatter={(value) => (
-                <span className="text-foreground/70 text-[11px] font-bold tracking-tight uppercase">
-                  Zona {value.replace("z", "")}
-                </span>
-              )}
-            />
-            {LINE_SERIES.map((series) => (
-              <Line
-                key={series.key}
-                type="monotone"
-                dataKey={series.key}
-                stroke={series.color}
-                strokeDasharray={series.dash}
-                strokeWidth={3}
-                dot={{
-                  r: series.dotRadius,
-                  fill: "#ffffff",
-                  strokeWidth: 2,
-                  stroke: series.color,
-                }}
-                activeDot={{ r: series.dotRadius + 2 }}
-                connectNulls
-              />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
   );
 }

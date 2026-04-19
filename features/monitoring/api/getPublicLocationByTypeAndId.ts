@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { LocationType } from "../../dashboard/actions/available-locations";
-import {
-  getPublicLocationDetail,
-  MonitoringDetailTypeMap,
-} from "../actions/public-location";
+import { getPublicLocationDetail } from "../actions/public-location";
+import { MonitoringDetailTypeMap } from "../types/monitoring-types";
 
 export const getPublicLocationByTypeAndIdQueryKey = (
   type: LocationType,

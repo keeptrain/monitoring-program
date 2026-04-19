@@ -7,6 +7,7 @@ import {
   DocumentationFormValue,
   DocumentationInsertRow,
 } from "@/features/documentation/documentation-schema";
+import { createClient } from "@/utils/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
 
 type SaveDocumentationsResult = {
@@ -17,7 +18,19 @@ type SaveDocumentationsResult = {
   error?: string;
 };
 
+export type ProgramDocumentationGroup = {
+  programId: number;
+  groupId: string | number | null;
+  beforePaths: string[];
+  afterPaths: string[];
+  beforeUrls: string[];
+  afterUrls: string[];
+  allUrls: string[];
+};
+
 const BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_BUCKET ?? "demo";
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") ?? "";
 
 function normalizeStoragePath(path: string): string {
   if (path.startsWith("http://") || path.startsWith("https://")) {
@@ -33,6 +46,13 @@ function normalizeStoragePath(path: string): string {
     return normalized.slice(BUCKET_NAME.length + 1);
   }
   return normalized;
+}
+
+function toPublicStorageUrl(path: string): string {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (!SUPABASE_URL) return path;
+  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${normalizeStoragePath(path)}`;
 }
 
 function mapToDocumentationRows(
@@ -132,6 +152,141 @@ export async function saveDocumentationsAction(
         error instanceof Error ? error.message : "Gagal menyimpan dokumentasi.",
     };
   }
+}
+
+type DocumentationProgramIdsQueryParams = {
+  programType: string;
+  programIds: number[];
+};
+
+type DocumentationProgramIdQueryParams = {
+  programType: string;
+  programId: number;
+};
+
+type DocumentationQueryRow = {
+  id: number;
+  program_id: number;
+  group_id: string | number | null;
+  type: "before" | "after";
+  path: string;
+  created_at: string | null;
+};
+
+type ProgramDocumentationAccumulator = ProgramDocumentationGroup & {
+  groupRank: bigint;
+};
+
+function getGroupRank(
+  groupId: string | number | null,
+  createdAt: string | null,
+  id: number,
+): bigint {
+  if (groupId !== null) {
+    try {
+      return typeof groupId === "number" ? BigInt(groupId) : BigInt(groupId);
+    } catch {
+      // fall through to created_at/id fallback
+    }
+  }
+
+  const createdAtMs = createdAt ? new Date(createdAt).getTime() : 0;
+  if (!Number.isNaN(createdAtMs) && createdAtMs > 0) {
+    return BigInt(createdAtMs);
+  }
+  return BigInt(id);
+}
+
+export async function getDocumentationsByTypeAndId(type: string, id: number) {
+  const supabase = await createClient();
+  return getDocumentationsByProgramId(supabase, {
+    programType: type,
+    programId: id,
+  });
+}
+
+export async function getDocumentationsByProgramIds(
+  supabase: SupabaseClient,
+  params: DocumentationProgramIdsQueryParams,
+): Promise<Map<number, ProgramDocumentationGroup>> {
+  const normalizedProgramType = documentationProgramTypeSchema.parse(
+    params.programType,
+  );
+  const normalizedProgramIds = Array.from(
+    new Set(params.programIds.filter((id) => Number.isInteger(id) && id > 0)),
+  );
+
+  if (normalizedProgramIds.length === 0) {
+    return new Map();
+  }
+
+  const { data, error } = await supabase
+    .from("documentations")
+    .select("id, program_id, group_id, type, path, created_at")
+    .eq("program_type", normalizedProgramType)
+    .in("program_id", normalizedProgramIds)
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const groupedByProgram = new Map<number, ProgramDocumentationAccumulator>();
+
+  for (const row of (data ?? []) as DocumentationQueryRow[]) {
+    const existing = groupedByProgram.get(row.program_id);
+    const rowRank = getGroupRank(row.group_id, row.created_at, row.id);
+
+    if (existing && rowRank < existing.groupRank) {
+      continue;
+    }
+
+    const normalizedPath = normalizeStoragePath(row.path);
+    const publicUrl = toPublicStorageUrl(normalizedPath);
+
+    if (!existing || rowRank > existing.groupRank) {
+      groupedByProgram.set(row.program_id, {
+        programId: row.program_id,
+        groupId: row.group_id,
+        beforePaths: row.type === "before" ? [normalizedPath] : [],
+        afterPaths: row.type === "after" ? [normalizedPath] : [],
+        beforeUrls: row.type === "before" ? [publicUrl] : [],
+        afterUrls: row.type === "after" ? [publicUrl] : [],
+        allUrls: [publicUrl],
+        groupRank: rowRank,
+      });
+      continue;
+    }
+
+    if (row.type === "before") {
+      existing.beforePaths.push(normalizedPath);
+      existing.beforeUrls.push(publicUrl);
+    } else {
+      existing.afterPaths.push(normalizedPath);
+      existing.afterUrls.push(publicUrl);
+    }
+    existing.allUrls.push(publicUrl);
+  }
+
+  return new Map(
+    Array.from(groupedByProgram.entries()).map(([programId, group]) => {
+      const { groupRank: _groupRank, ...publicGroup } = group;
+      return [programId, publicGroup];
+    }),
+  );
+}
+
+export async function getDocumentationsByProgramId(
+  supabase: SupabaseClient,
+  params: DocumentationProgramIdQueryParams,
+): Promise<ProgramDocumentationGroup | null> {
+  const groupedByProgram = await getDocumentationsByProgramIds(supabase, {
+    programType: params.programType,
+    programIds: [params.programId],
+  });
+
+  return groupedByProgram.get(params.programId) ?? null;
 }
 
 export { saveDocumentationsAction as insertDocumentations };

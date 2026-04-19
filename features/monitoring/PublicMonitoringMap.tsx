@@ -1,9 +1,8 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import type { PublicAvailableLocation } from "../dashboard/actions/public-available-locations";
 import { ProgressPercentage } from "./components/ProgressPercentage";
@@ -15,15 +14,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import Link from "next/link";
 import { LocationType } from "../dashboard/actions/available-locations";
 import { iconIsf, iconThematic } from "./components/MapPinIcon";
-import { MonitoringDetailTypeMap } from "./actions/public-location";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
 import ThematicPublicMonitoringDetail from "../thematic/components/ThematicPublicMonitoringDetail";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
+import { MonitoringDetailTypeMap } from "./types/monitoring-types";
 
 const SHEET_CONTENTS: {
   [K in Exclude<LocationType, "isf">]: React.ComponentType<{
@@ -148,104 +146,5 @@ export default function PublicMonitoringMap({
         </Sheet>
       )}
     </>
-  );
-}
-
-// function DocumentationSection({
-//   data,
-//   state,
-// }: {
-//   data: PublicMonitoringDetail;
-//   state: ReturnType<typeof useMonitoringPublicSheet>;
-// }) {
-//   const {
-//     documentations,
-//     totalDocumentations,
-//     activeDocumentationIndex,
-//     disabledLeftButton,
-//     disabledRightButton,
-//     beforeImageUrl,
-//     afterImageUrl,
-//     handleNextDocumentation,
-//     handlePreviousDocumentation,
-//   } = state;
-
-//   const {} = data;
-//   return (
-//     <div className="no-scrollbar space-y-4 overflow-y-auto px-4 pb-4">
-//       <div className="border-border bg-background flex items-center justify-between border px-3 py-2">
-//         <p className="text-muted-foreground text-xs">
-//           Dokumentasi{" "}
-//           {totalDocumentations && documentations.length > 0
-//             ? `${activeDocumentationIndex + 1}/${totalDocumentations}`
-//             : "0/0"}
-//         </p>
-//         <div className="flex items-center gap-2">
-//           <ArrowButton
-//             disabled={disabledLeftButton}
-//             onClick={handlePreviousDocumentation}
-//             direction="left"
-//           />
-//           <ArrowButton
-//             disabled={disabledRightButton}
-//             onClick={() => void handleNextDocumentation()}
-//             direction="right"
-//           />
-//         </div>
-//       </div>
-
-//       <div className="grid gap-4 sm:grid-cols-2">
-//         <DocumentationImageCard
-//           title="Sebelum"
-//           imageUrl={beforeImageUrl}
-//           loading={state.isFetching}
-//         />
-//         <DocumentationImageCard
-//           title="Sesudah"
-//           imageUrl={afterImageUrl}
-//           loading={state.isFetching}
-//         />
-//       </div>
-//       <div className="flex justify-end"></div>
-//     </div>
-//   );
-// }
-
-function DocumentationImageCard({
-  title,
-  imageUrl,
-  loading,
-}: {
-  title: string;
-  imageUrl: string | null;
-  loading: boolean;
-}) {
-  const altText =
-    title === "Sebelum"
-      ? "Dokumentasi sebelum pengerjaan"
-      : "Dokumentasi sesudah pengerjaan";
-  return (
-    <div className="space-y-2">
-      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-        {title}
-      </p>
-      <div className="border-border bg-muted relative aspect-video overflow-hidden border">
-        {loading ? (
-          <Skeleton className="h-full w-full rounded-none" />
-        ) : imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={altText}
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        ) : (
-          <div className="text-muted-foreground flex h-full items-center justify-center text-xs italic">
-            Tidak ada foto
-          </div>
-        )}
-      </div>
-    </div>
   );
 }
