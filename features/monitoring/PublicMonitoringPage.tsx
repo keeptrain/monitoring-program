@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  ArrowRightIcon,
   ArrowUpIcon,
   BiohazardIcon,
   FilterIcon,
@@ -38,12 +39,26 @@ const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
   loading: () => <LoadingLazyMap />,
 });
 
-const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
-  {
-    biofloc_thematic: { label: "Tematik Bioflok", icon: BiohazardIcon },
-    minapadi_thematic: { label: "Tematik Minapadi", icon: PlaneTakeoffIcon },
-    isf: { label: "Integrated Shrimp Farming", icon: ShrimpIcon },
-  };
+const FILTER_STATE: Record<
+  LocationType,
+  { label: string; sub: string; icon: LucideIcon }
+> = {
+  biofloc_thematic: {
+    label: "Tematik Bioflok",
+    sub: "Budidaya Ikan Sistem Bioflok",
+    icon: BiohazardIcon,
+  },
+  minapadi_thematic: {
+    label: "Tematik Minapadi",
+    sub: "Budidaya Padi dan Ikan Terintegrasi",
+    icon: PlaneTakeoffIcon,
+  },
+  isf: {
+    label: "Integrated Shrimp Farming",
+    sub: "Kawasan Budidaya Udang Terintegrasi",
+    icon: ShrimpIcon,
+  },
+};
 
 export default function PublicMonitoringPage() {
   const [activeTab, setActiveTab] = useState<LocationType | null>(null);
@@ -53,43 +68,92 @@ export default function PublicMonitoringPage() {
 
   return (
     <>
-      {/* Map area */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Map Container */}
-        <div className="relative flex flex-1 flex-col justify-center">
+        <div className="relative flex flex-1 flex-col justify-center bg-zinc-50/50">
           {activeTab && (locations || activeTab === "isf") ? (
-            activeTab === "isf" ? (
-              <LazyIsf />
-            ) : (
-              <LazyMap locations={locations!} type={activeTab} />
-            )
+            <div className="flex flex-1">
+              {activeTab === "isf" ? (
+                <LazyIsf />
+              ) : (
+                <LazyMap locations={locations!} type={activeTab} />
+              )}
+            </div>
           ) : (
-            <EmptyFilterState />
+            <EmptyFilterState onSelect={setActiveTab} />
           )}
 
-          {/* Bottom toolbar placeholder */}
-          <BottomToolbarMap onFilterClick={() => setIsFilterSheetOpen(true)} />
+          {/* Bottom toolbar */}
+          {activeTab && (
+            <>
+              <Sheet
+                open={isFilterSheetOpen}
+                onOpenChange={setIsFilterSheetOpen}
+              >
+                <SheetContent side="left">
+                  <SheetHeader className="mb-6 text-left">
+                    <SheetTitle>Filter Area</SheetTitle>
+                    <SheetDescription>
+                      Pilih layer untuk memvisualisasikan data pada peta.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <FilterLayerContent
+                    activeTab={activeTab}
+                    onTabChange={(tab: LocationType) => {
+                      setActiveTab(tab);
+                      setIsFilterSheetOpen(false);
+                    }}
+                  />
+                </SheetContent>
+              </Sheet>
+
+              <BottomToolbarMap
+                onFilterClick={() => setIsFilterSheetOpen(true)}
+              />
+            </>
+          )}
         </div>
       </div>
-
-      <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
-        <SheetContent side="left">
-          <SheetHeader className="mb-6 text-left">
-            <SheetTitle>Filter Area</SheetTitle>
-            <SheetDescription>
-              Pilih layer untuk memvisualisasikan data pada peta.
-            </SheetDescription>
-          </SheetHeader>
-          <FilterLayerContent
-            activeTab={activeTab}
-            onTabChange={(tab) => {
-              setActiveTab(tab);
-              setIsFilterSheetOpen(false);
-            }}
-          />
-        </SheetContent>
-      </Sheet>
     </>
+  );
+}
+
+function EmptyFilterState({
+  onSelect,
+}: {
+  onSelect: (tab: LocationType) => void;
+}) {
+  return (
+    <div className="mx-auto">
+      <div className="mb-8 text-center">
+        <p className="text-muted-foreground">Data Visualisasi</p>
+        <h1 className="text-3xl text-zinc-900">Pilih Program Prioritas</h1>
+      </div>
+      <div className="bg-border grid gap-px border sm:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(FILTER_STATE).map(([key, value]) => (
+          <button
+            key={key}
+            onClick={() => onSelect(key as LocationType)}
+            className="group bg-background hover:bg-muted/40 flex flex-col justify-between gap-12 p-8 text-left transition-all"
+          >
+            <div className="flex items-start justify-between">
+              <div className="border-border group-hover:border-foreground flex size-12 items-center justify-center border transition-colors">
+                <value.icon className="text-foreground size-6" />
+              </div>
+              <ArrowRightIcon className="text-muted-foreground group-hover:text-foreground size-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+            </div>
+            <div>
+              <h2 className="text-foreground text-sm font-semibold">
+                {value.label}
+              </h2>
+              <p className="text-muted-foreground mt-1 text-[10px] leading-relaxed font-medium">
+                {value.sub}
+              </p>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -118,7 +182,7 @@ export function Header() {
           size="icon"
           onClick={() => setShowHeader(false)}
         >
-          <XIcon />
+          <XIcon className="size-4" />
         </Button>
       </div>
     </div>
@@ -160,7 +224,6 @@ const TOOLBAR_MAP_ICONS: LucideIcon[] = [FilterIcon, ArrowUpIcon];
 
 function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
   const handleScrollToTop = () => {
-    // Scroll window & document (general)
     window.scrollTo({ top: 0, behavior: "smooth" });
     document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -183,28 +246,6 @@ function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
           )}
         </button>
       ))}
-    </div>
-  );
-}
-
-function EmptyFilterState() {
-  return (
-    <div className="flex -translate-y-8 flex-col items-center justify-center gap-4 px-6 text-center">
-      <div className="bg-muted/50 text-muted-foreground/50 group-hover:bg-muted group-hover:text-muted-foreground flex size-14 items-center justify-center rounded-full transition-colors">
-        <FilterIcon className="size-6" />
-      </div>
-      <div className="space-y-2">
-        <p className="text-foreground text-sm font-medium">
-          Belum Ada Layer Terpilih
-        </p>
-        <p className="text-muted-foreground max-w-[280px] text-xs leading-relaxed">
-          Silahkan pilih{" "}
-          <code className="border-border bg-muted text-foreground mx-1 inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-tight uppercase">
-            Filter Layer
-          </code>{" "}
-          untuk melihat visualisasi peta sebaran program.
-        </p>
-      </div>
     </div>
   );
 }

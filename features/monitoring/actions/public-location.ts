@@ -73,3 +73,62 @@ export async function getPublicMonitoringIsf(): Promise<PublicMonitoringIsf> {
     overall_summary: overallSummary,
   };
 }
+
+export async function getIsfPerMonthByZone(zoneNumber: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("isf_program_logs")
+    .select("*")
+    .eq("step_id", zoneNumber)
+    .order("progress_date", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching ISF per month by zone:", error);
+    throw error;
+  }
+
+  const datas = data.map((row) => {
+    return {
+      id: row.id,
+      progress_date: row.progress_date,
+      reporting_week: row.reporting_week,
+      progress_percent: row.progress_percent,
+      month: new Date(row.reporting_week).getMonth() + 1,
+    };
+  });
+
+  // Fungsi pembantu mencari semua hari Senin dalam sebulan
+  const getAllMondaysInMonth = (monthNum: number) => {
+    const year = new Date(
+      data?.[0]?.reporting_week || new Date(),
+    ).getFullYear();
+    const mondays: string[] = [];
+    const date = new Date(year, monthNum - 1, 1);
+
+    while (date.getMonth() === monthNum - 1) {
+      if (date.getDay() === 1) {
+        // 1 = Senin
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        mondays.push(`${yyyy}-${mm}-${dd}`);
+      }
+      date.setDate(date.getDate() + 1);
+    }
+    return mondays;
+  };
+
+  const uniqueMonths = Array.from(new Set(datas.map((d) => d.month))).sort(
+    (a, b) => a - b,
+  );
+
+  const availableMonths = uniqueMonths.map((m) => ({
+    month: m,
+    mondays: getAllMondaysInMonth(m),
+  }));
+
+  return {
+    data: datas,
+    available_months: availableMonths,
+  };
+}
