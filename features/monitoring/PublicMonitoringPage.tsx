@@ -46,40 +46,31 @@ const FILTER_STATE: Record<LocationType, { label: string; icon: LucideIcon }> =
   };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
+  const [activeTab, setActiveTab] = useState<LocationType | null>(null);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const { data: locations } = useGetPublicLocationsByType(activeTab);
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="flex flex-1 flex-col">
-        {/* Page header */}
-        <Header />
-
-        {/* Map area */}
-        <div className="bg-muted/30 relative flex flex-1">
-          {/* Sidebar controls (placeholder) */}
-
-          {/* Map placeholder */}
-          <div className="relative flex flex-1 flex-col items-center justify-center gap-6 p-8 text-center">
-            {activeTab && (locations || activeTab === "isf") ? (
-              activeTab === "isf" ? (
-                <LazyIsf />
-              ) : (
-                <LazyMap locations={locations!} type={activeTab} />
-              )
+    <>
+      {/* Map area */}
+      <div className="flex flex-1">
+        {/* Map Container */}
+        <div className="relative flex flex-1 flex-col justify-center">
+          {activeTab && (locations || activeTab === "isf") ? (
+            activeTab === "isf" ? (
+              <LazyIsf />
             ) : (
-              <EmptyFilterState />
-            )}
+              <LazyMap locations={locations!} type={activeTab} />
+            )
+          ) : (
+            <EmptyFilterState />
+          )}
 
-            {/* Bottom toolbar placeholder */}
-            <BottomToolbarMap
-              onFilterClick={() => setIsFilterSheetOpen(true)}
-            />
-          </div>
+          {/* Bottom toolbar placeholder */}
+          <BottomToolbarMap onFilterClick={() => setIsFilterSheetOpen(true)} />
         </div>
-      </main>
+      </div>
 
       <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
         <SheetContent side="left">
@@ -98,18 +89,18 @@ export default function PublicMonitoringPage() {
           />
         </SheetContent>
       </Sheet>
-    </div>
+    </>
   );
 }
 
-function Header() {
+export function Header() {
   const [showHeader, setShowHeader] = useState(true);
   return (
     <div
       className={cn(
-        "bg-background overflow-hidden px-4 transition-all duration-500 ease-in-out",
+        "bg-background/95 border-border sticky top-14 z-40 overflow-hidden px-4 backdrop-blur transition-all duration-500 ease-in-out",
         showHeader
-          ? "border-border max-h-40 border-b py-2 opacity-100"
+          ? "max-h-40 border-b py-2 opacity-100"
           : "max-h-0 border-b-0 border-transparent py-0 opacity-0",
       )}
     >
@@ -168,25 +159,17 @@ function FilterLayerContent({
 const TOOLBAR_MAP_ICONS: LucideIcon[] = [FilterIcon, ArrowUpIcon];
 
 function BottomToolbarMap({ onFilterClick }: { onFilterClick: () => void }) {
+  const handleScrollToTop = () => {
+    // Scroll window & document (general)
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+  };
   return (
-    <div className="border-border bg-background absolute bottom-6 z-10 flex items-center gap-1 border p-1">
+    <div className="border-border bg-background fixed right-8 bottom-8 z-50 flex items-center gap-1 border p-1 shadow-sm">
       {TOOLBAR_MAP_ICONS.map((Icon, i) => (
         <button
           key={i}
-          onClick={
-            Icon === FilterIcon
-              ? onFilterClick
-              : () => {
-                  const container = document.getElementById(
-                    "public-monitoring-container",
-                  );
-                  if (container) {
-                    container.scrollTo({ top: 0, behavior: "smooth" });
-                  } else {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }
-                }
-          }
+          onClick={Icon === FilterIcon ? onFilterClick : handleScrollToTop}
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground flex items-center justify-center transition-colors",
             Icon === FilterIcon ? "flex h-9 gap-2 px-3" : "size-9",

@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import { Header } from "@/features/monitoring/PublicMonitoringPage";
 
 export default function PublicLayout({
   children,
@@ -6,9 +7,12 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="grid min-h-screen grid-rows-[auto_1fr]">
       <Navbar />
-      {children}
+      <main className="bg-background flex flex-col">
+        <Header />
+        {children}
+      </main>
     </div>
   );
 }
