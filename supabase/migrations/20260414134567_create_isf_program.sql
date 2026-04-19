@@ -4,6 +4,7 @@ CREATE TABLE isf_program_logs (
 
   progress_percent INTEGER CHECK (progress_percent BETWEEN 0 AND 100),
   progress_date DATE NOT NULL,
+  reporting_week DATE NOT NULL,
 
   name TEXT NOT NULL,
   status TEXT NOT NULL,
@@ -17,7 +18,9 @@ CREATE TABLE isf_program_logs (
   follow_up TEXT NOT NULL,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  UNIQUE(step_id, reporting_week)
 );
 
 CREATE INDEX idx_logs_step_date 
