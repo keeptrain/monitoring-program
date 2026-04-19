@@ -12,7 +12,7 @@ export default function PublicMonitoringIsfDetailSheet({
 }: {
   data: IsfDetailSheet;
 }) {
-  const { id, progress_percent, total_worker, updated_at } = data;
+  const { id, step_id, progress_percent, total_worker, updated_at } = data;
 
   return (
     <div className="relative flex h-[calc(100vh-100px)]">
@@ -74,8 +74,8 @@ export default function PublicMonitoringIsfDetailSheet({
       {/* Fixed Bottom Button - Locked to Bottom of Sheet */}
       <div className="absolute right-0 bottom-0 left-0 px-4">
         <Button className="w-full" size="lg" asChild>
-          <Link href="/monitoring/isf">
-            Lihat lebih lanjut untuk {data.name}{" "}
+          <Link href={`/monitoring/isf/zona${step_id}`}>
+            Lihat lebih lanjut
             <ArrowRightIcon className="size-4" />
           </Link>
         </Button>

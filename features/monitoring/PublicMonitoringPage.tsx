@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -54,8 +53,6 @@ export default function PublicMonitoringPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
-
       <main className="flex flex-1 flex-col">
         {/* Page header */}
         <Header />

@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import ProgramList from "@/components/landing/ProgramList";
@@ -12,14 +11,13 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
+    <>
       <main className="flex-1">
         <Hero />
         <Features />
         <ProgramList />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

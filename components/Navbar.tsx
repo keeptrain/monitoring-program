@@ -1,22 +1,11 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { FishIcon, LayoutDashboard, Map } from "lucide-react";
 
-const navLinks = [
-  { href: "/#programs", label: "Program" },
-  { href: "/#features", label: "Fitur" },
-];
-
 export default function Navbar() {
-  const pathname = usePathname();
-
   return (
     <header className="border-border bg-background/90 sticky top-0 z-50 border-b backdrop-blur-sm">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
