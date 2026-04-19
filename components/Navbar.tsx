@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FishIcon, LayoutDashboard, Map } from "lucide-react";
+import { FishIcon, LogInIcon } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -21,16 +21,10 @@ export default function Navbar() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/monitoring">
-              <Map className="mr-1.5 size-3.5" />
-              Monitoring
-            </Link>
-          </Button>
-          <Button asChild size="sm">
+          <Button asChild>
             <Link href="/dashboard">
-              <LayoutDashboard className="mr-1.5 size-3.5" />
-              Dashboard
+              <LogInIcon className="mr-1 size-4" />
+              Login
             </Link>
           </Button>
         </div>
