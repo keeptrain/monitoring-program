@@ -2,7 +2,12 @@
 
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, TractorIcon, UsersIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  ArrowUpRightIcon,
+  TractorIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { PieChart, Pie, Label } from "recharts";
 import { IsfDetailSheet } from "../types/monitoring-types";
@@ -26,16 +31,25 @@ export default function PublicMonitoringIsfDetailSheet({
             <ZoneProgressChart progress={progress_percent} />
           </div>
 
-          <div className="flex flex-col gap-8">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4">
+            <div className="space-y-3">
               <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
                 Tenaga Kerja
               </p>
-              <div className="flex items-center gap-3">
-                <UsersIcon className="size-6" />
-                <p className="text-xl font-bold">
-                  {total_worker} <span className="text-sm">Orang</span>
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <UsersIcon className="size-6" />
+                  <p className="text-xl font-bold">
+                    {total_worker} <span className="text-sm">Orang</span>
+                  </p>
+                </div>
+
+                <Button variant="outline" size="sm" className="w-full" asChild>
+                  <Link href={`/monitoring/recruitment`}>
+                    Progress rekrutmen tenaga kerja
+                    <ArrowUpRightIcon className="size-4" />
+                  </Link>
+                </Button>
               </div>
             </div>
 
