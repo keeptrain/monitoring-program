@@ -94,21 +94,24 @@ export default function IsfReportForm({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dokumentasi</CardTitle>
-            <CardDescription>
-              Unggah dokumentasi pengerjaan program (Sebelum & Sesudah)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DocumentationsFormSection
-              form={form}
-              externalErrorMessage={documentationError}
-              storageBasePath="isf"
-            />
-          </CardContent>
-        </Card>
+        {!isEdit && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Dokumentasi</CardTitle>
+              <CardDescription>
+                Unggah dokumentasi pengerjaan program (Sebelum & Sesudah)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentationsFormSection
+                mode="create"
+                form={form}
+                externalErrorMessage={documentationError}
+                storageBasePath="isf"
+              />
+            </CardContent>
+          </Card>
+        )}
 
         <SubmitButton isPending={isFormPending} isEdit={isEdit} />
       </form>
