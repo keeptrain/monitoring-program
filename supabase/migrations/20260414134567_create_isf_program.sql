@@ -17,6 +17,8 @@ CREATE TABLE isf_program_logs (
   constraints TEXT NOT NULL,
   follow_up TEXT NOT NULL,
 
+  s_curve_path TEXT,
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 

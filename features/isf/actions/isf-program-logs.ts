@@ -59,7 +59,6 @@ function getMondayDate(dateString: string): string {
 
 function toDbPayload(data: IsfReportFormValues) {
   return {
-    step_id: data.step_id,
     progress_percent: data.progress_percent,
     progress_date: data.progress_date,
     reporting_week: getMondayDate(data.progress_date),
@@ -111,19 +110,39 @@ export async function getIsfProgramLogsByStep(
   };
 }
 
-export async function getIsfProgramLogById(id: number): Promise<IsfProgramLog> {
+export async function getIsfProgramLogById(id: number) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data: log, error } = await supabase
     .from("isf_program_logs")
     .select("*")
     .eq("id", id)
     .single();
 
   if (error) {
+    console.error("Error fetching ISF program log by ID:", error);
     throw error;
   }
 
-  return data as IsfProgramLog;
+  const reportingWeek = new Date(log.reporting_week);
+
+  // Calculate Sunday of the same week
+  const sunday = new Date(reportingWeek);
+  sunday.setDate(reportingWeek.getDate() + 6);
+
+  const formatDate = (date: Date) => {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  return {
+    data: log as IsfProgramLog,
+    availableDate: {
+      minDate: log.reporting_week as string,
+      maxDate: formatDate(sunday),
+    },
+  };
 }
 
 export async function getIsfStepSummaries(): Promise<IsfStepSummary[]> {
@@ -162,13 +181,19 @@ export async function getIsfStepSummaries(): Promise<IsfStepSummary[]> {
   });
 }
 
-export async function createIsfProgramLog(data: IsfReportFormValues) {
-  await assertProgressNotRegressing(data.step_id, data.progress_percent);
+export async function createIsfProgramLog(
+  stepId: number,
+  data: IsfReportFormValues,
+) {
+  await assertProgressNotRegressing(stepId, data.progress_percent);
 
   const supabase = await createClient();
   const { data: createdLog, error } = await supabase
     .from("isf_program_logs")
-    .upsert(toDbPayload(data), { onConflict: "step_id, reporting_week" })
+    .upsert(
+      { ...toDbPayload(data), step_id: stepId },
+      { onConflict: "step_id, reporting_week" },
+    )
     .select("id, step_id")
     .single();
 
@@ -196,7 +221,7 @@ export async function createIsfProgramLog(data: IsfReportFormValues) {
   }
 
   revalidatePath("/dashboard/isf");
-  revalidatePath(`/dashboard/isf/${data.step_id}`);
+  revalidatePath(`/dashboard/isf/${stepId}`);
   revalidatePath("/monitoring");
 
   return {
@@ -207,15 +232,17 @@ export async function createIsfProgramLog(data: IsfReportFormValues) {
 
 export async function updateIsfProgramLog(
   id: number,
+  stepId: number,
   data: IsfReportFormValues,
 ) {
-  await assertProgressNotRegressing(data.step_id, data.progress_percent, id);
+  await assertProgressNotRegressing(stepId, data.progress_percent, id);
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("isf_program_logs")
     .update({
       ...toDbPayload(data),
+      step_id: stepId,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -240,10 +267,10 @@ export async function updateIsfProgramLog(
   }
 
   revalidatePath("/dashboard/isf");
-  revalidatePath(`/dashboard/isf/${data.step_id}`);
+  revalidatePath(`/dashboard/isf/${stepId}`);
   revalidatePath(`/dashboard/isf/report/${id}`);
   revalidatePath(`/dashboard/isf/report/${id}/edit`);
-  return { id, stepId: data.step_id };
+  return { id, stepId: stepId };
 }
 
 export async function deleteIsfProgramLog(id: number, stepId: number) {

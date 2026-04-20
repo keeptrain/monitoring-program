@@ -12,51 +12,41 @@ import {
   updateIsfProgramLog,
 } from "../actions/isf-program-logs";
 import { IsfProgramLog } from "../types/isf";
-import { documentationFormSchema } from "@/features/documentation/documentation-schema";
+import { documentationFormSchema } from "@/features/documentation/forms/documentation-schema";
 
-const DEFAULT_VALUES: IsfReportFormInput = {
-  progress_date: "",
-  step_id: 1,
-  status: "",
-  progress_percent: 0,
-  provider_name: "",
-  name: "",
-  intervention: "",
-  total_worker: "",
-  production: "",
-  outcome: "",
-  constraints: "",
-  follow_up: "",
-  s_curve_path: "",
-  documentations: [],
+const DEFAULT_VALUES = (data?: IsfProgramLog) => {
+  return {
+    progress_date: data?.progress_date ?? "",
+    progress_percent: data?.progress_percent ?? 0,
+    name: data?.name ?? "",
+    status: data?.status ?? "",
+    provider_name: data?.provider_name ?? "",
+    intervention: data?.intervention ?? "",
+    total_worker: data?.total_worker ?? "",
+    production: data?.production ?? "",
+    outcome: data?.outcome ?? "",
+    constraints: data?.constraints ?? "",
+    follow_up: data?.follow_up ?? "",
+    s_curve_path: data?.s_curve_path ?? "",
+    documentations: [],
+  };
 };
 
 export function useIsfReportForm(
-  initialStep?: string,
+  zone: string,
   initialData?: IsfProgramLog,
   initialMinDate?: string,
   initialMaxDate?: string,
 ) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [documentationError, setDocumentationError] = useState<string | null>(
     null,
   );
-  const router = useRouter();
 
   const form = useForm<IsfReportFormInput, undefined, IsfReportFormValues>({
     resolver: zodResolver(isfReportSchema),
-    defaultValues: initialData
-      ? {
-          ...DEFAULT_VALUES,
-          ...initialData,
-          progress_date: initialData.progress_date.slice(0, 10),
-          s_curve_path: "",
-          documentations: [],
-        }
-      : {
-          ...DEFAULT_VALUES,
-          step_id: initialStep ? Number.parseInt(initialStep, 10) : 1,
-        },
+    defaultValues: DEFAULT_VALUES(initialData),
   });
 
   const onSubmit = (values: IsfReportFormValues) => {
@@ -96,19 +86,23 @@ export function useIsfReportForm(
           follow_up: values.follow_up ?? "",
           s_curve_path: values.s_curve_path ?? "",
           documentations: parsedDocumentations.success
-            ? parsedDocumentations.data
+            ? (parsedDocumentations.data ?? [])
             : [],
         };
 
         if (initialData?.id) {
-          const updated = await updateIsfProgramLog(initialData.id, payload);
+          const updated = await updateIsfProgramLog(
+            initialData.id,
+            Number(zone),
+            payload,
+          );
 
           router.push(`/dashboard/isf/${updated.stepId}`);
           router.refresh();
           return;
         }
 
-        const created = await createIsfProgramLog(payload);
+        const created = await createIsfProgramLog(Number(zone), payload);
 
         router.push(`/dashboard/isf/${created.stepId}`);
         router.refresh();

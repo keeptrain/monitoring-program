@@ -11,18 +11,18 @@ import { Button } from "@/components/ui/button";
 import { useIsfReportForm } from "../hooks/useIsfReportForm";
 import IsfInformationBasicFormSection from "../components/IsfInformationBasicFormSection";
 import IsfDetailRingkasanFormSection from "../components/IsfDetailRingkasanFormSection";
-import IsfSCurveFormSection from "../components/IsfSCurveFormSection";
 import { Loader2 } from "lucide-react";
 import { IsfProgramLog } from "../types/isf";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
+import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 
 export default function IsfReportForm({
-  initialStep,
+  zone,
   initialData,
   initialMinDate,
   initialMaxDate,
 }: {
-  initialStep: string;
+  zone: string;
   initialData?: IsfProgramLog;
   initialMinDate?: string;
   initialMaxDate?: string;
@@ -30,7 +30,7 @@ export default function IsfReportForm({
   const isEdit = initialData;
 
   const { form, onSubmit, isPending, documentationError } = useIsfReportForm(
-    initialStep,
+    zone,
     initialData,
     initialMinDate,
     initialMaxDate,
@@ -43,9 +43,9 @@ export default function IsfReportForm({
           Dashboard / ISF / Laporan / {isEdit ? "Ubah" : "Buat"}
         </p>
         <h2 className="text-foreground text-2xl font-semibold tracking-tight">
-          {initialData
-            ? `Ubah Laporan Zona ${initialData.step_id}`
-            : `Tambah Laporan untuk Zona ${initialStep ?? "-"}`}
+          {isEdit
+            ? `Ubah Laporan Zona ${zone}`
+            : `Tambah Laporan untuk Zona ${zone ?? "-"}`}
         </h2>
         <p className="text-muted-foreground text-sm">
           Silahkan isi aktivitas program Integrated Shrimp Farming (ISF) di
@@ -64,8 +64,8 @@ export default function IsfReportForm({
           <CardContent>
             <IsfInformationBasicFormSection
               form={form}
-              minDate={initialData ? undefined : initialMinDate}
-              maxDate={initialData ? undefined : initialMaxDate}
+              minDate={initialMinDate}
+              maxDate={initialMaxDate}
             />
           </CardContent>
         </Card>
@@ -88,7 +88,7 @@ export default function IsfReportForm({
             <CardDescription>Unggah lampiran kurva S tahapan</CardDescription>
           </CardHeader>
           <CardContent>
-            <IsfSCurveFormSection form={form} />
+            <SCurveFormSection form={form} />
           </CardContent>
         </Card>
 
@@ -110,7 +110,7 @@ export default function IsfReportForm({
 
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-          {initialData ? "Simpan Perubahan" : "Simpan Laporan"}
+          {isEdit ? "Simpan Perubahan" : "Simpan Laporan"}
         </Button>
       </form>
     </div>
