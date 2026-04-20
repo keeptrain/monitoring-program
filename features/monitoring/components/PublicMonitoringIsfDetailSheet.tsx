@@ -70,19 +70,12 @@ export default function PublicMonitoringIsfDetailSheet({
         <DocumentationCarouselGallery type="isf" id={id} />
 
         {/* Description */}
-        <div className="space-y-2">
+        {/* TODO: Will summary by AI for this section from outcome, constraints, follow up */}
+        {/* <div className="space-y-2">
           <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-            Ringkasan Aktivitas
+            Aktivitas
           </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-            quod. Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing
-            elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet
-            consectetur adipisicing elit. Quisquam, quod.
-          </p>
-        </div>
+        </div> */}
       </div>
 
       {/* Fixed Bottom Button - Locked to Bottom of Sheet */}

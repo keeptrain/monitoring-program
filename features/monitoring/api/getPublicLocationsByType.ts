@@ -24,9 +24,14 @@ export const useGetPublicLocationsByType = (type: LocationType | null) =>
     gcTime: 5 * 60 * 1000,
   });
 
+export const getPublicMonitoringIsfQueryKey = () => [
+  "public-monitoring",
+  "isf",
+];
+
 export const useGetPublicMonitoringIsf = () =>
   useQuery({
-    queryKey: ["public-monitoring", "isf"],
+    queryKey: getPublicMonitoringIsfQueryKey(),
     queryFn: async (): Promise<PublicMonitoringIsf> => getPublicMonitoringIsf(),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
