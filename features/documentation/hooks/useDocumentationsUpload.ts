@@ -14,8 +14,14 @@ function normalizeFiles(input: UploadInput): File[] {
   return input;
 }
 
+export const getDocumentationsUploadMutationKey = () => [
+  "documentations",
+  "uploading",
+];
+
 const useMutationUpload = () => {
   return useMutation({
+    mutationKey: getDocumentationsUploadMutationKey(),
     mutationFn: async ({
       input,
       options,

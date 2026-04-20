@@ -1,59 +1,37 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { UseFormReturn } from "react-hook-form";
-import { useFieldArray } from "react-hook-form";
-import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { Loader2Icon, Plus, Trash2 } from "lucide-react";
+import { useIsMutating } from "@tanstack/react-query";
+import type { UseFormReturn } from "react-hook-form";
 
-import useDocumentationsUpload from "@/features/documentation/useDocumentationsUpload";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { toPreviewUrl } from "@/lib/utils";
+import { getDocumentationsUploadMutationKey } from "./hooks/useDocumentationsUpload";
+import useDocumentationsForm from "./hooks/useDocumentationsForm";
 import {
-  DocumentationFormInput,
-  DocumentationFormValue,
-} from "./documentation-schema";
+  DEFAULT_GROUP,
+  type DocumentationFormInput,
+  type DocumentationFormValue,
+  type DocumentationGroup,
+} from "./forms/documentation-schema";
 
-type DocumentationGroup = DocumentationFormInput["documentations"][number];
-
-type Props = {
+type DocumentationsFormSectionProps = {
+  /** Pass any `UseFormReturn` whose schema extends `documentationFormSchema`. */
   form: unknown;
   maxGroups?: number;
   externalErrorMessage?: string | null;
   storageBasePath?: string;
 };
 
-const DEFAULT_GROUP: DocumentationGroup = {
-  image_before_paths: [],
-  image_after_paths: [],
-};
-
-function toPreviewUrl(
-  path: string,
-  localPreviews?: Record<string, string>,
-): string {
-  if (localPreviews?.[path]) return localPreviews[path];
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  if (path.startsWith("blob:")) return path;
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
-  if (!supabaseUrl || !bucket) return path;
-  const normalizedPath = path.replace(/^\/+/, "");
-  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${normalizedPath}`;
-}
-
-function mergeUnique(existing: string[], incoming: string[]) {
-  return [...new Set([...existing, ...incoming])];
-}
-
 export default function DocumentationsFormSection({
   form,
-  maxGroups = 20,
+  maxGroups = 5,
   externalErrorMessage,
   storageBasePath = "documentations",
-}: Props) {
+}: DocumentationsFormSectionProps) {
   const typedForm = form as UseFormReturn<
     DocumentationFormInput,
     undefined,
@@ -61,76 +39,22 @@ export default function DocumentationsFormSection({
   >;
 
   const {
-    control,
-    watch,
-    setValue,
-    formState: { errors },
-  } = typedForm;
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "documentations",
+    fields,
+    append,
+    remove,
+    docs,
+    canAddGroup,
+    localPreviews,
+    displayedErrorMessage,
+    handleUpload,
+  } = useDocumentationsForm({
+    form: typedForm,
+    maxGroups,
+    externalErrorMessage,
+    storageBasePath,
   });
 
-  const { upload, isPending: isUploading } = useDocumentationsUpload();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [localPreviews, setLocalPreviews] = useState<Record<string, string>>(
-    {},
-  );
-
-  const docs = (watch("documentations") ?? []) as DocumentationGroup[];
-  const canAddGroup = fields.length < maxGroups;
-  const displayedErrorMessage = useMemo(
-    () => externalErrorMessage ?? errorMessage,
-    [externalErrorMessage, errorMessage],
-  );
-
-  const setGroupPaths = (
-    groupIndex: number,
-    field: "image_before_paths" | "image_after_paths",
-    paths: string[],
-  ) => {
-    setValue(`documentations.${groupIndex}.${field}`, paths, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  };
-
-  const handleUpload = async (
-    groupIndex: number,
-    field: "image_before_paths" | "image_after_paths",
-    fileList: FileList | null,
-  ) => {
-    if (!fileList || fileList.length === 0) return;
-    setErrorMessage(null);
-
-    try {
-      const files = Array.from(fileList);
-      const uploadedPaths = await upload(fileList, {
-        basePath: storageBasePath,
-      });
-
-      // Create local object URLs for immediate preview
-      const newPreviews: Record<string, string> = { ...localPreviews };
-      uploadedPaths.forEach((path, index) => {
-        if (files[index]) {
-          newPreviews[path] = URL.createObjectURL(files[index]);
-        }
-      });
-      setLocalPreviews(newPreviews);
-
-      const group = docs[groupIndex] ?? DEFAULT_GROUP;
-      const current = group[field] ?? [];
-      const merged = mergeUnique(current, uploadedPaths);
-      setGroupPaths(groupIndex, field, merged);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Upload dokumentasi gagal. Silakan coba lagi.";
-      setErrorMessage(message);
-    }
-  };
+  const errors = typedForm.formState.errors;
 
   return (
     <div className="space-y-6">
@@ -149,133 +73,198 @@ export default function DocumentationsFormSection({
                 <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
                   Grup Dokumentasi #{index + 1}
                 </p>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => remove(index)}
-                    className="text-muted-foreground hover:text-destructive"
-                    disabled={isUploading}
-                  >
-                    <Trash2 />
-                  </Button>
-                )}
+                <RemoveGroupButton onRemove={() => remove(index)} />
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Field>
-                  <FieldLabel className="text-xs uppercase">
-                    Foto Sebelum
-                  </FieldLabel>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    disabled={isUploading}
-                    onChange={(e) =>
-                      handleUpload(index, "image_before_paths", e.target.files)
-                    }
-                  />
-                  {beforePaths.length > 0 ? (
-                    <div className="mt-2 grid grid-cols-3 gap-2">
-                      {beforePaths.map((path, imageIndex) => (
-                        <div
-                          key={`${path}-${imageIndex}`}
-                          className="border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
-                        >
-                          <Image
-                            src={toPreviewUrl(path, localPreviews)}
-                            alt={`Dokumentasi sebelum ${index + 1}-${imageIndex + 1}`}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  <FieldError>
-                    {
-                      (
-                        errors as {
-                          documentations?: Array<{
-                            image_before_paths?: { message?: string };
-                          }>;
-                        }
-                      ).documentations?.[index]?.image_before_paths?.message
-                    }
-                  </FieldError>
-                </Field>
-                <Field>
-                  <FieldLabel className="text-xs uppercase">
-                    Foto Sesudah
-                  </FieldLabel>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    disabled={isUploading}
-                    onChange={(e) =>
-                      handleUpload(index, "image_after_paths", e.target.files)
-                    }
-                  />
-                  {afterPaths.length > 0 ? (
-                    <div className="mt-2 grid grid-cols-3 gap-2">
-                      {afterPaths.map((path, imageIndex) => (
-                        <div
-                          key={`${path}-${imageIndex}`}
-                          className="border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
-                        >
-                          <Image
-                            src={toPreviewUrl(path, localPreviews)}
-                            alt={`Dokumentasi sesudah ${index + 1}-${imageIndex + 1}`}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  <FieldError>
-                    {
-                      (
-                        errors as {
-                          documentations?: Array<{
-                            image_after_paths?: { message?: string };
-                          }>;
-                        }
-                      ).documentations?.[index]?.image_after_paths?.message
-                    }
-                  </FieldError>
-                </Field>
+                {/* Foto Sebelum */}
+                <DocumentationImageField
+                  label="Foto Sebelum"
+                  paths={beforePaths}
+                  localPreviews={localPreviews}
+                  altPrefix={`Dokumentasi sebelum ${index + 1}`}
+                  errorMessage={
+                    (
+                      errors as {
+                        documentations?: Array<{
+                          image_before_paths?: { message?: string };
+                        }>;
+                      }
+                    ).documentations?.[index]?.image_before_paths?.message
+                  }
+                  onFilesSelected={(files) =>
+                    handleUpload(index, "image_before_paths", files)
+                  }
+                />
+
+                {/* Foto Sesudah */}
+                <DocumentationImageField
+                  label="Foto Sesudah"
+                  paths={afterPaths}
+                  localPreviews={localPreviews}
+                  altPrefix={`Dokumentasi sesudah ${index + 1}`}
+                  errorMessage={
+                    (
+                      errors as {
+                        documentations?: Array<{
+                          image_after_paths?: { message?: string };
+                        }>;
+                      }
+                    ).documentations?.[index]?.image_after_paths?.message
+                  }
+                  onFilesSelected={(files) =>
+                    handleUpload(index, "image_after_paths", files)
+                  }
+                />
               </div>
             </div>
           );
         })}
       </div>
 
-      {isUploading && (
-        <p className="text-muted-foreground text-xs">
-          Sedang mengunggah file...
-        </p>
+      <UploadingIndicator />
+      <AddGroupButton canAddGroup={canAddGroup} append={append} />
+
+      {displayedErrorMessage && (
+        <FieldError>{displayedErrorMessage}</FieldError>
       )}
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full border-dashed"
-        onClick={() => append({ ...DEFAULT_GROUP })}
-        disabled={!canAddGroup || isUploading}
-      >
-        <Plus className="mr-2 size-4" />
-        Tambah Grup Dokumentasi
-      </Button>
-
-      {displayedErrorMessage ? (
-        <p className="text-destructive text-xs">{displayedErrorMessage}</p>
-      ) : null}
     </div>
+  );
+}
+
+// Sub-components (isolated from parent re-renders)
+function DocumentationImageField({
+  label,
+  paths,
+  localPreviews,
+  altPrefix,
+  errorMessage,
+  onFilesSelected,
+}: {
+  label: string;
+  paths: string[];
+  localPreviews: Record<string, string>;
+  altPrefix: string;
+  errorMessage?: string;
+  onFilesSelected: (files: FileList | null) => void;
+}) {
+  return (
+    <Field>
+      <FieldLabel className="text-xs uppercase">{label}</FieldLabel>
+      <FileInput onFilesSelected={onFilesSelected} />
+      {paths.length > 0 && (
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {paths.map((path, i) => (
+            <div
+              key={`${path}-${i}`}
+              className="border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
+            >
+              <Image
+                src={toPreviewUrl(path, localPreviews)}
+                alt={`${altPrefix}-${i + 1}`}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      <FieldError>{errorMessage}</FieldError>
+    </Field>
+  );
+}
+
+/**
+ * Isolated file input — only re-renders when upload status changes.
+ */
+function FileInput({
+  onFilesSelected,
+}: {
+  onFilesSelected: (files: FileList | null) => void;
+}) {
+  const isUploading =
+    useIsMutating({
+      mutationKey: getDocumentationsUploadMutationKey(),
+    }) > 0;
+
+  return (
+    <Input
+      type="file"
+      accept="image/*"
+      multiple
+      disabled={isUploading}
+      onChange={(e) => onFilesSelected(e.target.files)}
+    />
+  );
+}
+
+/**
+ * Isolated uploading indicator — only re-renders when mutation count changes.
+ */
+function UploadingIndicator() {
+  const count = useIsMutating({
+    mutationKey: getDocumentationsUploadMutationKey(),
+  });
+  if (count < 1) return null;
+
+  return (
+    <div className="border-border bg-muted/20 relative flex h-20 w-full items-center justify-center overflow-hidden border">
+      <Loader2Icon className="mr-2 size-4 animate-spin" />
+      <p className="text-muted-foreground text-xs">Mengunggah...</p>
+    </div>
+  );
+}
+
+/**
+ * Isolated add-group button — hidden while uploading or at max capacity.
+ */
+function AddGroupButton({
+  canAddGroup,
+  append,
+}: {
+  canAddGroup: boolean;
+  append: (value: DocumentationGroup) => void;
+}) {
+  const isUploading =
+    useIsMutating({
+      mutationKey: getDocumentationsUploadMutationKey(),
+    }) > 0;
+
+  if (isUploading || !canAddGroup) return null;
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="w-full border-dashed"
+      onClick={() => append({ ...DEFAULT_GROUP })}
+    >
+      <Plus className="mr-2 size-4" />
+      Grup Dokumentasi
+    </Button>
+  );
+}
+
+/**
+ * Isolated remove button — disabled while uploading.
+ */
+function RemoveGroupButton({ onRemove }: { onRemove: () => void }) {
+  const isUploading =
+    useIsMutating({
+      mutationKey: getDocumentationsUploadMutationKey(),
+    }) > 0;
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      onClick={onRemove}
+      className="text-muted-foreground hover:text-destructive"
+      disabled={isUploading}
+    >
+      <Trash2 />
+    </Button>
   );
 }

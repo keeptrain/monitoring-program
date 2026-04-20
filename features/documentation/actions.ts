@@ -6,7 +6,7 @@ import {
   documentationProgramTypeSchema,
   DocumentationFormValue,
   DocumentationInsertRow,
-} from "@/features/documentation/documentation-schema";
+} from "@/features/documentation/forms/documentation-schema";
 import { createClient } from "@/utils/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -65,7 +65,7 @@ function mapToDocumentationRows(
 
   const baseGroupId = Date.now();
   const groupIds: number[] = [];
-  const rows = documentations.flatMap((documentation, index) => {
+  const rows = (documentations ?? []).flatMap((documentation, index) => {
     const row = documentationFormRowSchema.parse(documentation);
     const groupId = baseGroupId + index;
     groupIds.push(groupId);
