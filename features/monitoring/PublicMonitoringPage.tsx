@@ -168,10 +168,10 @@ export function Header() {
       <div className="mx-auto flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
-            Monitoring Publik
+            Monitoring
           </p>
           <h1 className="text-foreground font-semibold tracking-tight">
-            Peta Sebaran Program Prioritas
+            Dashboard Program Prioritas
           </h1>
         </div>
         <Button
