@@ -49,7 +49,7 @@ export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
         return (
           <Badge
             variant={variant}
-            className="rounded-full px-2 text-[10px] font-bold uppercase transition-all"
+            className="text-muted-foreground text-[10px] uppercase"
           >
             {row.status}
           </Badge>
