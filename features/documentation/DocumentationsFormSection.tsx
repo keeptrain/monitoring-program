@@ -24,6 +24,8 @@ type DocumentationsFormSectionProps = {
   maxGroups?: number;
   externalErrorMessage?: string | null;
   storageBasePath?: string;
+  /** "create" = thumbnail grid (default), "edit" = compact file-name list */
+  mode: "create" | "edit";
 };
 
 export default function DocumentationsFormSection({
@@ -31,6 +33,7 @@ export default function DocumentationsFormSection({
   maxGroups = 5,
   externalErrorMessage,
   storageBasePath = "documentations",
+  mode = "create",
 }: DocumentationsFormSectionProps) {
   const typedForm = form as UseFormReturn<
     DocumentationFormInput,
@@ -42,6 +45,7 @@ export default function DocumentationsFormSection({
     fields,
     append,
     remove,
+    removeImagePath,
     docs,
     canAddGroup,
     localPreviews,
@@ -79,6 +83,7 @@ export default function DocumentationsFormSection({
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Foto Sebelum */}
                 <DocumentationImageField
+                  mode={mode}
                   label="Foto Sebelum"
                   paths={beforePaths}
                   localPreviews={localPreviews}
@@ -95,10 +100,14 @@ export default function DocumentationsFormSection({
                   onFilesSelected={(files) =>
                     handleUpload(index, "image_before_paths", files)
                   }
+                  onRemoveImage={(pathIndex) =>
+                    removeImagePath(index, "image_before_paths", pathIndex)
+                  }
                 />
 
                 {/* Foto Sesudah */}
                 <DocumentationImageField
+                  mode={mode}
                   label="Foto Sesudah"
                   paths={afterPaths}
                   localPreviews={localPreviews}
@@ -114,6 +123,9 @@ export default function DocumentationsFormSection({
                   }
                   onFilesSelected={(files) =>
                     handleUpload(index, "image_after_paths", files)
+                  }
+                  onRemoveImage={(pathIndex) =>
+                    removeImagePath(index, "image_after_paths", pathIndex)
                   }
                 />
               </div>
@@ -132,32 +144,38 @@ export default function DocumentationsFormSection({
   );
 }
 
-// Sub-components (isolated from parent re-renders)
+// ─── Sub-components (isolated from parent re-renders) ────────────────────────
+
 function DocumentationImageField({
+  mode,
   label,
   paths,
   localPreviews,
   altPrefix,
   errorMessage,
   onFilesSelected,
+  onRemoveImage,
 }: {
+  mode: "create" | "edit";
   label: string;
   paths: string[];
   localPreviews: Record<string, string>;
   altPrefix: string;
   errorMessage?: string;
   onFilesSelected: (files: FileList | null) => void;
+  onRemoveImage: (index: number) => void;
 }) {
   return (
     <Field>
       <FieldLabel className="text-xs uppercase">{label}</FieldLabel>
       <FileInput onFilesSelected={onFilesSelected} />
-      {paths.length > 0 && (
+
+      {paths.length > 0 && mode === "create" && (
         <div className="mt-2 grid grid-cols-3 gap-2">
           {paths.map((path, i) => (
             <div
               key={`${path}-${i}`}
-              className="border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
+              className="group border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
             >
               <Image
                 src={toPreviewUrl(path, localPreviews)}
@@ -166,10 +184,51 @@ function DocumentationImageField({
                 className="object-cover"
                 unoptimized
               />
+              <button
+                type="button"
+                onClick={() => onRemoveImage(i)}
+                className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black"
+              >
+                <Trash2 className="size-3" />
+              </button>
             </div>
           ))}
         </div>
       )}
+
+      {paths.length > 0 && mode === "edit" && (
+        <div className="mt-2 space-y-1">
+          {paths.map((path, i) => {
+            const fileName = path.split("/").pop() || "file-dokumentasi";
+            const previewUrl = toPreviewUrl(path, localPreviews);
+
+            return (
+              <div
+                key={`${path}-${i}`}
+                className="border-border bg-muted/20 flex items-center justify-between border px-3 py-2 text-xs"
+              >
+                <a
+                  href={previewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-primary truncate pr-4 font-medium hover:underline"
+                  title="Buka preview di tab baru"
+                >
+                  {fileName}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => onRemoveImage(i)}
+                  className="text-muted-foreground hover:text-destructive shrink-0 transition-colors"
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <FieldError>{errorMessage}</FieldError>
     </Field>
   );

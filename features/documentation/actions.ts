@@ -363,4 +363,59 @@ export async function getDocumentationGroupsByTypeAndId(
   });
 }
 
+export async function upsertDocumentations(
+  programId: number,
+  programType: string,
+  documentations: DocumentationFormValue["documentations"],
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    const supabase = await createClient();
+    const normalizedProgramType =
+      documentationProgramTypeSchema.parse(programType);
+
+    // Step 1: Delete existing documentations for this program
+    const { error: deleteError } = await supabase
+      .from("documentations")
+      .delete()
+      .eq("program_type", normalizedProgramType)
+      .eq("program_id", programId);
+
+    if (deleteError) {
+      throw new Error(deleteError.message);
+    }
+
+    // Step 2: Insert new documentations (if any)
+    if (documentations && documentations.length > 0) {
+      const mapped = mapToDocumentationRows(
+        programId,
+        programType,
+        documentations,
+      );
+      const rows = mapped.rows.map((row) =>
+        documentationInsertRowSchema.parse(row),
+      );
+
+      if (rows.length > 0) {
+        const { error: insertError } = await supabase
+          .from("documentations")
+          .insert(rows);
+
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Gagal memperbarui dokumentasi.",
+    };
+  }
+}
+
 export { saveDocumentationsAction as insertDocumentations };

@@ -104,10 +104,27 @@ export default function useDocumentationsForm({
     [upload, storageBasePath, localPreviews, docs, setGroupPaths],
   );
 
+  const removeImagePath = useCallback(
+    (
+      groupIndex: number,
+      field: "image_before_paths" | "image_after_paths",
+      pathIndex: number,
+    ) => {
+      const group = docs[groupIndex];
+      if (!group) return;
+
+      const currentPaths = [...(group[field] ?? [])];
+      currentPaths.splice(pathIndex, 1);
+      setGroupPaths(groupIndex, field, currentPaths);
+    },
+    [docs, setGroupPaths],
+  );
+
   return {
     fields,
     append,
     remove,
+    removeImagePath,
     docs,
     canAddGroup,
     localPreviews,
