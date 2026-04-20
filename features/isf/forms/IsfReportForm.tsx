@@ -22,11 +22,13 @@ export default function IsfReportForm({
   initialMinDate,
   initialMaxDate,
 }: {
-  initialStep?: string;
+  initialStep: string;
   initialData?: IsfProgramLog;
   initialMinDate?: string;
   initialMaxDate?: string;
 }) {
+  const isEdit = initialData;
+
   const { form, onSubmit, isPending, documentationError } = useIsfReportForm(
     initialStep,
     initialData,
@@ -38,7 +40,7 @@ export default function IsfReportForm({
     <div className="mx-auto max-w-4xl">
       <div className="mb-6 space-y-1">
         <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-          Dashboard / ISF / Laporan / {initialData ? "Ubah" : "Buat"}
+          Dashboard / ISF / Laporan / {isEdit ? "Ubah" : "Buat"}
         </p>
         <h2 className="text-foreground text-2xl font-semibold tracking-tight">
           {initialData

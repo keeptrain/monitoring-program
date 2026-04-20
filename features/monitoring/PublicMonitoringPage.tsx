@@ -9,6 +9,7 @@ import {
   LucideIcon,
   Maximize2Icon,
   ShrimpIcon,
+  WavesIcon,
   WheatIcon,
   XIcon,
 } from "lucide-react";
@@ -58,10 +59,15 @@ const FILTER_STATE: Record<
     sub: "Kawasan Budidaya Udang Terintegrasi",
     icon: ShrimpIcon,
   },
+  revitalization: {
+    label: "Revitalisasi",
+    sub: "Revitalisasi tambak pantura",
+    icon: WavesIcon,
+  },
 };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>(null);
+  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
   const { data: locations } = useGetPublicLocationsByType(activeTab);
@@ -84,34 +90,25 @@ export default function PublicMonitoringPage() {
           )}
 
           {/* Bottom toolbar */}
-          {activeTab && (
-            <>
-              <Sheet
-                open={isFilterSheetOpen}
-                onOpenChange={setIsFilterSheetOpen}
-              >
-                <SheetContent side="left">
-                  <SheetHeader className="mb-6 text-left">
-                    <SheetTitle>Filter Area</SheetTitle>
-                    <SheetDescription>
-                      Pilih layer untuk memvisualisasikan data pada peta.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <FilterLayerContent
-                    activeTab={activeTab}
-                    onTabChange={(tab: LocationType) => {
-                      setActiveTab(tab);
-                      setIsFilterSheetOpen(false);
-                    }}
-                  />
-                </SheetContent>
-              </Sheet>
-
-              <BottomToolbarMap
-                onFilterClick={() => setIsFilterSheetOpen(true)}
+          <Sheet open={isFilterSheetOpen} onOpenChange={setIsFilterSheetOpen}>
+            <SheetContent side="left">
+              <SheetHeader className="mb-6 text-left">
+                <SheetTitle>Filter Area</SheetTitle>
+                <SheetDescription>
+                  Pilih layer untuk memvisualisasikan data pada peta.
+                </SheetDescription>
+              </SheetHeader>
+              <FilterLayerContent
+                activeTab={activeTab}
+                onTabChange={(tab: LocationType) => {
+                  setActiveTab(tab);
+                  setIsFilterSheetOpen(false);
+                }}
               />
-            </>
-          )}
+            </SheetContent>
+          </Sheet>
+
+          <BottomToolbarMap onFilterClick={() => setIsFilterSheetOpen(true)} />
         </div>
       </div>
     </>
