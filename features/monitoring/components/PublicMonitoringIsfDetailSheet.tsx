@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { PieChart, Pie, Label } from "recharts";
 import { IsfDetailSheet } from "../types/monitoring-types";
+import { SheetFooter } from "@/components/ui/sheet";
 
 export default function PublicMonitoringIsfDetailSheet({
   data,
@@ -20,9 +21,9 @@ export default function PublicMonitoringIsfDetailSheet({
   const { id, step_id, progress_percent, total_worker, updated_at } = data;
 
   return (
-    <div className="relative flex h-[calc(100vh-100px)]">
+    <div className="flex h-full flex-col overflow-scroll">
       {/* Scrollable Content */}
-      <div className="space-y-10 overflow-y-auto px-4 pb-14">
+      <div className="flex-1 space-y-10 overflow-y-auto px-4 pb-8">
         {/* Last Updated Status */}
         <LastUpdateStatus updatedAt={updated_at} />
 
@@ -79,14 +80,14 @@ export default function PublicMonitoringIsfDetailSheet({
       </div>
 
       {/* Fixed Bottom Button - Locked to Bottom of Sheet */}
-      <div className="absolute right-0 bottom-0 left-0 px-4">
-        <Button className="w-full" size="lg" asChild>
+      <SheetFooter>
+        <Button size="lg" asChild>
           <Link href={`/monitoring/isf/zona${step_id}`}>
             Lihat lebih lanjut
             <ArrowRightIcon className="size-4" />
           </Link>
         </Button>
-      </div>
+      </SheetFooter>
     </div>
   );
 }

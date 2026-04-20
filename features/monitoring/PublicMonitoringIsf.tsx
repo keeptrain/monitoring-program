@@ -100,7 +100,7 @@ export default function PublicMonitoringIsf() {
               <SheetTitle className="text-xl">
                 Zona {selectedStep.id}
               </SheetTitle>
-              <SheetDescription className="text-xs font-medium tracking-widest uppercase">
+              <SheetDescription className="text-sm font-medium tracking-widest uppercase">
                 {selectedStep.name}
               </SheetDescription>
             </SheetHeader>
@@ -112,7 +112,7 @@ export default function PublicMonitoringIsf() {
               )
             )}
             {isLoading && (
-              <p className="text-muted-foreground mt-4 text-xs">
+              <p className="text-muted-foreground animate-pulse px-4 text-xs">
                 Memuat data...
               </p>
             )}
