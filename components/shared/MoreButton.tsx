@@ -2,8 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { ReactElement, ReactNode } from "react";
-import { MoreHorizontalIcon } from "lucide-react";
+import { ReactElement } from "react";
+import { LucideIcon, MoreHorizontalIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ type BaseItem = {
   type: "link" | "action" | "custom";
   key: string;
   label?: string;
-  icon?: ReactNode;
+  icon?: LucideIcon;
   disabled?: boolean;
   className?: string;
   destructive?: boolean;
@@ -81,7 +81,7 @@ export function MoreButton({
 
           const content = (
             <>
-              {item.icon}
+              {item.icon && <item.icon className="mr-2 size-4" />}
               {item.label}
             </>
           );

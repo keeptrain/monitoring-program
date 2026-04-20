@@ -40,14 +40,14 @@ export function ThematicProgramColumns(opts?: {
             key: "edit",
             label: "Ubah",
             href: `/dashboard/thematic/${row.id}/form`,
-            icon: <PencilIcon />,
+            icon: PencilIcon,
           },
           {
             type: "action",
             key: "progress-update",
             label: "Update Progress",
             onClick: () => opts?.onOpenProgress?.(row),
-            icon: <ConstructionIcon />,
+            icon: ConstructionIcon,
           },
         ];
         return <MoreButton menuItems={menuItems} />;

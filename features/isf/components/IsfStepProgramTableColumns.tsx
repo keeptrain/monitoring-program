@@ -4,7 +4,7 @@ import { formatDate, formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
-import { PencilIcon } from "lucide-react";
+import { CameraIcon, PencilIcon } from "lucide-react";
 
 export interface IsfReport {
   id: number;
@@ -15,7 +15,11 @@ export interface IsfReport {
   updated_at: string;
 }
 
-export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
+export function getIsfProgramReportsColumns({
+  onUpdateDocumentations,
+}: {
+  onUpdateDocumentations: (id: number) => void;
+}): Column<IsfReport>[] {
   return [
     {
       header: "Dilaporkan Pada",
@@ -75,7 +79,14 @@ export function getIsfProgramReportsColumns(): Column<IsfReport>[] {
             key: "edit",
             label: "Ubah",
             href: `/dashboard/isf/report/${row.id}/edit`,
-            icon: <PencilIcon className="size-4" />,
+            icon: PencilIcon,
+          },
+          {
+            type: "action",
+            key: "update-documentations",
+            label: "Update Dokumentasi",
+            icon: CameraIcon,
+            onClick: () => onUpdateDocumentations(row.id),
           },
         ];
         return <MoreButton menuItems={menuItems} />;
