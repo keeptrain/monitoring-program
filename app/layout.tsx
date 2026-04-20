@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Program Prioritas DJPB",
   description: "Platform monitoring program prioritas KKP",
+  icons: {
+    icon: "/favicon.webp",
+  },
 };
 
 export default function RootLayout({
@@ -28,10 +31,10 @@ export default function RootLayout({
         inter.variable,
         geistSans.variable,
         geistMono.variable,
-        geistHeading.variable
+        geistHeading.variable,
       )}
     >
-      <body className="min-h-full bg-background text-foreground">
+      <body className="bg-background text-foreground min-h-full">
         <Providers>{children}</Providers>
       </body>
     </html>

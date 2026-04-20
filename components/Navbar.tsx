@@ -1,6 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { FishIcon, LogInIcon } from "lucide-react";
+import { Grid2X2PlusIcon } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -9,25 +10,29 @@ export default function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="text-foreground flex items-center gap-2 text-sm font-semibold tracking-tight"
+          className="text-foreground flex items-center gap-2 text-sm font-semibold"
         >
-          <span className="bg-primary text-background flex size-8 items-center justify-center rounded-full text-[10px] font-bold">
-            <FishIcon className="size-4" />
-          </span>
-          <span className="hidden text-xs sm:inline">
-            Kementerian Kelautan <br /> dan Perikanan
+          <div className="relative size-10 sm:size-12">
+            <Image
+              src="/favicon.webp"
+              alt="Logo KKP"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          <span className="hidden text-xs leading-tight font-bold sm:inline">
+            Kementerian Kelautan <br /> dan Perikanan Republik Indonesia
           </span>
         </Link>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link href="/dashboard">
-              <LogInIcon className="mr-1 size-4" />
-              Login
-            </Link>
-          </Button>
-        </div>
+        <Button asChild>
+          <Link href="/dashboard">
+            <Grid2X2PlusIcon className="size-4" />
+            Entry Data
+          </Link>
+        </Button>
       </nav>
     </header>
   );
