@@ -18,10 +18,13 @@ export async function getPublicLocationDetail<T extends LocationType>(
     return null;
   }
 
-  if (type === "biofloc_thematic") {
-    return (await getPublicThematicProgram(id)) as
-      | MonitoringDetailTypeMap[T]
-      | null;
+  if (
+    type === "biofloc_thematic" ||
+    type === "minapadi_thematic" ||
+    type === "revitalization"
+  ) {
+    const data = await getPublicThematicProgram(id);
+    return data as MonitoringDetailTypeMap[T] | null;
   }
 
   // Placeholder for ISF

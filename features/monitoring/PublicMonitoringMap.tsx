@@ -30,6 +30,7 @@ const SHEET_CONTENTS: {
 } = {
   biofloc_thematic: ThematicPublicMonitoringDetail,
   minapadi_thematic: ThematicPublicMonitoringDetail,
+  revitalization: ThematicPublicMonitoringDetail,
 };
 
 const INDONESIA_CENTER: [number, number] = [-2.5, 118];

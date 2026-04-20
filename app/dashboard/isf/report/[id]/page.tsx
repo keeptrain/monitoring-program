@@ -21,5 +21,5 @@ export default async function IsfReportDetailPage({
     return notFound();
   }
 
-  return <IsfProgramLogDetail data={data} />;
+  return <IsfProgramLogDetail data={data.data} />;
 }

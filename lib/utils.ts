@@ -61,3 +61,22 @@ export function generateUniqueFileName(file: File): string {
   const fileName = `${Date.now()}-${randomStr}.${fileExt}`;
   return fileName;
 }
+
+export function toPreviewUrl(
+  path: string,
+  localPreviews?: Record<string, string>,
+): string {
+  if (localPreviews?.[path]) return localPreviews[path];
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (path.startsWith("blob:")) return path;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+  const bucket = process.env.NEXT_PUBLIC_SUPABASE_BUCKET;
+  if (!supabaseUrl || !bucket) return path;
+  const normalizedPath = path.replace(/^\/+/, "");
+  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${normalizedPath}`;
+}
+
+export function mergeUnique(existing: string[], incoming: string[]) {
+  return [...new Set([...existing, ...incoming])];
+}

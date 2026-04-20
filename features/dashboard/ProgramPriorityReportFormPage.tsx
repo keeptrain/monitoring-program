@@ -10,7 +10,6 @@ import {
 import InformationBasicFormSection from "./components/InformationBasicFormSection";
 import { Button } from "@/components/ui/button";
 import useProgramPriorityForm from "./hooks/useProgramPriorityForm";
-import DocumentationsFormSection from "./components/DocumentationsFormSection";
 import { AvailableLocation } from "./actions/available-locations";
 import { ProgramPriorityFormInput } from "./forms/program-priority-schema";
 import { useTransition } from "react";
@@ -68,9 +67,7 @@ export default function ProgramPriorityReportFormPage({
             <CardTitle>Dokumentasi</CardTitle>
             <CardDescription>Isi dokumentasi program prioritas</CardDescription>
           </CardHeader>
-          <CardContent>
-            <DocumentationsFormSection form={form} />
-          </CardContent>
+          <CardContent></CardContent>
         </Card>
         <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
           {isLoading ? "Loading..." : reportId ? "Ubah" : "Submit"}

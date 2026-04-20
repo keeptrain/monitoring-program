@@ -31,6 +31,9 @@ const DETAIL_CONTENT: Record<
   minapadi_thematic: {
     title: "Mina Padi Thematic",
   },
+  revitalization: {
+    title: "Revitalisasi",
+  },
 };
 
 type Props = {

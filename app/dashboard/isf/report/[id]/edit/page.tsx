@@ -21,5 +21,14 @@ export default async function IsfReportEditPage({
     return notFound();
   }
 
-  return <IsfReportForm initialStep={String(report.step_id)} initialData={report} />;
+  const { data: reportData, availableDate } = report;
+
+  return (
+    <IsfReportForm
+      zone={String(reportData.step_id)}
+      initialData={reportData}
+      initialMinDate={availableDate.minDate ?? undefined}
+      initialMaxDate={availableDate.maxDate}
+    />
+  );
 }

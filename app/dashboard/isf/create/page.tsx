@@ -14,7 +14,7 @@ export default async function IsfCreatePage({
 
   return (
     <IsfReportForm
-      initialStep={step}
+      zone={step}
       initialMinDate={minDate}
       initialMaxDate={maxDate}
     />
