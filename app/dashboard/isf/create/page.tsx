@@ -8,7 +8,7 @@ export default async function IsfCreatePage({
 }) {
   const { step, minDate, maxDate } = await searchParams;
 
-  if (!maxDate) {
+  if (!maxDate || !step) {
     return notFound();
   }
 
