@@ -267,7 +267,7 @@ function DocumentationSection({ programId }: { programId: number }) {
     <div className="space-y-6 border-t border-zinc-100 pt-8">
       <div className="flex items-center gap-2">
         <CameraIcon className="size-5 text-zinc-400" />
-        <p className="text-sm font-bold tracking-widest text-zinc-900 uppercase">
+        <p className="text-sm font-semibold tracking-widest uppercase">
           Dokumentasi Pengerjaan
         </p>
       </div>
