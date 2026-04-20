@@ -15,6 +15,8 @@ import { Loader2 } from "lucide-react";
 import { IsfProgramLog } from "../types/isf";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 import SCurveFormSection from "@/features/documentation/SCurveFormSection";
+import { useIsMutating } from "@tanstack/react-query";
+import { getDocumentationsUploadMutationKey } from "@/features/documentation/hooks/useDocumentationsUpload";
 
 export default function IsfReportForm({
   zone,
@@ -27,14 +29,14 @@ export default function IsfReportForm({
   initialMinDate?: string;
   initialMaxDate?: string;
 }) {
-  const isEdit = initialData;
+  const isEdit = !!initialData;
 
-  const { form, onSubmit, isPending, documentationError } = useIsfReportForm(
-    zone,
-    initialData,
-    initialMinDate,
-    initialMaxDate,
-  );
+  const {
+    form,
+    onSubmit,
+    isPending: isFormPending,
+    documentationError,
+  } = useIsfReportForm(zone, initialData, initialMinDate, initialMaxDate);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -108,11 +110,30 @@ export default function IsfReportForm({
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-          {isEdit ? "Simpan Perubahan" : "Simpan Laporan"}
-        </Button>
+        <SubmitButton isPending={isFormPending} isEdit={isEdit} />
       </form>
     </div>
+  );
+}
+
+function SubmitButton({
+  isPending,
+  isEdit,
+}: {
+  isPending: boolean;
+  isEdit: boolean;
+}) {
+  const isUploading =
+    useIsMutating({
+      mutationKey: getDocumentationsUploadMutationKey(),
+    }) > 0;
+
+  const isSaving = isPending || isUploading;
+
+  return (
+    <Button type="submit" disabled={isSaving} className="w-full">
+      {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+      {isEdit ? "Simpan Perubahan" : "Simpan Laporan"}
+    </Button>
   );
 }

@@ -73,8 +73,15 @@ export default function IsfInformationBasicFormSection({
         <Field>
           <FieldLabel>Progres (%)</FieldLabel>
           <Input
+            {...form.register("progress_percent", {
+              min: "0",
+              max: "100",
+              maxLength: 3,
+              onChange: handleInputNumberValueChange,
+            })}
             type="number"
-            {...form.register("progress_percent")}
+            inputMode="numeric"
+            pattern="^-?[0-9]*\.?[0-9]*$"
             aria-invalid={!!form.formState.errors.progress_percent}
           />
           <FieldError>

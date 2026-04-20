@@ -7,12 +7,14 @@ const isfReportBaseSchema = z.object({
   status: z.string().min(1, "Status harus dipilih"),
   progress_percent: z.coerce
     .number()
-    .min(1, "Persentase minimal 1")
+    .min(1, "Pastikan persentasi lebih besar dari laporan sebelumnya")
     .max(100, "Persentase maksimal 100"),
   provider_name: z.string().min(1, "Nama penyedia harus diisi"),
   name: z.string().min(1, "Nama laporan harus diisi"),
   intervention: z.string().min(1, "Intervensi harus diisi"),
-  total_worker: z.coerce.number().min(1, "Serapan tenaga kerja harus diisi"),
+  total_worker: z.coerce
+    .number()
+    .min(1, "Jumlah serapan tenaga kerja harus diisi"),
   production: z.string().min(1, "Produksi harus diisi"),
   outcome: z.string().min(1, "Outcome harus diisi"),
   constraints: z.string().optional().default(""),
