@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Loader2Icon, Plus, Trash2 } from "lucide-react";
+import { Loader2Icon, Plus, Trash2, XIcon } from "lucide-react";
 import { useIsMutating } from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -221,7 +221,7 @@ function DocumentationImageField({
                   onClick={() => onRemoveImage(i)}
                   className="text-muted-foreground hover:text-destructive shrink-0 transition-colors"
                 >
-                  <Trash2 className="size-3" />
+                  <XIcon className="size-3" />
                 </button>
               </div>
             );

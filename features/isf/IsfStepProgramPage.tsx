@@ -13,6 +13,14 @@ import { useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { IsfReportDateWindow } from "./utils/report-date-window";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { FieldError } from "@/components/ui/field";
 
 export default function IsfStepProgramPage({
   step,
@@ -24,6 +32,7 @@ export default function IsfStepProgramPage({
   availableDate: IsfReportDateWindow;
 }) {
   const router = useRouter();
+  const [openSheet, setOpenSheet] = useState<boolean | null>(null);
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const stepData = STEPS.find((s) => s.id === step);
@@ -36,6 +45,7 @@ export default function IsfStepProgramPage({
 
   const handleUpdateDocumentations = useCallback((id: number) => {
     setSelectedReportId(id);
+    setOpenSheet(true);
   }, []);
 
   const columns = useMemo(
@@ -98,22 +108,31 @@ export default function IsfStepProgramPage({
         </div>
 
         {!isCanCreateReport && (
-          <p className="text-muted-foreground text-xs">
+          <FieldError>
             {errorMessage ?? "Belum ada tanggal laporan yang tersedia."}
-          </p>
+          </FieldError>
         )}
 
         <Datatable columns={columns} data={data} onRowClick={handleRowClick} />
       </div>
 
-      <ManageDocumentationsSheet
-        programId={selectedReportId}
-        programType="isf"
-        isOpen={selectedReportId !== null}
-        onOpenChange={(open) => {
-          if (!open) setSelectedReportId(null);
-        }}
-      />
+      {openSheet !== null && selectedReportId !== null && (
+        <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+          <SheetContent className="data-[side=right]:sm:max-w-[600px]">
+            <SheetHeader>
+              <SheetTitle>Kelola Dokumentasi</SheetTitle>
+              <SheetDescription>
+                Tambah atau hapus foto dokumentasi. <br /> Klik nama file untuk
+                preview, perubahan disimpan saat menekan &quot;Simpan&quot;.
+              </SheetDescription>
+            </SheetHeader>
+            <ManageDocumentationsSheet
+              programType="isf"
+              programId={selectedReportId}
+            />
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }
