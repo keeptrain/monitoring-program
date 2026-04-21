@@ -71,6 +71,7 @@ function toDbPayload(data: IsfReportFormValues) {
     outcome: data.outcome,
     constraints: data.constraints,
     follow_up: data.follow_up,
+    s_curve_path: data.s_curve_path,
   };
 }
 
