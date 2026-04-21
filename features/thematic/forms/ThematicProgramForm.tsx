@@ -10,19 +10,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import ThematicInformationBasicFormSection from "../components/ThematicInformationBasicFormSection";
-import ThematicDocumentationsFormSection from "../components/ThematicDocumentationsFormSection";
-import SCurveFormSection from "../components/SCurveFormSection";
 import { ThematicProgramDetail } from "../types/thematic";
 import { Loader2 } from "lucide-react";
 import LocationFormSection from "@/components/shared/LocationFormSection";
-
-interface ThematicProgramFormProps {
-  initialData?: ThematicProgramDetail | null;
-}
+import SCurveFormSection from "@/features/documentation/SCurveFormSection";
+import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 
 export default function ThematicProgramForm({
   initialData,
-}: ThematicProgramFormProps) {
+}: {
+  initialData?: ThematicProgramDetail | null;
+}) {
+  const isEdit = !!initialData;
   const { form, onSubmit, isPending } = useThematicProgramForm(initialData);
 
   return (
@@ -72,17 +71,23 @@ export default function ThematicProgramForm({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Dokumentasi</CardTitle>
-            <CardDescription>
-              Unggah dokumentasi pengerjaan program
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ThematicDocumentationsFormSection form={form} />
-          </CardContent>
-        </Card>
+        {!isEdit && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Dokumentasi</CardTitle>
+              <CardDescription>
+                Unggah dokumentasi pengerjaan program
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DocumentationsFormSection
+                mode="create"
+                form={form}
+                storageBasePath="thematic"
+              />
+            </CardContent>
+          </Card>
+        )}
 
         <Button type="submit" disabled={isPending} className="w-full">
           {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}

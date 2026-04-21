@@ -39,7 +39,7 @@ export function ThematicProgramColumns(opts?: {
             type: "link",
             key: "edit",
             label: "Ubah",
-            href: `/dashboard/thematic/${row.id}/form`,
+            href: `/dashboard/thematic/biofloc/${row.id}/edit`,
             icon: PencilIcon,
           },
           {
