@@ -30,3 +30,31 @@ ON isf_program_logs (step_id, progress_date DESC);
 
 CREATE INDEX idx_logs_date 
 ON isf_program_logs (progress_date);
+
+-- View to get the latest log for each step in ISF program
+CREATE OR REPLACE VIEW latest_isf_logs AS
+SELECT DISTINCT ON (step_id)
+  id,
+  step_id,
+  progress_percent,
+  progress_date,
+  reporting_week,
+  name,
+  status,
+  provider_name,
+  production,
+  intervention,
+  total_worker,
+  outcome,
+  constraints,
+  follow_up,
+  s_curve_path,
+  created_at,
+  updated_at
+FROM isf_program_logs
+ORDER BY step_id, reporting_week DESC, created_at DESC;
+
+GRANT ALL ON TABLE isf_program_logs TO anon, authenticated, service_role;
+
+-- Grant access to the view
+GRANT SELECT ON latest_isf_logs TO anon, authenticated, service_role;

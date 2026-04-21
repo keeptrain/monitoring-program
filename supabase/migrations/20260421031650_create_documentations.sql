@@ -26,3 +26,5 @@ CREATE TRIGGER set_updated_at
 BEFORE UPDATE ON documentations
 FOR EACH ROW
 EXECUTE PROCEDURE handle_updated_at();
+
+GRANT ALL ON TABLE documentations TO anon, authenticated, service_role;
