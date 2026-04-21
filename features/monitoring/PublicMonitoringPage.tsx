@@ -7,7 +7,6 @@ import {
   FilterIcon,
   Grid3x2Icon,
   LucideIcon,
-  Maximize2Icon,
   ShrimpIcon,
   WavesIcon,
   WheatIcon,
@@ -77,7 +76,7 @@ export default function PublicMonitoringPage() {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Map Container */}
         <div className="relative flex flex-1 flex-col justify-center bg-zinc-50/50">
-          {activeTab && (locations || activeTab === "isf") ? (
+          {activeTab && (locations || activeTab === "isf") && (
             <div className="flex flex-1">
               {activeTab === "isf" ? (
                 <LazyIsf />
@@ -85,8 +84,6 @@ export default function PublicMonitoringPage() {
                 <LazyMap locations={locations!} type={activeTab} />
               )}
             </div>
-          ) : (
-            <EmptyFilterState onSelect={setActiveTab} />
           )}
 
           {/* Bottom toolbar */}
@@ -112,45 +109,6 @@ export default function PublicMonitoringPage() {
         </div>
       </div>
     </>
-  );
-}
-
-function EmptyFilterState({
-  onSelect,
-}: {
-  onSelect: (tab: LocationType) => void;
-}) {
-  return (
-    <div className="mx-auto py-8">
-      <div className="mb-8 text-center">
-        <p className="text-muted-foreground">Data Visualisasi</p>
-        <h1 className="text-3xl text-zinc-900">Pilih Program Prioritas</h1>
-      </div>
-      <div className="bg-border grid gap-px border lg:grid-cols-3">
-        {Object.entries(FILTER_STATE).map(([key, value]) => (
-          <button
-            key={key}
-            onClick={() => onSelect(key as LocationType)}
-            className="group bg-background flex flex-col justify-between gap-8 p-8 text-left transition-all hover:bg-zinc-50"
-          >
-            <div className="flex items-start justify-between">
-              <div className="border-border group-hover:border-foreground flex size-12 items-center justify-center border transition-colors">
-                <value.icon className="text-foreground size-6" />
-              </div>
-              <Maximize2Icon className="text-muted-foreground group-hover:text-foreground size-5 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-            </div>
-            <div>
-              <h2 className="text-foreground text-base font-semibold">
-                {value.label}
-              </h2>
-              <p className="text-muted-foreground mt-1 leading-relaxed font-medium">
-                {value.sub}
-              </p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
