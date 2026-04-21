@@ -108,7 +108,7 @@ export function Header({
     : "Select Dashboard";
 
   return (
-    <div className="bg-background/95 border-border sticky top-14 z-40 overflow-hidden p-4 backdrop-blur transition-all duration-500 ease-in-out">
+    <div className="bg-background/95 border-border sticky top-14 z-40 overflow-hidden px-6 py-4 backdrop-blur transition-all duration-500 ease-in-out">
       <div className="mx-auto flex items-center justify-between">
         <div>
           <h2 className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
