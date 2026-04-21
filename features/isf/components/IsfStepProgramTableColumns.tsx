@@ -2,9 +2,9 @@ import React from "react";
 import { Column } from "@/components/datatable/datatable";
 import { formatDate, formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
 import { CameraIcon, PencilIcon } from "lucide-react";
+import IsfStatusBadge from "./IsfStatusBadge";
 
 export interface IsfReport {
   id: number;
@@ -44,23 +44,8 @@ export function getIsfProgramReportsColumns({
     {
       header: "Status",
       accessorKey: "status",
-      cell: (row) => {
-        let variant: "default" | "secondary" | "outline" | "destructive" =
-          "secondary";
-        if (row.status === "Selesai") variant = "default";
-        if (row.status === "Baru") variant = "outline";
-
-        return (
-          <Badge
-            variant={variant}
-            className="text-muted-foreground text-[10px] uppercase"
-          >
-            {row.status}
-          </Badge>
-        );
-      },
+      cell: (row) => <IsfStatusBadge status={row.status} />,
     },
-
     {
       header: "Diperbarui",
       accessorKey: "updated_at",

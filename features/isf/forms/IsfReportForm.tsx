@@ -87,7 +87,7 @@ export default function IsfReportForm({
         <Card>
           <CardHeader>
             <CardTitle>Kurva S</CardTitle>
-            <CardDescription>Unggah lampiran kurva S tahapan</CardDescription>
+            <CardDescription>Unggah lampiran kurva S</CardDescription>
           </CardHeader>
           <CardContent>
             <SCurveFormSection form={form} />
