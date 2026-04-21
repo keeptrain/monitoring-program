@@ -107,7 +107,7 @@ export async function getIsfProgramLogsByStep(
 
   return {
     data: mappedData,
-    availableDate: dateWindow,
+  availableDate: dateWindow,
   };
 }
 
