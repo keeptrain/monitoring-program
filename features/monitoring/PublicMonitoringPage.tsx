@@ -122,7 +122,7 @@ export function Header({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center">
               <MenuIcon className="size-4" />
-              <span className="hidden sm:block">Dashboard:</span> {activeLabel}
+              <span className="hidden sm:block">Dashboard: {activeLabel}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-64" align="end">
@@ -136,7 +136,7 @@ export function Header({
                   <DropdownMenuRadioItem
                     key={key}
                     value={key}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 px-2"
                   >
                     <value.icon className="text-muted-foreground size-4" />
                     <div className="flex flex-col">
