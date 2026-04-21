@@ -11,8 +11,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { LucideIcon, ArrowRight, ClipboardXIcon } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import {
+  ClipboardXIcon,
+  TractorIcon,
+  UsersIcon,
+  ArrowUpRight,
+  InfoIcon,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -21,6 +26,13 @@ import { PIN_LOCATIONS } from "./utils/monitoring-constants";
 import OverallSummaryIsf from "./components/OverallSummaryIsf";
 import ProgressChartIsf from "./components/ProgressChartIsf";
 import PublicMonitoringIsfDetailSheet from "./components/PublicMonitoringIsfDetailSheet";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
+import Autoplay from "embla-carousel-autoplay";
 
 export default function PublicMonitoringIsf() {
   const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
@@ -43,11 +55,11 @@ export default function PublicMonitoringIsf() {
   };
 
   return (
-    <div className="bg-background flex flex-1 flex-col">
+    <div className="bg-background flex flex-1 flex-col py-4">
       <div className="flex flex-1 flex-col p-4 md:p-4 lg:flex-row lg:gap-8">
-        {/* Main Map Area */}
-        <div className="flex flex-1 items-center justify-center">
-          <div className="relative aspect-video w-full max-w-6xl">
+        <div className="flex flex-1 flex-col items-center justify-center gap-8 md:flex-row">
+          {/* Main Map Area */}
+          <div className="relative aspect-video w-full max-w-3xl">
             <Image
               src="/images/isf_map.webp"
               alt="ISF Map"
@@ -66,27 +78,17 @@ export default function PublicMonitoringIsf() {
               />
             ))}
           </div>
+
+          <RightSideStats />
         </div>
       </div>
 
       {/* Bottom Stats Section */}
-      <div className="mx-auto flex w-full max-w-none flex-col px-6 sm:max-w-6xl sm:px-0">
-        {/* Top Row: Symmetrical Legend, Pie, and Summary */}
-        <div className="flex flex-col gap-10 py-6 md:py-4">
-          {/* 1. Legenda Zona - Sub-component */}
-          <LegendaZona />
-
-          <Separator />
-
+      <div className="mx-auto w-full max-w-6xl px-6 sm:px-0">
+        <div className="grid grid-cols-1 items-start gap-16 py-12 lg:grid-cols-2">
           {data && <OverallSummaryIsf data={data} />}
-
-          <Separator />
-
           <ProgressChartIsf />
         </div>
-
-        {/* Bottom Row: Specialized Reports Cards */}
-        <div className="py-24"></div>
       </div>
 
       {/* Sheet */}
@@ -142,31 +144,6 @@ function EmptyZoneDetail() {
   );
 }
 
-function LegendaZona() {
-  return (
-    <div className="flex w-full flex-col items-center justify-center space-y-6">
-      <p className="text-primary text-xs font-black tracking-[0.2em] uppercase">
-        Legenda Zona
-      </p>
-      <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-        {STEPS.map((s) => (
-          <div key={s.id} className="flex items-center gap-2.5">
-            <div
-              className={cn(
-                "size-2.5 rounded-full shadow-sm",
-                STEP_COLORS[s.id] || "bg-primary",
-              )}
-            />
-            <span className="text-foreground/70 text-xs font-bold tracking-tight uppercase">
-              {s.id}. {s.name}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function IsfPinPoint({
   step,
   onClick,
@@ -206,117 +183,141 @@ function IsfPinPoint({
   );
 }
 
-function SpecializedCard() {
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:gap-10">
-      {/* Ketenagakerjaan Card */}
-      {/* <ResourceStatItem
-              icon={UsersRoundIcon}
-              title="Ketenagakerjaan"
-              subTitle="Terverifikasi Lapangan"
-              statusLabel="Live Status"
-              statusBg="bg-primary"
-              value={`${dashboard?.workforce_total ?? 0} ORANG`}
-              valueDesc="Total pekerja aktif hari ini"
-              trend={
-                <div className="flex items-center gap-1.5">
-                  <TrendingUpIcon className="size-4 text-emerald-500" />
-                  <span className="text-xs font-bold text-emerald-500 uppercase">
-                    {dashboard?.active_zone_count ?? 0} Zona Aktif
-                  </span>
-                </div>
-              }
-              updateText={
-                dashboard?.updated_at
-                  ? `Update: ${new Date(dashboard.updated_at).toLocaleDateString("id-ID")}`
-                  : "Update: -"
-              }
-              href="/monitoring/labor"
-            /> */}
+function RightSideStats() {
+  const [showRincian, setShowRincian] = useState(false);
 
-      {/* Alat Berat Card */}
-      {/* <ResourceStatItem
-              icon={TractorIcon}
-              title="Alat Berat"
-              subTitle="Unit Terintegrasi"
-              statusLabel="Operational"
-              statusBg="bg-blue-600"
-              subTitleColor="text-blue-600"
-              value="12 UNIT"
-              valueDesc={`Aktif di ${dashboard?.active_zone_count ?? 0} zona pengerjaan`}
-              trend={
-                <div className="flex items-center gap-1.5">
-                  <HardHat className="text-primary size-4" />
-                  <span className="text-primary text-xs font-bold uppercase">
-                    {dashboard?.total_logs ?? 0} laporan masuk
+  return (
+    <div className="flex w-full flex-col items-center justify-center gap-6 text-center md:w-fit">
+      <div className="w-full space-y-6">
+        <p className="text-muted-foreground border-b pb-2 text-sm font-bold tracking-[0.2em] uppercase">
+          Statistik Jumlah
+        </p>
+
+        {/* Summary Metrics Grid */}
+        <div className="grid w-full grid-cols-2 items-start gap-8 px-2">
+          <div className="space-y-4">
+            <p className="text-muted-foreground/80 text-xs font-bold tracking-widest uppercase">
+              Tenaga Kerja
+            </p>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <UsersIcon className="text-primary size-5" />
+                <p className="text-xl font-bold tabular-nums">
+                  12
+                  <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
+                    Orang
                   </span>
-                </div>
-              }
-              updateText="Status: Standby & Run"
-              href="/monitoring/equipment"
-            /> */}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                asChild
+              >
+                <Link href={`/monitoring/recruitment`}>
+                  Rekrutmen
+                  <ArrowUpRight className="ml-1 size-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className="text-muted-foreground/80 text-xs font-bold tracking-widest uppercase">
+              Alat Berat
+            </p>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3">
+                <TractorIcon className="text-primary size-5" />
+                <p className="text-xl font-bold tabular-nums">
+                  103
+                  <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
+                    Unit
+                  </span>
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => setShowRincian(!showRincian)}
+              >
+                {showRincian ? "Tutup" : "Rincian Alat Berat"}
+                <InfoIcon className="ml-1 size-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="opacity-50" />
+
+      {/* Rincian Section (Conditional) */}
+      {showRincian && (
+        <div className="animate-in fade-in slide-in-from-top-1 w-full space-y-4 px-2 pb-2 duration-300">
+          <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
+            Detail Rincian Alat
+          </p>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-left text-xs leading-tight font-semibold">
+            <div className="space-y-1">
+              <p>a) Excavator : 39 Unit</p>
+              <p>b) Buldozer : 7 Unit</p>
+              <p>c) Grader : 1 Unit</p>
+              <p>d) Vibro : 10 Unit</p>
+            </div>
+            <div className="space-y-1">
+              <p>e) Dumptruck : 33 Unit</p>
+              <p>f) Fuel Truck : 2 Unit</p>
+              <p>g) Dutro Truck : 1 Unit</p>
+              <div>
+                <p>h) Kendaraan Operasional</p>
+                <p className="ml-2">: 10 Unit</p>
+              </div>
+            </div>
+          </div>
+          <Separator className="opacity-50" />
+        </div>
+      )}
+
+      <DocumentationCarousel />
     </div>
   );
 }
 
-function ResourceStatItem({
-  icon: Icon,
-  title,
-  value,
-  valueDesc,
-  trend,
-  updateText,
-  href,
-}: {
-  icon: LucideIcon;
-  title: string;
-  subTitle: string;
-  statusLabel: string;
-  statusBg?: string;
-  value: string;
-  valueDesc: string;
-  trend?: React.ReactNode;
-  updateText: string;
-  subTitleColor?: string;
-  href: string;
-}) {
-  return (
-    <Card className="bg-muted/40 hover:bg-muted/60 transition-all">
-      <CardContent>
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg">
-              <Icon className="text-primary size-6" />
-            </div>
-            <span className="block text-sm font-semibold uppercase">
-              {title}
-            </span>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href={href}>
-              Detail
-              <ArrowRight className="size-3.5" />
-            </Link>
-          </Button>
-        </div>
+function DocumentationCarousel() {
+  const images = [
+    "/images/bioflok.jpeg",
+    "/images/revitalisasi-tambak-pantura.jpg",
+    "/images/tambak-udang.jpg",
+  ];
 
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex flex-col items-start gap-1">
-            <p className="text-lg font-semibold">{value}</p>
-            <p className="text-muted-foreground text-xs font-medium">
-              {valueDesc}
-            </p>
-          </div>
-          <div className="flex flex-col items-start gap-4 sm:items-end sm:gap-2">
-            <div className="flex flex-col items-start gap-1 sm:items-end">
-              {trend}
-              <p className="text-muted-foreground font-medium uppercase">
-                {updateText}
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+  return (
+    <Carousel
+      className="w-75"
+      plugins={[Autoplay({ delay: 2000 })]}
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+    >
+      <CarouselContent>
+        {images.map((src, index) => (
+          <CarouselItem key={index}>
+            <Card className="overflow-hidden border-none shadow-sm">
+              <CardContent className="relative aspect-4/3">
+                <Image
+                  src={src}
+                  alt={`Dokumentasi ${index + 1}`}
+                  fill
+                  className="object-cover transition-transform duration-500 hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
+              </CardContent>
+            </Card>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </Carousel>
   );
 }

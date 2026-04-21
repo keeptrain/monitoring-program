@@ -4,7 +4,6 @@ import {
   STEP_COLORS,
   STEP_HEX_COLORS,
 } from "@/features/isf/constants/isf-step";
-import { Progress } from "@/components/ui/progress";
 import { Label, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { PublicMonitoringIsf } from "../types/monitoring-types";
 
@@ -16,19 +15,19 @@ export default function OverallSummaryIsf({
   const { overall_progress, overall_summary } = data;
 
   return (
-    <div className="flex w-full flex-col items-center justify-center space-y-8">
+    <div className="flex w-full flex-col items-center space-y-8">
       <p className="text-primary text-xs font-black tracking-[0.3em] uppercase">
         Overall Summary
       </p>
 
-      <div className="flex w-full flex-col items-center justify-center gap-12 sm:flex-row lg:gap-20">
+      <div className="flex w-full flex-col items-center justify-center gap-6 sm:flex-row">
         <PieChartIsf
           overallProgress={overall_progress}
           summary={overall_summary}
         />
 
         {/* Progress Grid */}
-        <div className="grid w-full flex-1 grid-cols-1 gap-x-12 gap-y-8 sm:grid-cols-2">
+        <div className="flex w-full flex-1 justify-center gap-x-6 gap-y-8">
           <ProgressGridIsf
             steps={STEPS.filter((s) => s.id <= 4)}
             summary={overall_summary}
@@ -137,21 +136,24 @@ function ProgressGridIsf({
         const progress = summary[s.id] || 0;
         return (
           <div key={s.id} className="space-y-2">
-            <div className="flex justify-between gap-3 text-sm font-bold tracking-tight uppercase">
-              <div className="flex items-center gap-2">
-                <div
-                  className={cn(
-                    "size-1.5 rounded-full shadow-sm",
-                    STEP_COLORS[s.id] || "bg-primary",
-                  )}
-                />
-                <span className="text-foreground/70">Zona {s.id}</span>
-              </div>
-              <span className="text-primary font-semibold tabular-nums">
+            <div className="flex items-center gap-2 text-sm font-semibold tracking-tight uppercase">
+              <span
+                className={cn(
+                  "flex w-20 justify-center rounded py-1 text-[10px] text-white shadow-xs",
+                  STEP_COLORS[s.id] || "bg-primary",
+                )}
+              >
+                Zona {s.id}
+              </span>
+              <span
+                className={cn(
+                  "flex w-12 justify-center rounded py-1 text-[10px] font-black text-white tabular-nums shadow-xs",
+                  STEP_COLORS[s.id] || "bg-primary",
+                )}
+              >
                 {progress}%
               </span>
             </div>
-            <Progress value={progress} className="h-2 w-full" />
           </div>
         );
       })}
