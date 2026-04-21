@@ -21,7 +21,7 @@ const PUBLIC_IMAGES = [
 
 export default function RecruitmentProgressPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-8 py-8">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 md:px-0">
       <div className="space-y-4">
         <Button variant="outline" size="sm" asChild>
           <Link href="/monitoring">
