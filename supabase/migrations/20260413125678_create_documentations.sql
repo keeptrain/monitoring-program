@@ -5,6 +5,7 @@ CREATE TABLE documentations (
   group_id VARCHAR(50) NOT NULL, -- id of the group
   type VARCHAR(25) CHECK (type IN ('before', 'after')) NOT NULL, -- before or after
   path TEXT NOT NULL, -- path to the file
+  file_name TEXT NOT NULL, -- file name of the file
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

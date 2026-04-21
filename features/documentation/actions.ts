@@ -6,6 +6,7 @@ import {
   documentationProgramTypeSchema,
   DocumentationFormValue,
   DocumentationInsertRow,
+  DocumentationImage,
 } from "@/features/documentation/forms/documentation-schema";
 import { createClient } from "@/utils/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
@@ -18,11 +19,15 @@ type SaveDocumentationsResult = {
   error?: string;
 };
 
+/**
+ * Representasi satu grup dokumentasi (Before/After) yang dikembalikan ke UI.
+ * Kini menggunakan objek DocumentationImage untuk mendukung file_name.
+ */
 export type ProgramDocumentationGroup = {
   programId: number;
   groupId: string | number | null;
-  beforePaths: string[];
-  afterPaths: string[];
+  beforeImages: DocumentationImage[];
+  afterImages: DocumentationImage[];
   beforeUrls: string[];
   afterUrls: string[];
   allUrls: string[];
@@ -67,35 +72,37 @@ function mapToDocumentationRows(
   const groupIds: number[] = [];
   const rows = (documentations ?? []).flatMap((documentation, index) => {
     const row = documentationFormRowSchema.parse(documentation);
-    const groupId = baseGroupId + index;
-    groupIds.push(groupId);
+    const groupId = String(baseGroupId + index); // Consistent with schema (string)
+    groupIds.push(Number(groupId));
 
     const mappedRows: DocumentationInsertRow[] = [];
 
-    for (const beforePath of row.image_before_paths) {
+    for (const img of row.image_before_paths) {
       mappedRows.push({
         program_type: normalizedProgramType,
         program_id: programId,
         group_id: groupId,
         type: "before",
-        path: normalizeStoragePath(beforePath),
+        path: normalizeStoragePath(img.path),
+        file_name: img.file_name,
       });
     }
 
-    for (const afterPath of row.image_after_paths) {
+    for (const img of row.image_after_paths) {
       mappedRows.push({
         program_type: normalizedProgramType,
         program_id: programId,
         group_id: groupId,
         type: "after",
-        path: normalizeStoragePath(afterPath),
+        path: normalizeStoragePath(img.path),
+        file_name: img.file_name,
       });
     }
 
     return mappedRows;
   });
 
-  return { rows, groupIds };
+  return { rows, groupIds: groupIds };
 }
 
 export async function saveDocumentationsAction(
@@ -170,32 +177,9 @@ type DocumentationQueryRow = {
   group_id: string | number | null;
   type: "before" | "after";
   path: string;
+  file_name: string;
   created_at: string | null;
 };
-
-type ProgramDocumentationAccumulator = ProgramDocumentationGroup & {
-  groupRank: bigint;
-};
-
-function getGroupRank(
-  groupId: string | number | null,
-  createdAt: string | null,
-  id: number,
-): bigint {
-  if (groupId !== null) {
-    try {
-      return typeof groupId === "number" ? BigInt(groupId) : BigInt(groupId);
-    } catch {
-      // fall through to created_at/id fallback
-    }
-  }
-
-  const createdAtMs = createdAt ? new Date(createdAt).getTime() : 0;
-  if (!Number.isNaN(createdAtMs) && createdAtMs > 0) {
-    return BigInt(createdAtMs);
-  }
-  return BigInt(id);
-}
 
 export async function getDocumentationsByTypeAndId(type: string, id: number) {
   const supabase = await createClient();
@@ -222,7 +206,7 @@ export async function getDocumentationsByProgramIds(
 
   const { data, error } = await supabase
     .from("documentations")
-    .select("id, program_id, group_id, type, path, created_at")
+    .select("id, program_id, group_id, type, path, file_name, created_at")
     .eq("program_type", normalizedProgramType)
     .in("program_id", normalizedProgramIds)
     .order("created_at", { ascending: true })
@@ -232,49 +216,40 @@ export async function getDocumentationsByProgramIds(
     throw new Error(error.message);
   }
 
-  const groupedByProgram = new Map<number, ProgramDocumentationAccumulator>();
+  const groupedByProgram = new Map<number, ProgramDocumentationGroup>();
 
+  // Catatan: logika ranking grup disederhanakan untuk kebutuhan Map per-program (biasanya hanya ambil satu grup terbaru)
   for (const row of (data ?? []) as DocumentationQueryRow[]) {
-    const existing = groupedByProgram.get(row.program_id);
-    const rowRank = getGroupRank(row.group_id, row.created_at, row.id);
-
-    if (existing && rowRank < existing.groupRank) {
-      continue;
-    }
-
     const normalizedPath = normalizeStoragePath(row.path);
     const publicUrl = toPublicStorageUrl(normalizedPath);
+    const imgObj = { path: normalizedPath, file_name: row.file_name };
 
-    if (!existing || rowRank > existing.groupRank) {
+    const existing = groupedByProgram.get(row.program_id);
+
+    if (!existing) {
       groupedByProgram.set(row.program_id, {
         programId: row.program_id,
         groupId: row.group_id,
-        beforePaths: row.type === "before" ? [normalizedPath] : [],
-        afterPaths: row.type === "after" ? [normalizedPath] : [],
+        beforeImages: row.type === "before" ? [imgObj] : [],
+        afterImages: row.type === "after" ? [imgObj] : [],
         beforeUrls: row.type === "before" ? [publicUrl] : [],
         afterUrls: row.type === "after" ? [publicUrl] : [],
         allUrls: [publicUrl],
-        groupRank: rowRank,
       });
       continue;
     }
 
     if (row.type === "before") {
-      existing.beforePaths.push(normalizedPath);
+      existing.beforeImages.push(imgObj);
       existing.beforeUrls.push(publicUrl);
     } else {
-      existing.afterPaths.push(normalizedPath);
+      existing.afterImages.push(imgObj);
       existing.afterUrls.push(publicUrl);
     }
     existing.allUrls.push(publicUrl);
   }
 
-  return new Map(
-    Array.from(groupedByProgram.entries()).map(([programId, group]) => {
-      const { groupRank: _groupRank, ...publicGroup } = group;
-      return [programId, publicGroup];
-    }),
-  );
+  return groupedByProgram;
 }
 
 export async function getDocumentationsByProgramId(
@@ -289,10 +264,6 @@ export async function getDocumentationsByProgramId(
   return groupedByProgram.get(params.programId) ?? null;
 }
 
-/**
- * Returns ALL documentation groups for a single program_id.
- * Each group_id produces a separate ProgramDocumentationGroup.
- */
 export async function getDocumentationGroupsByProgramId(
   supabase: SupabaseClient,
   params: DocumentationProgramIdQueryParams,
@@ -308,7 +279,7 @@ export async function getDocumentationGroupsByProgramId(
 
   const { data, error } = await supabase
     .from("documentations")
-    .select("id, program_id, group_id, type, path, created_at")
+    .select("id, program_id, group_id, type, path, file_name, created_at")
     .eq("program_type", normalizedProgramType)
     .eq("program_id", programId)
     .order("created_at", { ascending: true })
@@ -318,31 +289,31 @@ export async function getDocumentationGroupsByProgramId(
     throw new Error(error.message);
   }
 
-  // Group by group_id
   const groupMap = new Map<string, ProgramDocumentationGroup>();
 
   for (const row of (data ?? []) as DocumentationQueryRow[]) {
     const groupKey = String(row.group_id ?? row.id);
     const normalizedPath = normalizeStoragePath(row.path);
     const publicUrl = toPublicStorageUrl(normalizedPath);
+    const imgObj = { path: normalizedPath, file_name: row.file_name };
 
     const existing = groupMap.get(groupKey);
     if (!existing) {
       groupMap.set(groupKey, {
         programId: row.program_id,
         groupId: row.group_id,
-        beforePaths: row.type === "before" ? [normalizedPath] : [],
-        afterPaths: row.type === "after" ? [normalizedPath] : [],
+        beforeImages: row.type === "before" ? [imgObj] : [],
+        afterImages: row.type === "after" ? [imgObj] : [],
         beforeUrls: row.type === "before" ? [publicUrl] : [],
         afterUrls: row.type === "after" ? [publicUrl] : [],
         allUrls: [publicUrl],
       });
     } else {
       if (row.type === "before") {
-        existing.beforePaths.push(normalizedPath);
+        existing.beforeImages.push(imgObj);
         existing.beforeUrls.push(publicUrl);
       } else {
-        existing.afterPaths.push(normalizedPath);
+        existing.afterImages.push(imgObj);
         existing.afterUrls.push(publicUrl);
       }
       existing.allUrls.push(publicUrl);

@@ -30,8 +30,8 @@ export const useManageDocumentationsForm = (type: string, id: number) => {
     if (isSuccess && documentations && !isDirty) {
       reset({
         documentations: documentations.map((g) => ({
-          image_before_paths: g.beforePaths ?? [],
-          image_after_paths: g.afterPaths ?? [],
+          image_before_paths: g.beforeImages ?? [],
+          image_after_paths: g.afterImages ?? [],
         })),
       });
     }

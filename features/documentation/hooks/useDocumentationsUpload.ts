@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase-client";
 import { generateUniqueFileName } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
+import { type DocumentationImage } from "../forms/documentation-schema";
 
 const BUCKET_NAME: string = process.env.NEXT_PUBLIC_SUPABASE_BUCKET!;
 type UploadInput = File | File[] | FileList;
@@ -28,7 +29,7 @@ const useMutationUpload = () => {
     }: {
       input: UploadInput;
       options?: UploadOptions;
-    }) => {
+    }): Promise<DocumentationImage[]> => {
       const files = normalizeFiles(input);
       if (files.length === 0) {
         throw new Error("Tidak ada file yang dipilih.");
@@ -47,7 +48,12 @@ const useMutationUpload = () => {
           .upload(targetPath, file, { upsert: false });
 
         if (error) throw error;
-        return data.path;
+
+        // Mengembalikan objek path dan nama asli
+        return {
+          path: data.path,
+          file_name: file.name,
+        };
       });
 
       return Promise.all(promises);
@@ -58,7 +64,10 @@ const useMutationUpload = () => {
 export default function useDocumentationsUpload() {
   const { mutateAsync, isPending, error } = useMutationUpload();
 
-  const upload = async (file: UploadInput, options?: UploadOptions) => {
+  const upload = async (
+    file: UploadInput,
+    options?: UploadOptions,
+  ): Promise<DocumentationImage[]> => {
     return mutateAsync({ input: file, options });
   };
 

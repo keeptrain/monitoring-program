@@ -7,8 +7,8 @@ import {
   type DocumentationFormInput,
   type DocumentationFormValue,
   type DocumentationGroup,
+  type DocumentationImage,
 } from "../forms/documentation-schema";
-import { mergeUnique } from "@/lib/utils";
 
 type UseDocumentationsFormOptions = {
   form: UseFormReturn<
@@ -56,9 +56,9 @@ export default function useDocumentationsForm({
     (
       groupIndex: number,
       field: "image_before_paths" | "image_after_paths",
-      paths: string[],
+      images: DocumentationImage[],
     ) => {
-      setValue(`documentations.${groupIndex}.${field}`, paths, {
+      setValue(`documentations.${groupIndex}.${field}`, images, {
         shouldDirty: true,
         shouldValidate: true,
       });
@@ -77,21 +77,29 @@ export default function useDocumentationsForm({
 
       try {
         const files = Array.from(fileList);
-        const uploadedPaths = await upload(fileList, {
+        const uploadedImages = await upload(fileList, {
           basePath: storageBasePath,
         });
 
         const newPreviews: Record<string, string> = { ...localPreviews };
-        uploadedPaths.forEach((path, index) => {
+        uploadedImages.forEach((img, index) => {
           if (files[index]) {
-            newPreviews[path] = URL.createObjectURL(files[index]);
+            newPreviews[img.path] = URL.createObjectURL(files[index]);
           }
         });
         setLocalPreviews(newPreviews);
 
         const group = docs[groupIndex] ?? DEFAULT_GROUP;
         const current = group[field] ?? [];
-        const merged = mergeUnique(current, uploadedPaths);
+
+        // Merge unique based on path
+        const merged = [...current];
+        uploadedImages.forEach((newImg) => {
+          if (!merged.some((m) => m.path === newImg.path)) {
+            merged.push(newImg);
+          }
+        });
+
         setGroupPaths(groupIndex, field, merged);
       } catch (error) {
         const message =
@@ -113,9 +121,9 @@ export default function useDocumentationsForm({
       const group = docs[groupIndex];
       if (!group) return;
 
-      const currentPaths = [...(group[field] ?? [])];
-      currentPaths.splice(pathIndex, 1);
-      setGroupPaths(groupIndex, field, currentPaths);
+      const currentImages = [...(group[field] ?? [])];
+      currentImages.splice(pathIndex, 1);
+      setGroupPaths(groupIndex, field, currentImages);
     },
     [docs, setGroupPaths],
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Loader2Icon, Plus, Trash2, XIcon } from "lucide-react";
+import { Loader2Icon, Plus, Trash2, XIcon, FileText } from "lucide-react";
 import { useIsMutating } from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -16,6 +16,7 @@ import {
   type DocumentationFormInput,
   type DocumentationFormValue,
   type DocumentationGroup,
+  type DocumentationImage,
 } from "./forms/documentation-schema";
 
 type DocumentationsFormSectionProps = {
@@ -65,13 +66,13 @@ export default function DocumentationsFormSection({
       <div className="space-y-4">
         {fields.map((field, index) => {
           const group = docs[index] ?? DEFAULT_GROUP;
-          const beforePaths = group.image_before_paths ?? [];
-          const afterPaths = group.image_after_paths ?? [];
+          const beforeImages = group.image_before_paths ?? [];
+          const afterImages = group.image_after_paths ?? [];
 
           return (
             <div
               key={field.id}
-              className="border-border bg-background border p-4"
+              className="border-border bg-background border p-4 shadow-sm"
             >
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
@@ -85,7 +86,7 @@ export default function DocumentationsFormSection({
                 <DocumentationImageField
                   mode={mode}
                   label="Foto Sebelum"
-                  paths={beforePaths}
+                  images={beforeImages}
                   localPreviews={localPreviews}
                   altPrefix={`Dokumentasi sebelum ${index + 1}`}
                   errorMessage={
@@ -109,7 +110,7 @@ export default function DocumentationsFormSection({
                 <DocumentationImageField
                   mode={mode}
                   label="Foto Sesudah"
-                  paths={afterPaths}
+                  images={afterImages}
                   localPreviews={localPreviews}
                   altPrefix={`Dokumentasi sesudah ${index + 1}`}
                   errorMessage={
@@ -149,7 +150,7 @@ export default function DocumentationsFormSection({
 function DocumentationImageField({
   mode,
   label,
-  paths,
+  images,
   localPreviews,
   altPrefix,
   errorMessage,
@@ -158,7 +159,7 @@ function DocumentationImageField({
 }: {
   mode: "create" | "edit";
   label: string;
-  paths: string[];
+  images: DocumentationImage[];
   localPreviews: Record<string, string>;
   altPrefix: string;
   errorMessage?: string;
@@ -170,15 +171,15 @@ function DocumentationImageField({
       <FieldLabel className="text-xs uppercase">{label}</FieldLabel>
       <FileInput onFilesSelected={onFilesSelected} />
 
-      {paths.length > 0 && mode === "create" && (
+      {images.length > 0 && mode === "create" && (
         <div className="mt-2 grid grid-cols-3 gap-2">
-          {paths.map((path, i) => (
+          {images.map((img, i) => (
             <div
-              key={`${path}-${i}`}
+              key={`${img.path}-${i}`}
               className="group border-border bg-muted/20 relative h-20 w-full overflow-hidden border"
             >
               <Image
-                src={toPreviewUrl(path, localPreviews)}
+                src={toPreviewUrl(img.path, localPreviews)}
                 alt={`${altPrefix}-${i + 1}`}
                 fill
                 className="object-cover"
@@ -196,26 +197,28 @@ function DocumentationImageField({
         </div>
       )}
 
-      {paths.length > 0 && mode === "edit" && (
+      {images.length > 0 && mode === "edit" && (
         <div className="mt-2 space-y-1">
-          {paths.map((path, i) => {
-            const fileName = path.split("/").pop() || "file-dokumentasi";
-            const previewUrl = toPreviewUrl(path, localPreviews);
+          {images.map((img, i) => {
+            const previewUrl = toPreviewUrl(img.path, localPreviews);
 
             return (
               <div
-                key={`${path}-${i}`}
-                className="border-border bg-muted/20 flex items-center justify-between border px-3 py-2 text-xs"
+                key={`${img.path}-${i}`}
+                className="border-border bg-muted/20 hover:bg-muted/40 flex items-center justify-between border px-3 py-2 text-xs transition-colors"
               >
-                <a
-                  href={previewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-primary truncate pr-4 font-medium hover:underline"
-                  title="Buka preview di tab baru"
-                >
-                  {fileName}
-                </a>
+                <div className="flex items-center gap-2 overflow-hidden pr-4">
+                  <FileText className="text-muted-foreground size-3 shrink-0" />
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary truncate font-medium hover:underline"
+                    title="Buka preview di tab baru"
+                  >
+                    {img.file_name}
+                  </a>
+                </div>
                 <button
                   type="button"
                   onClick={() => onRemoveImage(i)}
@@ -268,9 +271,11 @@ function UploadingIndicator() {
   if (count < 1) return null;
 
   return (
-    <div className="border-border bg-muted/20 relative flex h-20 w-full items-center justify-center overflow-hidden border">
+    <div className="border-border bg-muted/20 relative flex h-14 w-full items-center justify-center overflow-hidden border">
       <Loader2Icon className="mr-2 size-4 animate-spin" />
-      <p className="text-muted-foreground text-xs">Mengunggah...</p>
+      <p className="text-muted-foreground text-xs font-medium">
+        Sedang mengunggah...
+      </p>
     </div>
   );
 }
@@ -300,7 +305,7 @@ function AddGroupButton({
       onClick={() => append({ ...DEFAULT_GROUP })}
     >
       <Plus className="mr-2 size-4" />
-      Grup Dokumentasi
+      Grup Dokumentasi Baru
     </Button>
   );
 }
@@ -320,10 +325,10 @@ function RemoveGroupButton({ onRemove }: { onRemove: () => void }) {
       variant="ghost"
       size="icon-sm"
       onClick={onRemove}
-      className="text-muted-foreground hover:text-destructive"
+      className="text-muted-foreground hover:text-destructive h-8 w-8"
       disabled={isUploading}
     >
-      <Trash2 />
+      <Trash2 className="size-4" />
     </Button>
   );
 }
