@@ -2,7 +2,7 @@
 
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Field, FieldError } from "@/components/ui/field";
 import { Loader2, FileIcon, X } from "lucide-react";
 import { useState } from "react";
 import { SCurveFormInput, SCurveFormValue } from "./forms/scurve-schema";
@@ -32,7 +32,7 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
       });
 
       if (paths && paths.length > 0) {
-        setValue("s_curve_path", paths[0], {
+        setValue("s_curve_path", paths[0].path, {
           shouldDirty: true,
           shouldValidate: true,
         });
@@ -54,9 +54,6 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
   return (
     <div className="space-y-4">
       <Field>
-        <FieldLabel className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-          Unggah Kurva S
-        </FieldLabel>
         <div className="relative">
           {!currentPath ? (
             <div className="relative flex items-center">
