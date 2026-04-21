@@ -70,10 +70,19 @@ export async function getPublicMonitoringIsf(): Promise<PublicMonitoringIsf> {
     {} as Record<number, number>,
   );
 
+  // Get cumulative workers from all historical rows
+  const { data: allWorkersData } = await supabase
+    .from("isf_program_logs")
+    .select("total_worker");
+
+  const totalWorkers =
+    allWorkersData?.reduce((acc, row) => acc + (row.total_worker || 0), 0) || 0;
+
   return {
     data: latestRows,
     overall_progress: overallProgress,
     overall_summary: overallSummary,
+    total_workers: totalWorkers,
   };
 }
 

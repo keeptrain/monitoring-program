@@ -38,6 +38,7 @@ export type PublicMonitoringIsf = {
   data: (IsfDetailSheet | null)[];
   overall_progress: number;
   overall_summary: Record<number, number>;
+  total_workers: number;
 };
 
 export type IsfChartPoint = {

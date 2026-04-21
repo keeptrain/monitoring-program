@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import Autoplay from "embla-carousel-autoplay";
+import { PublicMonitoringIsf as PublicMonitoringIsfType } from "./types/monitoring-types";
 
 export default function PublicMonitoringIsf() {
   const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
@@ -78,7 +79,7 @@ export default function PublicMonitoringIsf() {
             ))}
           </div>
 
-          <RightSideStats />
+          <RightSideStats data={data} />
         </div>
       </div>
 
@@ -181,8 +182,7 @@ function IsfPinPoint({
     </button>
   );
 }
-
-function RightSideStats() {
+function RightSideStats({ data }: { data?: PublicMonitoringIsfType }) {
   const [showRincian, setShowRincian] = useState(false);
 
   return (
@@ -202,7 +202,7 @@ function RightSideStats() {
               <div className="flex items-center gap-3">
                 <UsersIcon className="text-primary size-5" />
                 <p className="text-xl font-bold tabular-nums">
-                  12
+                  {data?.total_workers || 0}
                   <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
                     Orang
                   </span>
