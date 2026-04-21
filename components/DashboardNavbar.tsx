@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   LeafIcon,
   WavesIcon,
+  Grid3x3Icon,
 } from "lucide-react";
 
 const dashboardLinks = [
@@ -17,10 +18,16 @@ const dashboardLinks = [
     description: "Kelola data lokasi yang tersedia untuk program",
   },
   {
-    href: "/dashboard/thematic",
-    label: "Program Tematik",
+    href: "/dashboard/thematic/biofloc",
+    label: "Program Tematik Bioflok",
+    icon: Grid3x3Icon,
+    description: "Kelola program tematik bioflok DJPB",
+  },
+  {
+    href: "/dashboard/thematic/minapadi",
+    label: "Program Tematik Minapadi",
     icon: LeafIcon,
-    description: "Kelola program tematik DJPB",
+    description: "Kelola program tematik minapadi DJPB",
   },
   {
     href: "/dashboard/isf",

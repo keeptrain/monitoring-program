@@ -5,12 +5,12 @@ import { notFound } from "next/navigation";
 export default async function ThematicProgramDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; type: string }>;
 }) {
-  const { id } = await params;
+  const { id, type } = await params;
   const programId = Number(id);
 
-  if (Number.isNaN(programId)) {
+  if (Number.isNaN(programId) || (type !== "biofloc" && type !== "minapadi")) {
     return notFound();
   }
 
