@@ -10,8 +10,6 @@ import {
   AlertTriangleIcon,
   RefreshCcwIcon,
   CameraIcon,
-  FileTextIcon,
-  DownloadIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,7 +35,6 @@ export default function IsfProgramLogDetail({ data }: { data: IsfProgramLog }) {
           <div className="space-y-8 lg:col-span-2">
             <Overview data={data} />
             <Narrative data={data} />
-            <SCurveSection path={data.s_curve_path} />
           </div>
 
           {/* Sidebar */}
@@ -199,58 +196,6 @@ function Narrative({ data }: { data: IsfProgramLog }) {
             </p>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function SCurveSection({ path }: { path: string | null }) {
-  const fileName = path?.split("/").pop() || "Tidak ada file";
-
-  return (
-    <div className="space-y-4 border-zinc-100">
-      <div className="flex flex-col border border-zinc-100 bg-zinc-50/50 p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-            Kurva S
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div
-              className={cn(
-                "flex size-10 items-center justify-center rounded-lg",
-                path
-                  ? "bg-primary/10 text-primary"
-                  : "bg-zinc-100 text-zinc-400",
-              )}
-            >
-              <FileTextIcon className="size-4" />
-            </div>
-            <div>
-              <p
-                className={cn(
-                  "max-w-[200px] truncate text-sm font-medium sm:max-w-md",
-                  path ? "text-zinc-900" : "text-zinc-400",
-                )}
-              >
-                {fileName}
-              </p>
-              <p className="text-[10px] font-medium text-zinc-400">Dokumen</p>
-            </div>
-          </div>
-          {path && (
-            <Button variant="outline" size="sm" asChild className="bg-white">
-              <a
-                href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/demo/${path}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <DownloadIcon className="mr-2 size-3.5" /> Unduh
-              </a>
-            </Button>
-          )}
-        </div>
       </div>
     </div>
   );

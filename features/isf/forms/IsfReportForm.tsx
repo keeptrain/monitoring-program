@@ -14,7 +14,6 @@ import IsfDetailRingkasanFormSection from "../components/IsfDetailRingkasanFormS
 import { Loader2 } from "lucide-react";
 import { IsfProgramLog } from "../types/isf";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
-import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 import { useIsMutating } from "@tanstack/react-query";
 import { getDocumentationsUploadMutationKey } from "@/features/documentation/hooks/useDocumentationsUpload";
 
@@ -81,16 +80,6 @@ export default function IsfReportForm({
           </CardHeader>
           <CardContent>
             <IsfDetailRingkasanFormSection form={form} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Kurva S</CardTitle>
-            <CardDescription>Unggah lampiran kurva S</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SCurveFormSection form={form} />
           </CardContent>
         </Card>
 

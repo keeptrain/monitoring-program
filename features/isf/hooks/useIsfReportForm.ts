@@ -27,7 +27,6 @@ const DEFAULT_VALUES = (data?: IsfProgramLog) => {
     outcome: data?.outcome ?? "",
     constraints: data?.constraints ?? "",
     follow_up: data?.follow_up ?? "",
-    s_curve_path: data?.s_curve_path ?? "",
     documentations: [],
   };
 };
@@ -84,7 +83,6 @@ export function useIsfReportForm(
           ...values,
           constraints: values.constraints ?? "",
           follow_up: values.follow_up ?? "",
-          s_curve_path: values.s_curve_path ?? "",
           documentations: parsedDocumentations.success
             ? (parsedDocumentations.data ?? [])
             : [],

@@ -14,7 +14,6 @@ export interface IsfProgramLog {
   outcome: string;
   constraints: string;
   follow_up: string;
-  s_curve_path: string;
   created_at: string;
   updated_at: string;
 }

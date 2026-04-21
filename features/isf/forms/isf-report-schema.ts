@@ -1,5 +1,4 @@
 import { documentationFormSchema } from "@/features/documentation/forms/documentation-schema";
-import { sCurveSchema } from "@/features/documentation/forms/scurve-schema";
 import { z } from "zod";
 
 const isfReportBaseSchema = z.object({
@@ -21,13 +20,11 @@ const isfReportBaseSchema = z.object({
   follow_up: z.string().optional().default(""),
 });
 
-export const isfReportSchema = isfReportBaseSchema
-  .extend(sCurveSchema.shape)
-  .extend({
-    documentations: documentationFormSchema.shape.documentations
-      .optional()
-      .default([]),
-  });
+export const isfReportSchema = isfReportBaseSchema.extend({
+  documentations: documentationFormSchema.shape.documentations
+    .optional()
+    .default([]),
+});
 
 export type IsfReportFormInput = z.input<typeof isfReportSchema>;
 export type IsfReportFormValues = z.output<typeof isfReportSchema>;
