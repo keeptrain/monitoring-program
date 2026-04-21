@@ -129,6 +129,7 @@ export default function IsfStepProgramPage({
             <ManageDocumentationsSheet
               programType="isf"
               programId={selectedReportId}
+              onSuccess={() => setOpenSheet(false)}
             />
           </SheetContent>
         </Sheet>

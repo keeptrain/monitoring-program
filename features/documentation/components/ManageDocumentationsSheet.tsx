@@ -43,7 +43,6 @@ export default function ManageDocumentationsSheet({
         const result = await upsertDocumentations(programId, programType, docs);
 
         if (result.success) {
-          // Invalidate cache agar data terbaru diambil saat dibuka kembali
           queryClient.invalidateQueries({
             queryKey: getDocumentationGroupsByTypeAndIdQueryKey(
               programType,
