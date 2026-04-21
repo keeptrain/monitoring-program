@@ -18,7 +18,6 @@ import {
   ArrowUpRight,
   InfoIcon,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useGetPublicMonitoringIsf } from "./api/getPublicLocationsByType";
@@ -187,14 +186,14 @@ function RightSideStats() {
   const [showRincian, setShowRincian] = useState(false);
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-6 text-center md:w-fit">
+    <div className="flex w-full flex-col items-center justify-center gap-4 text-center md:w-fit">
       <div className="w-full space-y-6">
         <p className="text-muted-foreground border-b pb-2 text-sm font-bold tracking-[0.2em] uppercase">
           Statistik Jumlah
         </p>
 
         {/* Summary Metrics Grid */}
-        <div className="grid w-full grid-cols-2 items-start gap-8 px-2">
+        <div className="grid w-full grid-cols-2 items-start gap-8 px-2 sm:px-0">
           <div className="space-y-4">
             <p className="text-muted-foreground/80 text-xs font-bold tracking-widest uppercase">
               Tenaga Kerja
@@ -294,7 +293,7 @@ function DocumentationCarousel() {
 
   return (
     <Carousel
-      className="w-75"
+      className="w-80"
       plugins={[Autoplay({ delay: 2000 })]}
       opts={{
         align: "start",
@@ -304,8 +303,8 @@ function DocumentationCarousel() {
       <CarouselContent>
         {images.map((src, index) => (
           <CarouselItem key={index}>
-            <Card className="overflow-hidden border-none shadow-sm">
-              <CardContent className="relative aspect-4/3">
+            <div className="overflow-hidden border-none">
+              <div className="relative aspect-4/3">
                 <Image
                   src={src}
                   alt={`Dokumentasi ${index + 1}`}
@@ -313,8 +312,8 @@ function DocumentationCarousel() {
                   className="object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>
