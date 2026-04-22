@@ -15,7 +15,5 @@ export const updateProgressSchema = updateBaseProgressSchema.extend({
     .default([]),
 });
 
-export type UpdateProgressFormInput = z.input<typeof updateBaseProgressSchema>;
-export type UpdateProgressFormValues = z.output<
-  typeof updateBaseProgressSchema
->;
+export type UpdateProgressFormInput = z.input<typeof updateProgressSchema>;
+export type UpdateProgressFormValues = z.output<typeof updateProgressSchema>;

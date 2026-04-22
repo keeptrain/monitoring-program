@@ -58,7 +58,7 @@ export default function ThematicDocumentationsFormSection({
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
     fieldId: string,
-    fieldName: "image_before_path" | "image_after_path",
+    fieldName: "image_before_paths" | "image_after_paths",
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -84,10 +84,14 @@ export default function ThematicDocumentationsFormSection({
       if (error) {
         throw error;
       }
-      form.setValue(`documentations.${index}.${fieldName}`, data.path, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
+      form.setValue(
+        `documentations.${index}.${fieldName}`,
+        [{ path: data.path, file_name: file.name }],
+        {
+          shouldDirty: true,
+          shouldValidate: true,
+        },
+      );
     } catch (error) {
       console.error("Upload failed", error);
     } finally {
@@ -123,12 +127,12 @@ export default function ThematicDocumentationsFormSection({
       <div className="space-y-4">
         {fields.map((field, index) => {
           const beforePreviewSrc = getPreviewSrc(
-            `${field.id}-image_before_path`,
-            documentations?.[index]?.image_before_path,
+            `${field.id}-image_before_paths`,
+            documentations?.[index]?.image_before_paths?.[0]?.path,
           );
           const afterPreviewSrc = getPreviewSrc(
-            `${field.id}-image_after_path`,
-            documentations?.[index]?.image_after_path,
+            `${field.id}-image_after_paths`,
+            documentations?.[index]?.image_after_paths?.[0]?.path,
           );
 
           return (
@@ -163,16 +167,16 @@ export default function ThematicDocumentationsFormSection({
                       type="file"
                       accept="image/*"
                       aria-invalid={
-                        !!errors.documentations?.[index]?.image_before_path
+                        !!errors.documentations?.[index]?.image_before_paths
                       }
                       onChange={(e) =>
-                        handleOnChange(e, index, field.id, "image_before_path")
+                        handleOnChange(e, index, field.id, "image_before_paths")
                       }
                       className={
-                        uploading[`${index}-image_before_path`] ? "pr-10" : ""
+                        uploading[`${index}-image_before_paths`] ? "pr-10" : ""
                       }
                     />
-                    {uploading[`${index}-image_before_path`] && (
+                    {uploading[`${index}-image_before_paths`] && (
                       <div className="absolute top-1/2 right-3 -translate-y-1/2">
                         <Loader2 className="text-muted-foreground size-4 animate-spin" />
                       </div>
@@ -189,7 +193,7 @@ export default function ThematicDocumentationsFormSection({
                     </div>
                   )}
                   <FieldError>
-                    {errors.documentations?.[index]?.image_before_path?.message}
+                    {errors.documentations?.[index]?.image_before_paths?.message}
                   </FieldError>
                 </Field>
 
@@ -202,16 +206,16 @@ export default function ThematicDocumentationsFormSection({
                       type="file"
                       accept="image/*"
                       aria-invalid={
-                        !!errors.documentations?.[index]?.image_after_path
+                        !!errors.documentations?.[index]?.image_after_paths
                       }
                       onChange={(e) =>
-                        handleOnChange(e, index, field.id, "image_after_path")
+                        handleOnChange(e, index, field.id, "image_after_paths")
                       }
                       className={
-                        uploading[`${index}-image_after_path`] ? "pr-10" : ""
+                        uploading[`${index}-image_after_paths`] ? "pr-10" : ""
                       }
                     />
-                    {uploading[`${index}-image_after_path`] && (
+                    {uploading[`${index}-image_after_paths`] && (
                       <div className="absolute top-1/2 right-3 -translate-y-1/2">
                         <Loader2 className="text-muted-foreground size-4 animate-spin" />
                       </div>
@@ -228,7 +232,7 @@ export default function ThematicDocumentationsFormSection({
                     </div>
                   )}
                   <FieldError>
-                    {errors.documentations?.[index]?.image_after_path?.message}
+                    {errors.documentations?.[index]?.image_after_paths?.message}
                   </FieldError>
                 </Field>
               </div>
@@ -241,7 +245,7 @@ export default function ThematicDocumentationsFormSection({
         type="button"
         variant="outline"
         className="hover:bg-muted w-full border-dashed py-6"
-        onClick={() => append({ image_before_path: "", image_after_path: "" })}
+        onClick={() => append({ image_before_paths: [], image_after_paths: [] })}
         disabled={fields.length >= 5}
       >
         <Plus className="mr-2 size-4" /> Tambah Dokumentasi

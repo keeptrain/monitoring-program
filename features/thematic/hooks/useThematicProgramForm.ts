@@ -12,7 +12,7 @@ import {
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
 
-const CREATE_DEFAULT_VALUES: ThematicProgramFormValues = {
+const CREATE_DEFAULT_VALUES: ThematicProgramFormInput = {
   name: "",
   percentage_of_work: 0,
   commodity: "",
@@ -23,8 +23,9 @@ const CREATE_DEFAULT_VALUES: ThematicProgramFormValues = {
   sppg_partner: "",
   s_curve_path: "",
   location_name: "",
-  latitude: "" as unknown as number,
-  longitude: "" as unknown as number,
+  latitude: "",
+  longitude: "",
+  documentations: [],
 };
 
 export function useThematicProgramForm(
