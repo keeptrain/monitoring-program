@@ -1,22 +1,21 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { HardHatIcon, ArrowLeftIcon } from "lucide-react";
+import { HardHatIcon, ArrowLeftIcon, ImageIcon } from "lucide-react";
 import { PieChart, Pie, Cell, Label } from "recharts";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import NextImage from "next/image";
+import { useGetRecruitmentDocumentationsByPhase } from "@/features/monitoring/api/getRecruitmentDocumentationsByPhase";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") ?? "";
 
 const pieData = [
   { name: "Luar Sumba Timur", value: 48, fill: "#f97316" }, // Orange
   { name: "Lokal Sumba Timur", value: 1260, fill: "#0ea5e9" }, // Light Blue
-];
-
-const PUBLIC_IMAGES = [
-  "/images/bioflok.jpeg",
-  "/images/isf_map.webp",
-  "/images/revitalisasi-tambak-pantura.jpg",
-  "/images/tambak-udang.jpg",
 ];
 
 export default function RecruitmentProgressPage() {
@@ -175,6 +174,23 @@ export default function RecruitmentProgressPage() {
 function RecruitmentTimelineSection() {
   const [activeStep, setActiveStep] = useState(1);
 
+  // Ambil data dokumentasi dari DB menggunakan TanStack Query
+  const { data: dbImages = [], isLoading } =
+    useGetRecruitmentDocumentationsByPhase(activeStep);
+
+  // Gunakan foto dari DB jika ada
+  const galleryImages = useMemo(() => {
+    if (dbImages && dbImages.length > 0) {
+      const urls = dbImages.map(
+        (img) =>
+          `${supabaseUrl}/storage/v1/object/public/demo/${img.file_path}`,
+      );
+      return urls;
+    }
+
+    return [];
+  }, [dbImages]);
+
   // Definisi Step dalam Object
   const timelineSteps = useMemo(
     () => [
@@ -218,16 +234,6 @@ function RecruitmentTimelineSection() {
     [],
   );
 
-  // Logika Randomize Gambar per Step
-  const galleryImages = useMemo(() => {
-    // Gunakan seed sederhana berdasarkan activeStep agar "random" tapi konsisten per klik
-    return [...PUBLIC_IMAGES].sort((a, b) => {
-      const hashA = a.length + activeStep;
-      const hashB = b.length + activeStep;
-      return (hashA % 3) - (hashB % 2);
-    });
-  }, [activeStep]);
-
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
       {/* Kolom Timeline */}
@@ -248,16 +254,11 @@ function RecruitmentTimelineSection() {
                       key={step.id}
                       className={cn("relative pl-8", step.opacity)}
                     >
-                      <div className="absolute top-1 -left-[11px] size-5 items-center justify-center rounded-full border-4 border-sky-500 bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
-                      <div className="w-fit rounded-full bg-amber-400 px-3 py-1 text-[10px] font-bold text-zinc-900 uppercase">
+                      <div className="absolute top-1 -left-[5px] size-2 rounded-full bg-white/30" />
+                      <div className="mb-1 text-[10px] font-bold text-white/50 uppercase">
                         {step.date}
                       </div>
-                      <p
-                        className={cn(
-                          "mt-2 text-sm font-medium",
-                          step.isItalic && "text-zinc-300 italic",
-                        )}
-                      >
+                      <p className="text-sm font-medium opacity-60">
                         {step.title}
                       </p>
                     </div>
@@ -269,10 +270,10 @@ function RecruitmentTimelineSection() {
                     key={step.id}
                     onClick={() => setActiveStep(step.id)}
                     className={cn(
-                      "relative block w-full pl-8 text-left transition-all duration-300",
+                      "relative block w-full pl-8 text-left transition-all hover:translate-x-1",
                       isActive
-                        ? "scale-105 opacity-100"
-                        : "opacity-60 grayscale hover:opacity-100 hover:grayscale-0",
+                        ? "scale-105"
+                        : "opacity-50 grayscale hover:opacity-100 hover:grayscale-0",
                     )}
                   >
                     <div
@@ -308,22 +309,49 @@ function RecruitmentTimelineSection() {
           </h3>
 
           <div className="grid h-full grid-cols-2 gap-4">
-            {galleryImages.map((src, idx) => (
-              <div
-                key={`${activeStep}-${idx}`}
-                className="group animate-in fade-in zoom-in-95 relative aspect-video overflow-hidden bg-zinc-200 shadow-sm transition-all duration-500"
-              >
-                <img
-                  src={src}
-                  alt={`Dokumentasi ${activeStep}-${idx}`}
-                  className="object-crop h-full w-full transition-transform duration-700 group-hover:scale-110"
+            {isLoading ? (
+              // Loading Skeleton State
+              [1, 2, 3, 4].map((i) => (
+                <Skeleton
+                  key={i}
+                  className="aspect-video w-full rounded-none opacity-10"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              </div>
-            ))}
+              ))
+            ) : galleryImages.length > 0 ? (
+              // Data State
+              galleryImages.map((src, idx) => (
+                <div
+                  key={`${activeStep}-${idx}`}
+                  className="group animate-in fade-in zoom-in-95 relative aspect-video overflow-hidden bg-zinc-200 shadow-sm transition-all duration-500"
+                >
+                  <NextImage
+                    src={src}
+                    alt={`Dokumentasi ${activeStep}-${idx}`}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </div>
+              ))
+            ) : (
+              // Empty State (Full Height)
+              <EmptyState />
+            )}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="col-span-2 flex h-full min-h-[300px] flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 text-zinc-400">
+      <ImageIcon className="size-10 opacity-20" />
+      <p className="max-w-[200px] text-center text-xs font-medium italic">
+        Belum ada dokumentasi yang diunggah untuk tahap ini.
+      </p>
     </div>
   );
 }

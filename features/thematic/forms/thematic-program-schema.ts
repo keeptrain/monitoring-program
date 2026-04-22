@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const thematicBaseProgramSchema = z.object({
   name: z.string().min(1, "Nama KDMP dibutuhkan"),
-  progress: z.coerce
+  percentage_of_work: z.coerce
     .number()
     .min(1, "Pastikan persentasi lebih besar dari laporan sebelumnya")
     .max(100, "Persentase maksimal 100"),

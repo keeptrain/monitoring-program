@@ -3,12 +3,12 @@
 import { Button } from "@/components/ui/button";
 import {
   ArrowUpIcon,
-  Grid3x2Icon,
+  Grid3X3Icon,
+  LeafIcon,
   LucideIcon,
   MenuIcon,
   ShrimpIcon,
   WavesIcon,
-  WheatIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -46,12 +46,12 @@ const FILTER_STATE: Record<
   biofloc_thematic: {
     label: "Tematik Bioflok",
     sub: "Budidaya Ikan Sistem Bioflok",
-    icon: Grid3x2Icon,
+    icon: Grid3X3Icon,
   },
   minapadi_thematic: {
     label: "Tematik Minapadi",
     sub: "Budidaya Padi dan Ikan Terintegrasi",
-    icon: WheatIcon,
+    icon: LeafIcon,
   },
   isf: {
     label: "Integrated Shrimp Farming",

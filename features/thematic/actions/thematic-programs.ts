@@ -126,9 +126,9 @@ export async function updateThematicPrograms(
 function normalizeDocumentations(
   data: ThematicProgramFormValues["documentations"],
 ) {
-  return data.map((doc) => ({
+  return (data ?? []).map((doc) => ({
     id: crypto.randomUUID(),
-    image_before_path: doc.image_before_path ?? "",
-    image_after_path: doc.image_after_path ?? "",
+    image_before_path: doc.image_before_paths?.[0]?.path ?? "",
+    image_after_path: doc.image_after_paths?.[0]?.path ?? "",
   }));
 }

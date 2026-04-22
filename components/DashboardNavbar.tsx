@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   LayoutDashboard,
-  MapPin,
   ArrowLeft,
   LeafIcon,
   WavesIcon,
@@ -13,27 +12,27 @@ import {
 const dashboardLinks = [
   {
     href: "/dashboard/available-location",
-    label: "Lokasi Tersedia",
-    icon: MapPin,
-    description: "Kelola data lokasi yang tersedia untuk program",
+    label: "Revitalisasi Tambak Panturan",
+    icon: WavesIcon,
+    description: "Kelola data Revitalisasi Tambak Panturan",
   },
   {
     href: "/dashboard/thematic/biofloc",
-    label: "Program Tematik Bioflok",
+    label: "Bioflok",
     icon: Grid3x3Icon,
-    description: "Kelola program tematik bioflok DJPB",
+    description: "Kelola program tematik bioflok",
   },
   {
     href: "/dashboard/thematic/minapadi",
-    label: "Program Tematik Minapadi",
+    label: "Minapadi",
     icon: LeafIcon,
-    description: "Kelola program tematik minapadi DJPB",
+    description: "Kelola program tematik minapadi",
   },
   {
     href: "/dashboard/isf",
-    label: "Program Isf",
+    label: "Integrated Shrimp Farming (ISF)",
     icon: WavesIcon,
-    description: "Kelola program isf DJPB",
+    description: "Kelola program Integrated Shrimp Farming",
   },
 ];
 
