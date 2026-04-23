@@ -2,6 +2,7 @@
 
 import { STEPS } from "@/features/isf/constants/isf-step";
 import { createClient } from "@/utils/supabase";
+import { TABLES } from "@/lib/constants/tables";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
 import { getPublicThematicProgram } from "@/features/thematic/actions/public-thematic-programs";
 
@@ -56,7 +57,7 @@ type PublicBiofloc = {
 export async function getPublicBiofloc(id: number): Promise<any> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select("*")
     .eq("id", id)
     .limit(1);

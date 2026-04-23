@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase";
+import { TABLES } from "@/lib/constants/tables";
 
 export type PublicThematicDocumentation = {
   id: string;
@@ -58,7 +59,7 @@ type PublicThematicProgramRow = {
 export async function getPublicThematicProgram(id: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(
       `
       id,

@@ -7,11 +7,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createLocationFromProgram } from "@/features/dashboard/actions/available-locations";
 import { ThematicProgramDetail, ThematicProgramIndex } from "../types/thematic";
+import { TABLES } from "@/lib/constants/tables";
 
 export async function getThematicPrograms() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(
       `
       id,
@@ -39,7 +40,7 @@ export async function getThematicProgramById(
 ): Promise<ThematicProgramDetail> {
   const client = supabase || (await createClient());
   const { data, error } = await client
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(
       `
       *,
@@ -81,11 +82,13 @@ export async function createThematicPrograms(data: ThematicProgramFormValues) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { location_name, latitude, longitude, ...programData } = data;
 
-  const { error } = await supabase.from("thematic_programs").insert({
-    ...programData,
-    location_id: locationId,
-    documentations,
-  });
+  const { error } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .insert({
+      ...programData,
+      location_id: locationId,
+      documentations,
+    });
 
   if (error) {
     console.error("Error creating thematic program:", error);
@@ -104,7 +107,7 @@ export async function updateThematicPrograms(
 
   const supabase = await createClient();
   const { error } = await supabase
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .update({
       ...data,
       documentations,

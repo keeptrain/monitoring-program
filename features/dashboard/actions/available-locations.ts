@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase";
+import { TABLES } from "@/lib/constants/tables";
 import { AvailableLocationFormValues } from "../forms/available-location-schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -37,7 +38,9 @@ export async function getAvailableLocationsByType(
   const supabase = await createClient();
 
   const programTable =
-    type === "biofloc_thematic" ? "thematic_programs" : "isf_programs";
+    type === "biofloc_thematic"
+      ? TABLES.BIOFLOC_THEMATIC_PROGRAMS
+      : "isf_programs";
 
   const { data, error } = await supabase
     .from("available_locations")
