@@ -2,14 +2,17 @@ import { Button } from "@/components/ui/button";
 import { ArrowDownIcon, UploadIcon } from "lucide-react";
 import ProposalProvinceTable from "./ProposalProvinceTable";
 import ProposalSubmissionTable from "./ProposalSubmissionTable";
+import Link from "next/link";
 
 export default function BioflocProposalSection() {
   return (
     <section className="space-y-4">
       {/* 1. Upload Banner */}
-      <Button className="h-10 w-full text-base font-bold uppercase">
-        <UploadIcon />
-        Upload Pengajuan Proposal Bioflok Tematik 2026
+      <Button className="h-10 w-full text-base font-bold uppercase" asChild>
+        <Link href="/monitoring/biofloc/proposal">
+          <UploadIcon />
+          Upload Pengajuan Proposal Bioflok Tematik 2026
+        </Link>
       </Button>
 
       <div className="flex items-center gap-2">
