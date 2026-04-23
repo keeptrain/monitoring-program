@@ -13,7 +13,7 @@ export type PublicThematicProgram = {
   id: number;
   location_id: number;
   name: string;
-  percentage_of_work: number;
+  progress_percent: number;
   commodity: string;
   land_area: string;
   production: string;
@@ -33,7 +33,7 @@ type PublicThematicProgramRow = {
   id: number;
   location_id: number;
   name: string;
-  percentage_of_work: number;
+  progress_percent: number;
   commodity: string;
   land_area: string;
   production: string;
@@ -65,7 +65,7 @@ export async function getPublicThematicProgram(id: number) {
       id,
       location_id,
       name,
-      percentage_of_work,
+      progress_percent,
       commodity,
       land_area,
       production,
@@ -117,7 +117,7 @@ export async function getPublicThematicProgram(id: number) {
     id: data.id,
     location_id: data.location_id,
     name: data.name,
-    percentage_of_work: data.percentage_of_work,
+    progress_percent: data.progress_percent,
     commodity: data.commodity,
     land_area: data.land_area,
     production: data.production,

@@ -105,13 +105,13 @@ export function ThematicProgramDetailComponent({
                     <Percent className="size-4" /> Capaian
                   </span>
                   <span className="font-semibold">
-                    {data.percentage_of_work}%
+                    {data.progress_percent}%
                   </span>
                 </div>
                 <div className="bg-muted h-2.5 w-full overflow-hidden rounded-full">
                   <div
                     className="bg-primary h-full transition-all duration-500 ease-in-out"
-                    style={{ width: `${data.percentage_of_work}%` }}
+                    style={{ width: `${data.progress_percent}%` }}
                   />
                 </div>
               </div>

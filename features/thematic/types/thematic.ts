@@ -2,7 +2,7 @@ export interface ThematicPrograms {
   id: number;
   location_id: number;
   name: string;
-  percentage_of_work: number;
+  progress_percent: number;
   commodity: string;
   land_area: string;
   production: string;
@@ -35,7 +35,7 @@ export type ThematicProgramIndex = Pick<
   | "location_id"
   | "name"
   | "commodity"
-  | "percentage_of_work"
+  | "progress_percent"
   | "created_at"
   | "updated_at"
 > & {

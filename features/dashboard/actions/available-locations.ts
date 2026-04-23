@@ -53,7 +53,7 @@ export async function getAvailableLocationsByType(
       ${programTable}!inner (
         id,
         name,
-        percentage_of_work
+        progress_percent
       )
     `,
     )
@@ -72,15 +72,17 @@ export async function getAvailableLocationsByType(
   } & Record<string, unknown>;
 
   return ((data as unknown as LocationWithProgramRow[]) ?? []).map((item) => {
-    const program = Array.isArray(item[programTable])
-      ? item[programTable][0]
-      : item[programTable];
+    const program = (
+      Array.isArray(item[programTable])
+        ? item[programTable][0]
+        : item[programTable]
+    ) as { id: number; name: string; progress_percent: number } | null;
 
     return {
       id: program?.id ?? item.id,
       program_name: program?.name ?? "Unknown Program",
       location_name: item.name,
-      percentage_of_work: program?.percentage_of_work ?? 0,
+      progress_percent: program?.progress_percent ?? 0,
       position: {
         latitude: item.latitude ?? 0,
         longitude: item.longitude ?? 0,

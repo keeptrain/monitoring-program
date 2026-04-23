@@ -2,7 +2,7 @@ import { documentationFormSchema } from "@/features/documentation/forms/document
 import { z } from "zod";
 
 export const updateBaseProgressSchema = z.object({
-  percentage_of_work: z.coerce
+  progress_percent: z.coerce
     .number({ error: "Persentase harus berupa angka" })
     .int()
     .min(0, "Minimum 0%")

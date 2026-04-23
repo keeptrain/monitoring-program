@@ -9,7 +9,7 @@ CREATE TABLE biofloc_thematic_programs (
   kusuka_number TEXT NOT NULL,
 
   name TEXT NOT NULL,
-  percentage_of_work INTEGER CHECK (percentage_of_work BETWEEN 0 AND 100),
+  progress_percent INTEGER CHECK (progress_percent BETWEEN 0 AND 100),
   commodity TEXT NOT NULL,
   land_area TEXT NOT NULL,
   production TEXT NOT NULL,

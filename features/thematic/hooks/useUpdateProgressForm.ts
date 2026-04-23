@@ -1,10 +1,12 @@
 import { useForm } from "react-hook-form";
 import { UpdateProgressFormValues } from "../forms/update-progress-schema";
 
-export const useUpdateProgressForm = () => {
+export const useUpdateProgressForm = (
+  initialData: UpdateProgressFormValues,
+) => {
   const form = useForm<UpdateProgressFormValues>({
     defaultValues: {
-      percentage_of_work: 0,
+      progress_percent: initialData.progress_percent,
     },
   });
 

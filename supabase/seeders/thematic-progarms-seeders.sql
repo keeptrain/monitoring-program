@@ -7,7 +7,7 @@ WITH loc AS (
   VALUES ('biofloc_thematic', 'Kp Cicalengka, Desa Mekarmukti', -6.93095800, 107.46755700)
   RETURNING id
 )
-INSERT INTO biofloc_thematic_programs (location_id, name, percentage_of_work, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
+INSERT INTO biofloc_thematic_programs (location_id, name, progress_percent, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
 SELECT id, 'Koperasi Desa Merah Putih Mekarmukti', 100, 'Nila', 'Kp Cicalengka, Desa Mekarmukti, Kecamatan Cihampelas, Mekarmukti, Cihampelas, Kab. Bandung Barat, Jawa Barat, 40562', '1,250 kg', 5, 2100, 'Satker Sekretariat Ditjen Perikanan Budi Daya', '/assets/docs/seed_scurve.pdf', '[]' FROM loc;
 
 -- Row 2: Koperasi Desa Merah Putih Mekarsari
@@ -16,7 +16,7 @@ WITH loc AS (
   VALUES ('biofloc_thematic', 'Desa Mekarsari', -6.93699167, 107.37341833)
   RETURNING id
 )
-INSERT INTO biofloc_thematic_programs (location_id, name, percentage_of_work, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
+INSERT INTO biofloc_thematic_programs (location_id, name, progress_percent, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
 SELECT id, 'Koperasi Desa Merah Putih Mekarsari', 100, 'Lele', 'Jl. Desa Mekarsari, Desa Mekarsari, Kecamatan Cipongkor, Bandung Barat, Mekarsari, Cipongkor, Kab. Bandung Barat, Jawa Barat, 40564', '980 kg', 3, 4500, 'Satker Sekretariat Ditjen Perikanan Budi Daya', '/assets/docs/seed_scurve.pdf', '[]' FROM loc;
 
 -- Row 3: Koperasi Desa Merah Putih Babakan
@@ -25,7 +25,7 @@ WITH loc AS (
   VALUES ('biofloc_thematic', 'Desa Babakan', -7.38134200, 109.18721800)
   RETURNING id
 )
-INSERT INTO biofloc_thematic_programs (location_id, name, percentage_of_work, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
+INSERT INTO biofloc_thematic_programs (location_id, name, progress_percent, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
 SELECT id, 'Koperasi Desa Merah Putih Babakan', 100, 'Lele', 'Jl. Raya Babakan, Desa Babakan, Kecamatan Karawelas, Babakan, Karanglewas, Kab. Banyumas, Jawa Tengah, 53161', '1,120 kg', 8, 3200, 'Satker Sekretariat Ditjen Perikanan Budi Daya', '/assets/docs/seed_scurve.pdf', '[]' FROM loc;
 
 -- Row 4: Koperasi Desa Merah Putih Dawuhan
@@ -34,7 +34,7 @@ WITH loc AS (
   VALUES ('biofloc_thematic', 'Desa Dawuhan', -7.51902000, 109.26344500)
   RETURNING id
 )
-INSERT INTO biofloc_thematic_programs (location_id, name, percentage_of_work, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
+INSERT INTO biofloc_thematic_programs (location_id, name, progress_percent, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
 SELECT id, 'Koperasi Desa Merah Putih Dawuhan', 100, 'Lele', 'Jl. Pesarean Adipati Mrapat, Desa Dawuhan, Kec. Banyumas, Banyumas, Dawuhan, Banyumas, Kab. Banyumas, Jawa Tengah, 53192', '1,050 kg', 4, 1500, 'Satker Sekretariat Ditjen Perikanan Budi Daya', '/assets/docs/seed_scurve.pdf', '[]' FROM loc;
 
 -- Row 5: Koperasi Desa Merah Putih Wiradadi
@@ -43,7 +43,7 @@ WITH loc AS (
   VALUES ('biofloc_thematic', 'Desa Wiradadi', -7.47024700, 109.26086400)
   RETURNING id
 )
-INSERT INTO biofloc_thematic_programs (location_id, name, percentage_of_work, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
+INSERT INTO biofloc_thematic_programs (location_id, name, progress_percent, commodity, land_area, production, total_admin, distribution_amount, sppg_partner, s_curve_path, documentations)
 SELECT id, 'Koperasi Desa Merah Putih Wiradadi', 100, 'Lele', 'KDMP Wiradadi, Kecamatan Sokaraja, Kab. Banyumas', '850 kg', 6, 2800, 'Satker Sekretariat Ditjen Perikanan Budi Daya', '/assets/docs/seed_scurve.pdf', '[]' FROM loc;
 
 -- [The script continues for all 91 valid rows...]
@@ -57,7 +57,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -73,7 +73,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -89,7 +89,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -105,7 +105,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -121,7 +121,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -137,7 +137,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -153,7 +153,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -169,7 +169,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -185,7 +185,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -201,7 +201,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -217,7 +217,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -233,7 +233,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -249,7 +249,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -265,7 +265,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -281,7 +281,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -297,7 +297,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -313,7 +313,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -329,7 +329,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -345,7 +345,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -361,7 +361,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -377,7 +377,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -393,7 +393,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -409,7 +409,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -425,7 +425,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -441,7 +441,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -457,7 +457,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -473,7 +473,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -489,7 +489,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -505,7 +505,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -521,7 +521,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -537,7 +537,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -553,7 +553,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -569,7 +569,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -585,7 +585,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -601,7 +601,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -617,7 +617,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -633,7 +633,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -649,7 +649,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -665,7 +665,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -681,7 +681,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -697,7 +697,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -713,7 +713,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -729,7 +729,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -745,7 +745,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -761,7 +761,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -777,7 +777,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -793,7 +793,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -809,7 +809,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -825,7 +825,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -841,7 +841,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -857,7 +857,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -873,7 +873,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -889,7 +889,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -905,7 +905,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -921,7 +921,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -937,7 +937,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -953,7 +953,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -969,7 +969,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -985,7 +985,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1001,7 +1001,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1017,7 +1017,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1033,7 +1033,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1049,7 +1049,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1065,7 +1065,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1081,7 +1081,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1097,7 +1097,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1113,7 +1113,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1129,7 +1129,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1145,7 +1145,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1161,7 +1161,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1177,7 +1177,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1193,7 +1193,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1209,7 +1209,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1225,7 +1225,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1241,7 +1241,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1257,7 +1257,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1273,7 +1273,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1289,7 +1289,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1305,7 +1305,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1321,7 +1321,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1337,7 +1337,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1353,7 +1353,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1369,7 +1369,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1385,7 +1385,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1401,7 +1401,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1417,7 +1417,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1433,7 +1433,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1449,7 +1449,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1465,7 +1465,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1481,7 +1481,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1497,7 +1497,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1513,7 +1513,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1529,7 +1529,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1545,7 +1545,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1561,7 +1561,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1577,7 +1577,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1593,7 +1593,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1609,7 +1609,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1625,7 +1625,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )
@@ -1641,7 +1641,7 @@ WITH loc AS (
     RETURNING id
 )
 INSERT INTO biofloc_thematic_programs (
-    location_id, name, percentage_of_work, commodity, land_area, 
+    location_id, name, progress_percent, commodity, land_area, 
     production, total_admin, distribution_amount, sppg_partner, 
     s_curve_path, documentations
 )

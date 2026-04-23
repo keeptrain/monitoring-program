@@ -14,7 +14,7 @@ import { useTransition } from "react";
 
 const CREATE_DEFAULT_VALUES: ThematicProgramFormInput = {
   name: "",
-  percentage_of_work: 0,
+  progress_percent: 0,
   commodity: "",
   land_area: "",
   production: "",

@@ -27,7 +27,7 @@ export default function BioflocDetailSheet({
           Progres
         </p>
         <div className="relative size-48">
-          <ProgressPieChartZoneIsf progress={data.percentage_of_work} />
+          <ProgressPieChartZoneIsf progress={data.progress_percent} />
         </div>
       </div>
 

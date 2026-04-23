@@ -41,21 +41,21 @@ export default function ThematicInformationBasicFormSection({
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="percentage_of_work">
+        <FieldLabel htmlFor="progress_percent">
           Persentase Pengerjaan (%)
         </FieldLabel>
         <Input
-          {...register("percentage_of_work", {
+          {...register("progress_percent", {
             maxLength: 3,
           })}
-          aria-invalid={!!errors.percentage_of_work}
+          aria-invalid={!!errors.progress_percent}
           type="number"
           placeholder="0-100"
         />
         <FieldDescription>
           * disesuaikan dengan persentase pengerjaan program
         </FieldDescription>
-        <FieldError>{errors.percentage_of_work?.message}</FieldError>
+        <FieldError>{errors.progress_percent?.message}</FieldError>
       </Field>
 
       <Field>

@@ -18,11 +18,13 @@ export function ThematicProgramColumns(opts?: {
     },
     {
       header: "Capaian (%)",
-      accessorKey: "percentage_of_work",
+      accessorKey: "progress_percent",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Progress value={row.original.percentage_of_work} className="w-20" />
-          <span className="text-xs">{row.original.percentage_of_work}%</span>
+          <Progress value={row.original.progress_percent} className="w-20" />
+          <span className="text-muted-foreground text-xs whitespace-nowrap">
+            {row.original.progress_percent}%
+          </span>
         </div>
       ),
     },

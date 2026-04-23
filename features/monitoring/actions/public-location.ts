@@ -5,7 +5,6 @@ import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
 import { getPublicThematicProgram } from "@/features/thematic/actions/public-thematic-programs";
-
 import {
   MonitoringDetailTypeMap,
   PublicMonitoringIsf,
@@ -36,23 +35,6 @@ export async function getPublicLocationDetail<T extends LocationType>(
 
   return null;
 }
-
-type PublicBiofloc = {
-  id: number;
-  location_id: number;
-  name: string;
-  percentage_of_work: number;
-  commodity: string;
-  land_area: string;
-  production: string;
-  total_admin: number;
-  distribution_amount: number;
-  sppg_partner: string;
-  s_curve_path: string;
-  documentations: string;
-  created_at: string;
-  updated_at: string;
-};
 
 export async function getPublicBiofloc(id: number): Promise<any> {
   const supabase = await createClient();

@@ -17,8 +17,7 @@ export async function getThematicPrograms() {
       `
       id,
       location_id,
-      name,
-      percentage_of_work,
+      progress_percent,
       updated_at,
       available_locations (
         name

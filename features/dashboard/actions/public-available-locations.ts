@@ -6,7 +6,7 @@ export interface PublicAvailableLocation {
   id: number;
   program_name: string;
   location_name: string;
-  percentage_of_work: number;
+  progress_percent: number;
   position: {
     latitude: number;
     longitude: number;
@@ -21,7 +21,7 @@ export async function getPublicAvailableLocations(): Promise<
     .select(`
       id,
       name,
-      percentage_of_work,
+      progress_percent,
       available_locations(
           name,
           latitude,
@@ -37,7 +37,7 @@ export async function getPublicAvailableLocations(): Promise<
   type PublicAvailableLocationRow = {
     id: number;
     name: string;
-    percentage_of_work: number;
+    progress_percent: number;
     available_locations:
       | {
           name: string | null;
@@ -70,7 +70,7 @@ export async function getPublicAvailableLocations(): Promise<
         id: item.id,
         program_name: item.name,
         location_name: location.name ?? "Unknown",
-        percentage_of_work: item.percentage_of_work,
+        progress_percent: item.progress_percent,
         position: {
           latitude: location.latitude,
           longitude: location.longitude,

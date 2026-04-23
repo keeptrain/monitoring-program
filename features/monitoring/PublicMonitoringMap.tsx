@@ -103,7 +103,7 @@ export default function PublicMonitoringMap({
                       {location.program_name}
                     </span>
                   </h3>
-                  <ProgressPercentage value={location.percentage_of_work} />
+                  <ProgressPercentage value={location.progress_percent} />
                   <Button
                     onClick={() => handleDetailClick(location)}
                     variant="outline"
