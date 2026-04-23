@@ -6,11 +6,10 @@ import { PlusIcon } from "lucide-react";
 import Datatable from "@/components/datatable/datatable";
 import {
   IsfReport,
-  getIsfProgramReportsColumns,
+  IsfStepProgramTableColumns,
 } from "./components/IsfStepProgramTableColumns";
 import { STEPS } from "./constants/isf-step";
 import { useRouter } from "next/navigation";
-import type { MouseEvent } from "react";
 import { IsfReportDateWindow } from "./utils/report-date-window";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
 import {
@@ -50,7 +49,7 @@ export default function IsfStepProgramPage({
 
   const columns = useMemo(
     () =>
-      getIsfProgramReportsColumns({
+      IsfStepProgramTableColumns({
         onUpdateDocumentations: handleUpdateDocumentations,
       }),
     [handleUpdateDocumentations],
@@ -69,14 +68,7 @@ export default function IsfStepProgramPage({
     return `/dashboard/isf/create?${params.toString()}`;
   }, [maxDate, minDate, step]);
 
-  const handleRowClick = (
-    e: MouseEvent<HTMLTableRowElement>,
-    row: IsfReport,
-  ) => {
-    const target = e.target as HTMLElement;
-    if (target.closest("button") || target.closest("a")) {
-      return;
-    }
+  const handleRowClick = (row: IsfReport) => {
     router.push(`/dashboard/isf/report/${row.id}`);
   };
 

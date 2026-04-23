@@ -24,7 +24,7 @@ import { useGetPublicMonitoringIsf } from "./api/getPublicLocationsByType";
 import { PIN_LOCATIONS } from "./utils/monitoring-constants";
 import OverallSummaryIsf from "./components/OverallSummaryIsf";
 import ProgressChartIsf from "./components/ProgressChartIsf";
-import PublicMonitoringIsfDetailSheet from "./components/PublicMonitoringIsfDetailSheet";
+import PublicMonitoringIsfDetailSheet from "./components/isf-detail/PublicMonitoringIsfDetailSheet";
 import {
   Carousel,
   CarouselContent,

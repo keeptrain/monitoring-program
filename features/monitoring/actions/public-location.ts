@@ -36,6 +36,39 @@ export async function getPublicLocationDetail<T extends LocationType>(
   return null;
 }
 
+type PublicBiofloc = {
+  id: number;
+  location_id: number;
+  name: string;
+  percentage_of_work: number;
+  commodity: string;
+  land_area: string;
+  production: string;
+  total_admin: number;
+  distribution_amount: number;
+  sppg_partner: string;
+  s_curve_path: string;
+  documentations: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function getPublicBiofloc(id: number): Promise<any> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("thematic_programs")
+    .select("*")
+    .eq("id", id)
+    .limit(1);
+
+  if (error) {
+    console.error("Error fetching biofloc data:", error);
+    throw error;
+  }
+
+  return data || "";
+}
+
 export async function getPublicMonitoringIsf(): Promise<PublicMonitoringIsf> {
   const supabase = await createClient();
   const stepIds = STEPS.map((step) => step.id);

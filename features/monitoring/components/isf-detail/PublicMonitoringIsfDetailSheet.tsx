@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { PieChart, Pie, Label } from "recharts";
-import { IsfDetailSheet } from "../types/monitoring-types";
+import { IsfDetailSheet } from "../../types/monitoring-types";
 import { SheetFooter } from "@/components/ui/sheet";
 
 export default function PublicMonitoringIsfDetailSheet({

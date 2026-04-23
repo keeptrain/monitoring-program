@@ -5,10 +5,17 @@ import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
 import dynamic from "next/dynamic";
-import { getIsfPerMonthByZone } from "@/features/monitoring/actions/public-location";
+import {
+  getIsfPerMonthByZone,
+  getPublicBiofloc,
+} from "@/features/monitoring/actions/public-location";
 
 const LazyMonitoringDetailClient = dynamic(
   () => import("@/features/monitoring/components/MonitoringDetailClient"),
+);
+
+const LazyMonitoringBioflocDetail = dynamic(
+  () => import("@/features/monitoring/pages/BioflocDetailPage"),
 );
 
 const DETAIL_CONTENT: Record<
@@ -26,7 +33,9 @@ const DETAIL_CONTENT: Record<
     query: getIsfPerMonthByZone,
   },
   biofloc_thematic: {
-    title: "Budidaya Ikan Bioflok",
+    Component: LazyMonitoringBioflocDetail,
+    title: "TematikBioflok",
+    query: getPublicBiofloc,
   },
   minapadi_thematic: {
     title: "Mina Padi Thematic",
@@ -49,19 +58,29 @@ export default async function MonitoringDetailPage({ params }: Props) {
   // Validasi apakah tipe tersedia di konfigurasi
   const config = DETAIL_CONTENT[type as keyof typeof DETAIL_CONTENT];
 
-  // Validasi ID (zona1 - zona7)
-  const zoneMatch = id.match(/^zona([1-7])$/);
-
-  if (!config || !zoneMatch) {
+  if (!config) {
     return notFound();
   }
 
-  const zoneNumber = parseInt(zoneMatch[1], 10);
-  const currentStep = STEPS.find((s) => s.id === zoneNumber);
+  // Khusus ISF menggunakan pola zona1-zona7
+  // Tipe lain (seperti biofloc) menggunakan ID numerik langsung
+  const isIsf = type === "isf";
+  const zoneMatch = id.match(/^zona([1-7])$/);
+  const mappedNonIsfId = parseInt(id, 10);
+
+  if (isIsf && !zoneMatch) {
+    return notFound();
+  }
+  if (!isIsf && Number.isNaN(mappedNonIsfId)) {
+    return notFound();
+  }
+
+  const resolvedId = isIsf ? parseInt(zoneMatch![1], 10) : mappedNonIsfId;
+  const currentStep = isIsf ? STEPS.find((s) => s.id === resolvedId) : null;
 
   // Ambil data awal di Server jika query tersedia
   const logsData = config.query
-    ? await config.query(zoneNumber).catch(() => null)
+    ? await config.query(resolvedId).catch(() => null)
     : null;
 
   return (
@@ -80,11 +99,13 @@ export default async function MonitoringDetailPage({ params }: Props) {
               {config.title}
             </p>
             <div className="flex flex-col gap-0 md:flex-row md:items-center md:gap-2">
-              <h1 className="text-muted-foreground text-xl font-semibold">
-                Zona {zoneNumber}:
-              </h1>
+              {isIsf && (
+                <h1 className="text-muted-foreground text-xl font-semibold">
+                  Zona {resolvedId}:
+                </h1>
+              )}
               <p className="text-primary text-xl font-bold tracking-wider uppercase">
-                {currentStep?.name || config.title}
+                {isIsf ? currentStep?.name : config.title}
               </p>
             </div>
           </div>

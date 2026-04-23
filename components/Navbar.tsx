@@ -5,7 +5,7 @@ import { Grid2X2PlusIcon } from "lucide-react";
 
 export default function Navbar() {
   return (
-    <header className="border-border bg-background/90 sticky top-0 z-50 border-b backdrop-blur-sm">
+    <header className="border-border bg-background/90 sticky top-0 z-10 border-b backdrop-blur-sm">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
@@ -19,6 +19,7 @@ export default function Navbar() {
               fill
               className="object-cover"
               priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
           <span className="hidden text-xs leading-tight font-bold sm:inline">
