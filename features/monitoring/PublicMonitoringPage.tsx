@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   ArrowUpIcon,
   Grid3X3Icon,
@@ -20,11 +19,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { LoadingLazyMap } from "./components/LoadingLazyMap";
-import { LocationType } from "../dashboard/actions/available-locations";
-import type { PublicMonitoringMapProps } from "./PublicMonitoringMap";
-import { useGetPublicLocationsByType } from "./api/getPublicLocationsByType";
+import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
+import { LocationType } from "@/features/dashboard/actions/available-locations";
+import type { PublicMonitoringMapProps } from "@/features/monitoring/PublicMonitoringMap";
 
 const LazyMap = dynamic<PublicMonitoringMapProps>(
   () => import("./PublicMonitoringMap"),
@@ -39,12 +39,20 @@ const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
   loading: () => <LoadingLazyMap />,
 });
 
+const LazyBioflocProposalSection = dynamic(
+  () => import("./components/biofloc/BioflocProposalSection"),
+  {
+    ssr: false,
+    loading: () => <LoadingLazyMap />,
+  },
+);
+
 const FILTER_STATE: Record<
   LocationType,
   { label: string; sub: string; icon: LucideIcon }
 > = {
   biofloc_thematic: {
-    label: "Tematik Bioflok",
+    label: "Tematik Bioflok 2025",
     sub: "Budidaya Ikan Sistem Bioflok",
     icon: Grid3X3Icon,
   },
@@ -66,9 +74,37 @@ const FILTER_STATE: Record<
 };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
+  const [activeTab, setActiveTab] = useState<LocationType | null>(
+    "biofloc_thematic",
+  );
+  const [shouldLoadBioflocTable, setShouldLoadBioflocTable] = useState(false);
+  const bioflocTableRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: locations } = useGetPublicLocationsByType(activeTab);
+  useEffect(() => {
+    if (activeTab !== "biofloc_thematic" || shouldLoadBioflocTable) {
+      return;
+    }
+
+    const target = bioflocTableRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadBioflocTable(true);
+          observer.disconnect();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "200px 0px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [activeTab, shouldLoadBioflocTable]);
 
   return (
     <>
@@ -76,21 +112,39 @@ export default function PublicMonitoringPage() {
         activeTab={activeTab}
         onTabChange={(tab: LocationType) => setActiveTab(tab)}
       />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Map Container */}
-        <div className="relative flex flex-1 flex-col justify-center bg-zinc-50/50">
-          {activeTab && (locations || activeTab === "isf") && (
-            <div className="flex flex-1">
-              {activeTab === "isf" ? (
-                <LazyIsf />
+      <div className="flex flex-1 flex-col">
+        <div className="mx-auto w-full max-w-6xl space-y-8 pb-8">
+          {/* Map Container - Top Section */}
+          <section
+            className={cn(
+              "relative h-[65vh] min-h-[400px] w-full",
+              activeTab !== "isf" && "mt-6",
+            )}
+          >
+            {activeTab && (
+              <div className="flex h-full w-full">
+                {activeTab === "isf" ? (
+                  <LazyIsf />
+                ) : (
+                  <LazyMap type={activeTab} />
+                )}
+              </div>
+            )}
+          </section>
+
+          {/* Table Container - Bottom Section */}
+          {activeTab === "biofloc_thematic" && (
+            <div ref={bioflocTableRef}>
+              {shouldLoadBioflocTable ? (
+                <LazyBioflocProposalSection />
               ) : (
-                <LazyMap locations={locations!} type={activeTab} />
+                <div className="h-24 border border-zinc-200 bg-zinc-50/40" />
               )}
             </div>
           )}
-
-          <BottomToolbarMap />
         </div>
+
+        <BottomToolbarMap />
       </div>
     </>
   );
@@ -108,24 +162,29 @@ export function Header({
     : "Select Dashboard";
 
   return (
-    <div className="bg-background/95 border-border sticky top-14 z-40 overflow-hidden px-6 py-4 backdrop-blur transition-all duration-500 ease-in-out">
+    <div className="sticky top-14 z-40 border-b border-zinc-200 bg-white px-6 py-2">
       <div className="mx-auto flex items-center justify-between">
         <div>
-          <h2 className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
+          <h2 className="text-xs font-semibold text-zinc-400 uppercase">
             Monitoring
           </h2>
-          <h1 className="text-foreground font-semibold tracking-tight">
+          <h1 className="font-bold text-zinc-900">
             Dashboard Program Prioritas
           </h1>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center">
+            <Button
+              variant="outline"
+              className="flex items-center rounded-none border-zinc-200"
+            >
               <MenuIcon className="size-4" />
-              <span className="hidden sm:block">Dashboard: {activeLabel}</span>
+              <span className="ml-2 hidden sm:block">
+                Dashboard: {activeLabel}
+              </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-64" align="end">
+          <DropdownMenuContent className="min-w-64 rounded-none" align="end">
             <DropdownMenuGroup>
               <DropdownMenuLabel>Pilih Dashboard Program</DropdownMenuLabel>
               <DropdownMenuRadioGroup
@@ -136,12 +195,12 @@ export function Header({
                   <DropdownMenuRadioItem
                     key={key}
                     value={key}
-                    className="flex items-center gap-2 px-2"
+                    className="flex items-center gap-2 rounded-none px-2"
                   >
-                    <value.icon className="text-muted-foreground size-4" />
+                    <value.icon className="size-4 text-zinc-400" />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{value.label}</span>
-                      <span className="text-muted-foreground text-[10px] leading-none">
+                      <span className="text-[10px] leading-none text-zinc-400">
                         {value.sub}
                       </span>
                     </div>
