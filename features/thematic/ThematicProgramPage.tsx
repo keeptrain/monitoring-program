@@ -8,8 +8,6 @@ import { ThematicProgramIndex } from "./types/thematic";
 import { ThematicProgramColumns } from "./components/ThematicProgramTableColumns";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { useUpdateProgressSheet } from "./hooks/useUpdateProgressSheet";
-import UpdateProgressSheet from "./components/UpdateProgressSheet";
 import {
   Sheet,
   SheetContent,
@@ -26,23 +24,13 @@ export default function ThematicProgramPage({
   programType?: "biofloc" | "minapadi";
 }) {
   const router = useRouter();
-  const { form, openForRow, sheetOpen, setSheetOpen, onSubmit } =
-    useUpdateProgressSheet();
 
   const getColumns = useMemo(
-    () => ThematicProgramColumns({ onOpenProgress: openForRow }),
-    [openForRow],
+    () => ThematicProgramColumns({ onOpenProgress: () => {} }),
+    [],
   );
 
-  const handleRowClick = (
-    e: React.MouseEvent<HTMLTableRowElement>,
-    row: ThematicProgramIndex,
-  ) => {
-    const target = e.target as HTMLElement;
-    if (target.closest("button") || target.closest("a")) {
-      return;
-    }
-
+  const handleRowClick = (row: ThematicProgramIndex) => {
     if (row.id && programType) {
       router.push(`/dashboard/thematic/${programType}/${row.id}`);
     }
@@ -59,7 +47,7 @@ export default function ThematicProgramPage({
             Program Tematik Bioflok
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Kelola dan pantau program KDMP tematik bioflok DJPB.
+            Kelola dan pantau program tematik bioflok DJPB.
           </p>
         </div>
         <Button size="sm" asChild>
@@ -80,7 +68,7 @@ export default function ThematicProgramPage({
         />
       )}
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      {/* <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="right">
           <SheetHeader>
             <SheetTitle>Update Progress & Dokumentasi</SheetTitle>
@@ -95,7 +83,7 @@ export default function ThematicProgramPage({
             onSubmit={onSubmit}
           />
         </SheetContent>
-      </Sheet>
+      </Sheet> */}
     </div>
   );
 }
