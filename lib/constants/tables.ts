@@ -1,4 +1,5 @@
 export const TABLES = {
+  AVAILABLE_LOCATIONS: "available_locations",
   BIOFLOC_THEMATIC_PROGRAMS: "biofloc_thematic_programs",
   PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS: "proposal_biofloc_thematic_programs",
   PROGRAM_QUOTAS: "program_quotas",
