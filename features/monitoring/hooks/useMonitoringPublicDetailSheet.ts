@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import { LocationType } from "../../dashboard/actions/available-locations";
-import type { PublicThematicDocumentation } from "@/features/thematic/actions/public-thematic-programs";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") ?? "";

@@ -18,7 +18,7 @@ import { useState } from "react";
 import { LocationType } from "../dashboard/actions/available-locations";
 import { iconIsf, iconThematic } from "./components/MapPinIcon";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
-import BioflocDetailSheet from "../thematic/components/BioflocDetailSheet";
+import BioflocDetailSheet from "./components/biofloc-detail/BioflocDetailSheet";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
 import { MonitoringDetailTypeMap } from "./types/monitoring-types";
 import Link from "next/link";
@@ -71,7 +71,7 @@ export default function PublicMonitoringMap({
 
   return (
     <>
-      <MapTopContent />
+      {type === "biofloc_thematic" && <MapTopContent />}
       <MapContainer
         center={INDONESIA_CENTER}
         zoom={5}
