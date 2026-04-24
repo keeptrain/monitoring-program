@@ -38,7 +38,8 @@ const BIOFLOC_PAGE_TABS = {
   QUOTA: "quota",
 } as const;
 
-type BioflocPageTab = (typeof BIOFLOC_PAGE_TABS)[keyof typeof BIOFLOC_PAGE_TABS];
+type BioflocPageTab =
+  (typeof BIOFLOC_PAGE_TABS)[keyof typeof BIOFLOC_PAGE_TABS];
 
 export default function BioflocProgramPage({
   data,
@@ -62,9 +63,8 @@ export default function BioflocProgramPage({
     selectedRow,
   } = useUpdateProgressSheet();
   const [quotaSheetOpen, setQuotaSheetOpen] = useState(false);
-  const [selectedQuotaRow, setSelectedQuotaRow] = useState<ProgramQuotaView | null>(
-    null,
-  );
+  const [selectedQuotaRow, setSelectedQuotaRow] =
+    useState<ProgramQuotaView | null>(null);
   const [submitQuotaError, setSubmitQuotaError] = useState<string | null>(null);
   const { data: quotaRows = [], isLoading: isLoadingQuotas } =
     useGetBioflocProgramQuotas();
@@ -184,6 +184,19 @@ export default function BioflocProgramPage({
             columns={columns}
             data={data}
             onRowClick={handleRowClick}
+            topContent={(table) => (
+              <div className="ml-auto w-1/4">
+                <Input
+                  placeholder="Cari kelompok kdmp..."
+                  value={
+                    (table.getColumn("name")?.getFilterValue() as string) ?? ""
+                  }
+                  onChange={(event) =>
+                    table.getColumn("name")?.setFilterValue(event.target.value)
+                  }
+                />
+              </div>
+            )}
           />
         )
       ) : (
