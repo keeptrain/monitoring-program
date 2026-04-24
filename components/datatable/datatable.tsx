@@ -23,11 +23,18 @@ import { Skeleton } from "../ui/skeleton";
 import { Loader2Icon } from "lucide-react";
 import DataTablePagination from "./data-table-pagination";
 
+interface TableOptions {
+  defaultPageSize?: number;
+  showRowsText?: boolean;
+  showPagination?: boolean;
+}
+
 interface DataTableProps<TData, TValue> {
-  topContent?: (table: TanstackTable<TData>) => React.ReactNode;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   isPending?: boolean;
+  options?: TableOptions;
+  topContent?: (table: TanstackTable<TData>) => React.ReactNode;
   onRowClick?: (row: TData) => void;
 }
 
@@ -37,13 +44,26 @@ export default function DataTable<TData, TValue>({
   data,
   isPending = false,
   onRowClick,
+  options: userOptions,
 }: DataTableProps<TData, TValue>) {
+  const options = {
+    defaultPageSize: 10,
+    showRowsText: true,
+    showPagination: true,
+    ...userOptions,
+  };
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
     data,
     columns,
+    initialState: {
+      pagination: {
+        pageSize: options.defaultPageSize,
+      },
+    },
     state: {
       sorting,
       columnFilters,
@@ -113,7 +133,7 @@ export default function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} options={options} />
     </div>
   );
 }

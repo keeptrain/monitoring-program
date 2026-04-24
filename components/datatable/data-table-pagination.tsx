@@ -13,19 +13,27 @@ import {
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  options?: {
+    showRowsText?: boolean;
+    showPagination?: boolean;
+  };
 }
 
 export default function DataTablePagination<TData>({
   table,
+  options,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="flex items-center justify-between">
       <div className="text-muted-foreground flex-1 text-xs">
-        {table.getFilteredRowModel().rows.length} row(s)
+        {options?.showRowsText && (
+          <>{table.getFilteredRowModel().rows.length} row(s)</>
+        )}
       </div>
 
-      <div className="flex items-center gap-4 lg:gap-6">
-        {/* <div className="flex items-center gap-2">
+      {options?.showPagination && (
+        <div className="flex items-center gap-4 lg:gap-6">
+          {/* <div className="flex items-center gap-2">
           <p className="text-xs font-medium">Rows per page</p>
           <NativeSelect
             className="w-[72px]"
@@ -42,52 +50,53 @@ export default function DataTablePagination<TData>({
           </NativeSelect>
         </div> */}
 
-        <div className="flex w-[100px] items-center justify-center text-xs font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </div>
+          <div className="flex w-[100px] items-center justify-center text-xs font-medium">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </div>
 
-        <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="icon-sm"
-            className="hidden lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft className="size-4" />
-            <span className="sr-only">Go to first page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="size-4" />
-            <span className="sr-only">Go to previous page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight className="size-4" />
-            <span className="sr-only">Go to next page</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            className="hidden lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight className="size-4" />
-            <span className="sr-only">Go to last page</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              className="hidden lg:flex"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeft className="size-4" />
+              <span className="sr-only">Go to first page</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="size-4" />
+              <span className="sr-only">Go to previous page</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight className="size-4" />
+              <span className="sr-only">Go to next page</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              className="hidden lg:flex"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRight className="size-4" />
+              <span className="sr-only">Go to last page</span>
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
