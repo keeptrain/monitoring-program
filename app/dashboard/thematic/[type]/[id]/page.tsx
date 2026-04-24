@@ -1,5 +1,5 @@
 import { ThematicProgramDetailComponent as Component } from "@/features/thematic/components/ThematicProgramDetail";
-import { getThematicProgramById } from "@/features/thematic/actions/thematic-programs";
+import { getThematicProgramById } from "@/features/thematic/actions/biofloc";
 import { notFound } from "next/navigation";
 
 export default async function ThematicProgramDetailPage({

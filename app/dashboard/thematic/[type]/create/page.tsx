@@ -1,4 +1,4 @@
-import Component from "@/features/thematic/forms/ThematicProgramForm";
+import BioflocProgramForm from "@/features/thematic/forms/BioflocProgramForm";
 import { notFound } from "next/navigation";
 
 export default async function ThematicProgramCreatePage({
@@ -12,5 +12,5 @@ export default async function ThematicProgramCreatePage({
     return notFound();
   }
 
-  return <Component />;
+  return <BioflocProgramForm />;
 }

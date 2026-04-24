@@ -1,5 +1,5 @@
-import Component from "@/features/thematic/forms/ThematicProgramForm";
-import { getThematicProgramById } from "@/features/thematic/actions/thematic-programs";
+import BioflocProgramForm from "@/features/thematic/forms/BioflocProgramForm";
+import { getThematicProgramById } from "@/features/thematic/actions/biofloc";
 import { ThematicProgramDetail } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
 
@@ -23,5 +23,5 @@ export default async function ThematicProgramEditPage({
     return notFound();
   }
 
-  return <Component initialData={program as ThematicProgramDetail} />;
+  return <BioflocProgramForm initialData={program as ThematicProgramDetail} />;
 }

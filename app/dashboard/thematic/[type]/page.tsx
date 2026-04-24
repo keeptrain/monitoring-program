@@ -1,5 +1,6 @@
-import { getThematicPrograms } from "@/features/thematic/actions/thematic-programs";
-import ThematicProgramPage from "@/features/thematic/ThematicProgramPage";
+import { getThematicPrograms } from "@/features/thematic/actions/biofloc";
+import BioflocProgramPage from "@/features/thematic/BioflocProgramPage";
+import MinapadiProgramPage from "@/features/thematic/MinapadiProgramPage";
 import { ThematicProgramIndex } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -13,11 +14,11 @@ const PAGE_CONFIG: Record<
 > = {
   biofloc: {
     label: "Program Tematik Bioflok",
-    Component: ThematicProgramPage,
+    Component: BioflocProgramPage,
   },
   minapadi: {
     label: "Program Tematik Minapadi",
-    Component: MinapadiPage,
+    Component: MinapadiProgramPage,
   },
 };
 
@@ -37,24 +38,4 @@ export default async function ThematicProgramTypePage({
   const data = await getThematicPrograms();
 
   return <ComponentPage data={data} />;
-}
-
-function MinapadiPage() {
-  return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
-        <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            Dashboard / Tematik / Minapadi
-          </p>
-          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-            Program Tematik Minapadi
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Kelola dan pantau program KDMP tematik minapadi DJPB.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
 }
