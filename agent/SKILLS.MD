@@ -60,3 +60,31 @@
 - **Mutation Pattern:**
   - Always invalidate relevant query keys on successful mutations to ensure UI consistency.
   - Use `useMutation` from `@tanstack/react-query`.
+
+## 5. Performance Optimization
+
+### **Memoization Standards**
+
+- **Stable References:** Use `useCallback` for all functions passed as props to child components (e.g., `onEdit`, `onOpen`).
+- **Expensive Calculations:** Wrap complex data transformations, filtering, and sorting in `useMemo`.
+- **Table Columns:** TanStack Table column definitions MUST be wrapped in `useMemo` to prevent unnecessary table re-initialization.
+
+### **Atomic & Targeted Rendering**
+
+- **Component Splitting:** Break down large pages into smaller, focused components. If a state update (like a search input or a toggle) only affects a specific part of the UI, move that state into a smaller sub-component.
+- **Form Granularity:** Use `react-hook-form` to isolate form state. Avoid top-level `useState` for frequent input changes to prevent full-page re-renders.
+- **Children Pattern:** Prefer passing components as `children` to keep them from re-rendering when the parent's unrelated state changes.
+
+## 6. Shared & Reusable Components
+
+- **Location:** Shared components live in `components/shared/`.
+- **Leaflet Maps:** Use `dynamic(() => import(...), { ssr: false })` for all Leaflet-based components. Never import Leaflet on the server.
+- **Map Pin Picker:** Use `components/shared/MapPinPicker.tsx` for any form that needs lat/long selection. It supports click-to-place, drag-to-adjust, and current-location detection.
+- **Location Form:** Use `components/shared/LocationFormSection.tsx` and its exported `locationFormSchemaPattern` for consistent lat/long validation across schemas.
+
+## 7. File Upload (Supabase Storage)
+
+- **Reusable Component:** Use `features/documentation/components/FileUploadField.tsx` for single-file uploads to Supabase Storage.
+- **Upload Hook:** Use `features/documentation/hooks/useDocumentationsUpload.ts` which wraps `useMutation` for upload state management.
+- **File Naming:** Always use `generateUniqueFileName()` from `lib/utils.ts` to avoid collisions.
+- **Bucket:** Stored in `process.env.NEXT_PUBLIC_SUPABASE_BUCKET`. Use `basePath` to organize files into sub-folders (e.g., `proposal-biofloc-thematic`).
