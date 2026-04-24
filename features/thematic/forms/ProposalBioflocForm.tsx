@@ -4,15 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Loader2, FileIcon, X } from "lucide-react";
-import { ChangeEvent, useState } from "react";
-import useDocumentationsUpload from "@/features/documentation/hooks/useDocumentationsUpload";
+import { Loader2 } from "lucide-react";
 import { useProposalBioflocForm } from "../hooks/useProposalBioflocForm";
+import { useCallback } from "react";
+import FileUploadField from "@/features/documentation/components/FileUploadField";
+import LocationFormSection from "@/components/shared/LocationFormSection";
 
 export default function ProposalBioflocForm() {
   const { form, onSubmit, isPending, submitError } = useProposalBioflocForm();
-  const { upload, isPending: isUploading } = useDocumentationsUpload();
-  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const {
     register,
@@ -23,41 +22,19 @@ export default function ProposalBioflocForm() {
 
   const proposalPath = watch("proposal_path");
 
-  const handleUploadProposal = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploadError(null);
-
-    try {
-      const uploaded = await upload(file, {
-        basePath: "proposal-biofloc-thematic",
-      });
-
-      if (uploaded.length === 0) {
-        throw new Error("Upload proposal gagal.");
-      }
-
-      setValue("proposal_path", uploaded[0].path, {
+  const handleProposalPathChange = useCallback(
+    (path: string) => {
+      setValue("proposal_path", path, {
         shouldDirty: true,
         shouldValidate: true,
       });
-    } catch (error) {
-      setUploadError(
-        error instanceof Error ? error.message : "Upload proposal gagal.",
-      );
-    }
-  };
-
-  const handleRemoveProposal = () => {
-    setValue("proposal_path", "", {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  };
+    },
+    [setValue],
+  );
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-10">
+      {/* Section 1: Informasi KDMP  */}
       <Card>
         <CardHeader>
           <CardTitle>Informasi Pengajuan Proposal</CardTitle>
@@ -115,61 +92,34 @@ export default function ProposalBioflocForm() {
         </CardContent>
       </Card>
 
+      {/* Section 2: Lokasi Map Pick Pin */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lokasi KDMP</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LocationFormSection form={form} />
+        </CardContent>
+      </Card>
+
+      {/* Section 3: Upload Proposal */}
       <Card>
         <CardHeader>
           <CardTitle>Upload Proposal</CardTitle>
         </CardHeader>
         <CardContent>
-          <Field>
-            {!proposalPath ? (
-              <div className="relative w-full md:w-1/2">
-                <Input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleUploadProposal}
-                  disabled={isUploading}
-                  aria-invalid={!!errors.proposal_path}
-                />
-                {isUploading && (
-                  <div className="absolute top-1/2 right-3 -translate-y-1/2">
-                    <Loader2 className="text-muted-foreground size-4 animate-spin" />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="border-border flex w-full items-center justify-between border bg-zinc-50/50 p-2 text-sm md:w-1/2">
-                <div className="flex items-center gap-2 overflow-hidden">
-                  <FileIcon className="size-4 shrink-0 text-zinc-400" />
-                  <span className="truncate font-medium text-zinc-700">
-                    {proposalPath.split("/").pop()}
-                  </span>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleRemoveProposal}
-                  className="hover:text-destructive h-7 w-7"
-                >
-                  <X className="size-3.5" />
-                </Button>
-              </div>
-            )}
-            <FieldError>
-              {errors.proposal_path?.message || uploadError || submitError}
-            </FieldError>
-          </Field>
+          <FileUploadField
+            value={proposalPath}
+            onChange={handleProposalPathChange}
+            basePath="proposal-biofloc-thematic"
+            accept=".pdf,.doc,.docx"
+            error={errors.proposal_path?.message || submitError || undefined}
+          />
         </CardContent>
       </Card>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={isPending || isUploading}
-      >
-        {(isPending || isUploading) && (
-          <Loader2 className="mr-2 size-4 animate-spin" />
-        )}
+      <Button type="submit" className="w-full" disabled={isPending}>
+        {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
         Kirim Proposal
       </Button>
     </form>

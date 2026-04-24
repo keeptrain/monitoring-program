@@ -17,6 +17,8 @@ const DEFAULT_VALUES: ProposalBioflocFormInput = {
   regency: "",
   district: "",
   village: "",
+  latitude: "",
+  longitude: "",
   proposal_path: "",
 };
 
