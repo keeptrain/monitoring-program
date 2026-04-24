@@ -41,7 +41,7 @@ export function useProposalBioflocForm() {
       setSubmitError(null);
       try {
         await createProposalBioflocThematicProgram(values);
-        router.push("/monitoring/biofloc_thematic/bantuan-2025");
+        router.push("/monitoring");
         router.refresh();
       } catch (error) {
         if (error instanceof Error) {

@@ -1,6 +1,7 @@
 import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
 import { PROGRAM_QUOTA_TYPE } from "../forms/program-quota-schema";
+import { getProposalBioflocTotal } from "./proposal-biofloc-services";
 
 export type ProgramQuotaRow = {
   id: number;
@@ -12,7 +13,7 @@ export type ProgramQuotaRow = {
   updated_at: string;
 };
 
-export async function getProgramQuotasByTypeAndYearService(year: number) {
+export async function getProgramQuotasByTypeAndYear(year: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(TABLES.PROGRAM_QUOTAS)
@@ -21,14 +22,19 @@ export async function getProgramQuotasByTypeAndYearService(year: number) {
     .eq("year", year)
     .order("region_id", { ascending: true });
 
+  const total = await getProposalBioflocTotal(supabase);
+
   if (error) {
     throw error;
   }
 
-  return (data ?? []) as ProgramQuotaRow[];
+  return {
+    data: (data ?? []) as ProgramQuotaRow[],
+    proposal_total: total,
+  };
 }
 
-export async function upsertProgramQuotaByRegionService(input: {
+export async function upsertProgramQuotaByRegion(input: {
   region_id: string;
   year: number;
   quota_limit: number;

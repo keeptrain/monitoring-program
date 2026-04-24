@@ -9,6 +9,8 @@ import { useProposalBioflocForm } from "../hooks/useProposalBioflocForm";
 import { useCallback } from "react";
 import FileUploadField from "@/features/documentation/components/FileUploadField";
 import LocationFormSection from "@/components/shared/LocationFormSection";
+import ProvinceSelect from "@/components/shared/ProvinceSelect";
+import { Controller } from "react-hook-form";
 
 export default function ProposalBioflocForm() {
   const { form, onSubmit, isPending, submitError } = useProposalBioflocForm();
@@ -52,10 +54,19 @@ export default function ProposalBioflocForm() {
 
           <Field>
             <FieldLabel>Provinsi</FieldLabel>
-            <Input
-              {...register("province")}
-              aria-invalid={!!errors.province}
-              placeholder="Contoh: Jawa Timur"
+            <Controller
+              control={form.control}
+              name="province"
+              render={({ field }) => (
+                <ProvinceSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  allLabel="Pilih Provinsi"
+                  showAll={true}
+                  className="w-full"
+                  aria-invalid={!!errors.province}
+                />
+              )}
             />
             <FieldError>{errors.province?.message}</FieldError>
           </Field>

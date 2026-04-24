@@ -6,6 +6,7 @@ CREATE TABLE proposal_biofloc_thematic_programs (
   status VARCHAR(20) NOT NULL,
 
   name TEXT NOT NULL, -- nama kdmp
+  name_search TEXT GENERATED ALWAYS AS (lower(name)) STORED, -- nama kdmp untuk search (lowercase)
 
   province TEXT NOT NULL, -- nama provinsi
   regency TEXT NOT NULL, -- nama kabupaten
@@ -17,5 +18,11 @@ CREATE TABLE proposal_biofloc_thematic_programs (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- INDEXING: Agar pencarian nama kelompok (KDMP) secepat kilat
+CREATE INDEX idx_proposals_name_search ON proposal_biofloc_thematic_programs (name_search);
+
+-- INDEXING TAMBAHAN: Untuk mempermudah filtering provinsi (karena ada 34-38 data)
+CREATE INDEX idx_proposals_province ON proposal_biofloc_thematic_programs (province);
 
 GRANT ALL ON TABLE proposal_biofloc_thematic_programs TO anon, authenticated, service_role;
