@@ -33,3 +33,30 @@
 
 - **Single Responsibility:** Server Actions act as "Controllers" only—they don't contain raw SQL/DB logic directly.
 - **Predictable File Naming:** Using specific naming conventions like `features/thematic/actions/thematic-programs.ts` for clarity in large-scale projects (150+ units).
+
+## 4. Client-Side Data Fetching & Mutations
+
+- **TanStack Query:** MUST use TanStack Query (React Query) for all client-side fetching and mutations to handle caching, loading states, and error handling consistently.
+- **File Organization:**
+  - All hooks related to data fetching/mutations must be placed in `features/[feature-name]/api/`.
+  - For simple fetches, use the naming convention `useGet[ResourceName]`.
+  - For mutations, use the naming convention `use[Action][ResourceName]` (e.g., `useUpdateQuota`).
+- **Standard Pattern:**
+
+  ```typescript
+  // features/feature-name/api/get-resource.ts
+  export const getResourceQueryKey = (params: any) => ["resource-key", params];
+
+  export const useGetResource = (params: any, enabled = true) =>
+    useQuery({
+      queryKey: getResourceQueryKey(params),
+      queryFn: () => getResourceAction(params),
+      staleTime: 3 * 60 * 1000, // 3 minutes
+      gcTime: 5 * 60 * 1000, // 5 minutes
+      enabled: enabled && !!params,
+    });
+  ```
+
+- **Mutation Pattern:**
+  - Always invalidate relevant query keys on successful mutations to ensure UI consistency.
+  - Use `useMutation` from `@tanstack/react-query`.
