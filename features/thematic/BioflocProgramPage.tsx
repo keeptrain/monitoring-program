@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Grid2x2Icon, Plus } from "lucide-react";
 import Link from "next/link";
@@ -8,33 +15,17 @@ import { ThematicProgramIndex } from "./types/thematic";
 import { BioflocProgramTableColumns } from "./components/biofloc/BioflocProgramTableColumns";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import UpdateProgressSheet from "./components/biofloc/UpdateProgressSheet";
 import { useUpdateProgressSheet } from "./hooks/useUpdateProgressSheet";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
-import { BioflocProgramQuotaTableColumns } from "./components/biofloc/BioflocProgramQuotaTableColumns";
-import UpdateProgramQuotaSheet from "./components/biofloc/UpdateProgramQuotaSheet";
-import { PROGRAM_QUOTA_YEAR } from "./forms/program-quota-schema";
+import ProvinceSelect from "@/components/shared/ProvinceSelect";
+import ProposalBioflocProgramPage from "@/features/thematic/pages/ProposalBioflocProgramPage";
+import ManagementQuotaPage from "@/features/thematic/pages/ManagementQuotaPage";
 import { Input } from "@/components/ui/input";
-import { useGetBioflocProgramQuotas } from "./api/getBioflocProgramQuotas";
-import { useUpdateBioflocProgramQuota } from "./api/updateBioflocProgramQuota";
-import { ProgramQuotaView } from "./actions/program-quotas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
-  ProgramQuotaUpdateInput,
-  ProgramQuotaUpdateValues,
-  programQuotaUpdateSchema,
-} from "./forms/program-quota-schema";
 
 const BIOFLOC_PAGE_TABS = {
   PROGRAM: "program",
+  PROPOSAL: "proposal",
   QUOTA: "quota",
 } as const;
 
@@ -62,64 +53,10 @@ export default function BioflocProgramPage({
     isPending: isUpdatingProgress,
     selectedRow,
   } = useUpdateProgressSheet();
-  const [quotaSheetOpen, setQuotaSheetOpen] = useState(false);
-  const [selectedQuotaRow, setSelectedQuotaRow] =
-    useState<ProgramQuotaView | null>(null);
-  const [submitQuotaError, setSubmitQuotaError] = useState<string | null>(null);
-  const { data: quotaRows = [], isLoading: isLoadingQuotas } =
-    useGetBioflocProgramQuotas();
-  const updateQuotaMutation = useUpdateBioflocProgramQuota();
-
-  const quotaForm = useForm<
-    ProgramQuotaUpdateInput,
-    undefined,
-    ProgramQuotaUpdateValues
-  >({
-    resolver: zodResolver(programQuotaUpdateSchema),
-    defaultValues: {
-      quota_limit: 0,
-    },
-  });
-
-  const openQuotaSheetForRow = useCallback(
-    (row: ProgramQuotaView) => {
-      setSelectedQuotaRow(row);
-      setSubmitQuotaError(null);
-      quotaForm.reset({ quota_limit: row.quota_limit });
-      setQuotaSheetOpen(true);
-    },
-    [quotaForm],
-  );
-
-  const onSubmitQuota = useCallback(
-    async (values: ProgramQuotaUpdateValues) => {
-      if (!selectedQuotaRow) {
-        return;
-      }
-      setSubmitQuotaError(null);
-      try {
-        await updateQuotaMutation.mutateAsync({
-          region_id: selectedQuotaRow.region_id,
-          quota_limit: values.quota_limit,
-        });
-        setQuotaSheetOpen(false);
-      } catch (error) {
-        setSubmitQuotaError(
-          error instanceof Error ? error.message : "Gagal menyimpan kuota.",
-        );
-      }
-    },
-    [selectedQuotaRow, updateQuotaMutation],
-  );
 
   const columns = useMemo(
     () => BioflocProgramTableColumns({ onOpenProgress: openForRow }),
     [openForRow],
-  );
-  const quotaColumns = useMemo(
-    () =>
-      BioflocProgramQuotaTableColumns({ onEditQuota: openQuotaSheetForRow }),
-    [openQuotaSheetForRow],
   );
 
   const handleRowClick = useCallback(
@@ -168,6 +105,15 @@ export default function BioflocProgramPage({
         <Button
           type="button"
           variant={
+            activeTab === BIOFLOC_PAGE_TABS.PROPOSAL ? "default" : "outline"
+          }
+          onClick={() => setActiveTab(BIOFLOC_PAGE_TABS.PROPOSAL)}
+        >
+          Proposal
+        </Button>
+        <Button
+          type="button"
+          variant={
             activeTab === BIOFLOC_PAGE_TABS.QUOTA ? "default" : "outline"
           }
           onClick={() => setActiveTab(BIOFLOC_PAGE_TABS.QUOTA)}
@@ -180,102 +126,71 @@ export default function BioflocProgramPage({
         data.length === 0 ? (
           <EmptyState />
         ) : (
-          <Datatable
-            columns={columns}
-            data={data}
-            onRowClick={handleRowClick}
-            topContent={(table) => (
-              <div className="ml-auto w-1/4">
-                <Input
-                  placeholder="Cari kelompok kdmp..."
-                  value={
-                    (table.getColumn("name")?.getFilterValue() as string) ?? ""
-                  }
-                  onChange={(event) =>
-                    table.getColumn("name")?.setFilterValue(event.target.value)
-                  }
+          <>
+            <Datatable
+              columns={columns}
+              data={data}
+              onRowClick={handleRowClick}
+              topContent={(table) => (
+                <>
+                  <ProvinceSelect
+                    value={""}
+                    onChange={(val) => console.log(val)}
+                    allLabel="Semua Provinsi"
+                    className="w-[200px]"
+                  />
+                  <div className="ml-auto w-1/4">
+                    <Input
+                      placeholder="Cari kelompok kdmp..."
+                      value={
+                        (table.getColumn("name")?.getFilterValue() as string) ??
+                        ""
+                      }
+                      onChange={(event) => {
+                        table
+                          .getColumn("name")
+                          ?.setFilterValue(event.target.value);
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+            />
+
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetContent
+                side="right"
+                className="data-[side=right]:sm:max-w-[600px]"
+              >
+                <SheetHeader>
+                  <SheetTitle>Update Progress & Dokumentasi</SheetTitle>
+                  <SheetDescription>
+                    Ubah persentase capaian lalu kelola dokumentasi program.
+                  </SheetDescription>
+                </SheetHeader>
+                <UpdateProgressSheet
+                  form={form}
+                  setSheetOpen={setSheetOpen}
+                  onSubmit={onSubmit}
+                  submitError={submitError}
+                  isPending={isUpdatingProgress}
                 />
-              </div>
-            )}
-          />
+                {selectedRow && (
+                  <ManageDocumentationsSheet
+                    programType="biofloc_thematic"
+                    programId={selectedRow.id}
+                    onSuccess={() => setSheetOpen(false)}
+                  />
+                )}
+              </SheetContent>
+            </Sheet>
+          </>
         )
+      ) : activeTab === BIOFLOC_PAGE_TABS.PROPOSAL ? (
+        <ProposalBioflocProgramPage />
       ) : (
-        <Datatable
-          columns={quotaColumns}
-          data={quotaRows}
-          isPending={isLoadingQuotas}
-          topContent={(table) => (
-            <div className="ml-auto w-1/4">
-              <Input
-                placeholder="Cari provinsi..."
-                value={
-                  (table
-                    .getColumn("region_name")
-                    ?.getFilterValue() as string) ?? ""
-                }
-                onChange={(event) =>
-                  table
-                    .getColumn("region_name")
-                    ?.setFilterValue(event.target.value)
-                }
-              />
-            </div>
-          )}
-        />
+        <ManagementQuotaPage />
       )}
-
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent
-          side="right"
-          className="data-[side=right]:sm:max-w-[600px]"
-        >
-          <SheetHeader>
-            <SheetTitle>Update Progress & Dokumentasi</SheetTitle>
-            <SheetDescription>
-              Ubah persentase capaian lalu kelola dokumentasi program.
-            </SheetDescription>
-          </SheetHeader>
-          <UpdateProgressSheet
-            form={form}
-            setSheetOpen={setSheetOpen}
-            onSubmit={onSubmit}
-            submitError={submitError}
-            isPending={isUpdatingProgress}
-          />
-          {selectedRow && (
-            <ManageDocumentationsSheet
-              programType="biofloc_thematic"
-              programId={selectedRow.id}
-              onSuccess={() => setSheetOpen(false)}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
-
-      <Sheet open={quotaSheetOpen} onOpenChange={setQuotaSheetOpen}>
-        <SheetContent
-          side="right"
-          className="data-[side=right]:sm:max-w-[500px]"
-        >
-          <SheetHeader>
-            <SheetTitle>Ubah Kuota Program</SheetTitle>
-            <SheetDescription>
-              Perubahan disimpan sebagai kuota program tahun{" "}
-              {PROGRAM_QUOTA_YEAR}.
-            </SheetDescription>
-          </SheetHeader>
-          {selectedQuotaRow && (
-            <UpdateProgramQuotaSheet
-              provinceName={selectedQuotaRow.region_name}
-              form={quotaForm}
-              setSheetOpen={setQuotaSheetOpen}
-              onSubmit={onSubmitQuota}
-              submitError={submitQuotaError}
-              isPending={updateQuotaMutation.isPending}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
