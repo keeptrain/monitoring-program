@@ -5,15 +5,46 @@ import { useMemo } from "react";
 import getProposalProvinceTableColumns, {
   ProvinceSummary,
 } from "./ProposalProvinceTableColumns";
+import { useInViewOnce } from "@/hooks/useInViewOnce";
+import { useGetBioflocProgramQuotas } from "@/features/monitoring/api/getBioflocProgramQuotas";
+
+const TableOptions = {
+  defaultPageSize: 5,
+  showRowsText: false,
+  showPagination: true,
+};
 
 export default function ProposalProvinceTable() {
-  const provinceData: ProvinceSummary[] = [
-    { province: "Jawa Barat", count: 25, quota: 30 },
-    { province: "Jawa Timur", count: 18, quota: 25 },
-    { province: "Jawa Tengah", count: 15, quota: 20 },
-    { province: "Lampung", count: 12, quota: 15 },
-  ];
-  const columns = useMemo(() => getProposalProvinceTableColumns(), []);
+  const { ref: tableRef, isInView } = useInViewOnce<HTMLDivElement>({
+    root: null,
+    rootMargin: "120px 0px",
+    threshold: 0.1,
+  });
+  const { data: quotas = [], isPending } = useGetBioflocProgramQuotas(isInView);
 
-  return <Datatable columns={columns} data={provinceData} />;
+  const columns = useMemo(() => getProposalProvinceTableColumns(), []);
+  const provinceData = useMemo<ProvinceSummary[]>(
+    () =>
+      quotas
+        .filter((item) => item.quota_limit > 0)
+        .map((item) => ({
+          province: item.region_name,
+          // DUMMY sementara sampai schema proposal final.
+          count: 0,
+          quota: item.quota_limit,
+        }))
+        .sort((a, b) => b.quota - a.quota),
+    [quotas],
+  );
+
+  return (
+    <div ref={tableRef}>
+      <Datatable
+        columns={columns}
+        data={provinceData}
+        isPending={isPending}
+        options={TableOptions}
+      />
+    </div>
+  );
 }

@@ -4,9 +4,11 @@ import ProposalProvinceTable from "./ProposalProvinceTable";
 import ProposalSubmissionTable from "./ProposalSubmissionTable";
 import Link from "next/link";
 
+const DUMMY_PROPOSAL_TOTAL_FROM_TABLE = 200;
+
 export default function BioflocProposalSection() {
   return (
-    <section className="space-y-4">
+    <section className="space-y-8">
       {/* 1. Upload Banner */}
       <Button className="h-10 w-full text-base font-bold uppercase" asChild>
         <Link href="/monitoring/biofloc/proposal">
@@ -23,16 +25,16 @@ export default function BioflocProposalSection() {
       </div>
 
       {/* 2. Summary Section: Circle + Small Table */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
         {/* Circle Stats */}
-        <div className="flex flex-col items-center justify-center border border-zinc-200 bg-zinc-50 p-8 lg:col-span-2">
+        <div className="flex flex-col items-center justify-center border border-zinc-200 bg-zinc-50 lg:col-span-2">
           <p className="text-muted-foreground mb-6 text-xs font-bold uppercase">
             Jumlah Proposal Masuk
           </p>
           <div className="relative flex items-center justify-center">
-            <div className="flex size-48 flex-col items-center justify-center border border-zinc-200 bg-white">
-              <span className="text-5xl leading-none font-bold text-zinc-900">
-                70
+            <div className="flex size-35 flex-col items-center justify-center border border-zinc-200 bg-white">
+              <span className="text-4xl leading-none font-bold text-zinc-900">
+                {DUMMY_PROPOSAL_TOTAL_FROM_TABLE}
               </span>
               <span className="text-foreground-muted mt-1 text-xs font-semibold uppercase">
                 Proposal
@@ -42,7 +44,7 @@ export default function BioflocProposalSection() {
         </div>
 
         {/* Small Provincial Summary Table */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-4">
           <ProposalProvinceTable />
         </div>
       </div>
