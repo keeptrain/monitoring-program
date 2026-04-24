@@ -8,7 +8,7 @@ import {
   ProposalBioflocFormInput,
   ProposalBioflocFormValues,
 } from "../forms/proposal-biofloc-schema";
-import { createProposalBioflocThematicProgram } from "../actions/proposal-biofloc-thematic-programs";
+import { createProposalBioflocThematicProgram } from "../actions/proposal-biofloc";
 import { useRouter } from "next/navigation";
 
 const DEFAULT_VALUES: ProposalBioflocFormInput = {

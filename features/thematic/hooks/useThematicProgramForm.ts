@@ -1,18 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
-  thematicProgramSchema,
-  ThematicProgramFormInput,
-  ThematicProgramFormValues,
-} from "../forms/thematic-program-schema";
+  bioflocProgramSchema,
+  BioflocProgramFormInput,
+  BioflocProgramFormValues,
+} from "../forms/biofloc-program-schema";
 import {
   createThematicPrograms,
   updateThematicPrograms,
-} from "../actions/thematic-programs";
+} from "../actions/biofloc";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
 
-const CREATE_DEFAULT_VALUES: ThematicProgramFormInput = {
+const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   name: "",
   progress_percent: 0,
   commodity: "",
@@ -28,21 +28,68 @@ const CREATE_DEFAULT_VALUES: ThematicProgramFormInput = {
   documentations: [],
 };
 
+function getFileNameFromPath(path: string): string {
+  const segments = path.split("/");
+  return segments[segments.length - 1] || "documentation";
+}
+
+function getDefaultValues(
+  initialData?: ThematicProgramDetail | null,
+): BioflocProgramFormInput {
+  if (!initialData) {
+    return CREATE_DEFAULT_VALUES;
+  }
+
+  return {
+    name: initialData.name ?? "",
+    progress_percent: initialData.progress_percent ?? 0,
+    commodity: initialData.commodity ?? "",
+    land_area: initialData.land_area ?? "",
+    production: initialData.production ?? "",
+    total_admin: initialData.total_admin ?? 0,
+    distribution_amount: initialData.distribution_amount ?? 0,
+    sppg_partner: initialData.sppg_partner ?? "",
+    s_curve_path: initialData.s_curve_path ?? "",
+    location_name: initialData.available_locations?.name ?? "",
+    latitude: String(initialData.available_locations?.latitude ?? ""),
+    longitude: String(initialData.available_locations?.longitude ?? ""),
+    documentations:
+      initialData.documentations?.map((doc) => ({
+        image_before_paths: doc.image_before_path
+          ? [
+              {
+                path: doc.image_before_path,
+                file_name: getFileNameFromPath(doc.image_before_path),
+              },
+            ]
+          : [],
+        image_after_paths: doc.image_after_path
+          ? [
+              {
+                path: doc.image_after_path,
+                file_name: getFileNameFromPath(doc.image_after_path),
+              },
+            ]
+          : [],
+      })) ?? [],
+  };
+}
+
 export function useThematicProgramForm(
   initialData?: ThematicProgramDetail | null,
 ) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<
-    ThematicProgramFormInput,
+    BioflocProgramFormInput,
     undefined,
-    ThematicProgramFormValues
+    BioflocProgramFormValues
   >({
-    resolver: zodResolver(thematicProgramSchema),
-    defaultValues: CREATE_DEFAULT_VALUES,
+    resolver: zodResolver(bioflocProgramSchema),
+    defaultValues: getDefaultValues(initialData),
   });
 
-  const onSubmit = (values: ThematicProgramFormValues) => {
+  const onSubmit = (values: BioflocProgramFormValues) => {
     startTransition(async () => {
       try {
         if (initialData) {

@@ -9,15 +9,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import {
-  ThematicProgramFormInput,
-  ThematicProgramFormValues,
-} from "../forms/thematic-program-schema";
+  BioflocProgramFormInput,
+  BioflocProgramFormValues,
+} from "../forms/biofloc-program-schema";
 
 interface ThematicFormProps {
   form: UseFormReturn<
-    ThematicProgramFormInput,
+    BioflocProgramFormInput,
     undefined,
-    ThematicProgramFormValues
+    BioflocProgramFormValues
   >;
 }
 

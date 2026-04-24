@@ -3,9 +3,9 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import {
-  ThematicProgramFormInput,
-  ThematicProgramFormValues,
-} from "../forms/thematic-program-schema";
+  BioflocProgramFormInput,
+  BioflocProgramFormValues,
+} from "../forms/biofloc-program-schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
@@ -14,9 +14,9 @@ import { useMemo, useState } from "react";
 
 interface ThematicFormProps {
   form: UseFormReturn<
-    ThematicProgramFormInput,
+    BioflocProgramFormInput,
     undefined,
-    ThematicProgramFormValues
+    BioflocProgramFormValues
   >;
 }
 
@@ -193,7 +193,10 @@ export default function ThematicDocumentationsFormSection({
                     </div>
                   )}
                   <FieldError>
-                    {errors.documentations?.[index]?.image_before_paths?.message}
+                    {
+                      errors.documentations?.[index]?.image_before_paths
+                        ?.message
+                    }
                   </FieldError>
                 </Field>
 
@@ -245,7 +248,9 @@ export default function ThematicDocumentationsFormSection({
         type="button"
         variant="outline"
         className="hover:bg-muted w-full border-dashed py-6"
-        onClick={() => append({ image_before_paths: [], image_after_paths: [] })}
+        onClick={() =>
+          append({ image_before_paths: [], image_after_paths: [] })
+        }
         disabled={fields.length >= 5}
       >
         <Plus className="mr-2 size-4" /> Tambah Dokumentasi
