@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { upsertBioflocProgramQuota2026 } from "../actions/program-quotas";
+import { upsertBioflocProgramQuota } from "../actions/program-quotas";
 import { getBioflocProgramQuotasQueryKey } from "./getBioflocProgramQuotas";
 
 type UpdateQuotaPayload = {
@@ -12,7 +12,7 @@ export const useUpdateBioflocProgramQuota = () => {
 
   return useMutation({
     mutationFn: (payload: UpdateQuotaPayload) =>
-      upsertBioflocProgramQuota2026(payload),
+      upsertBioflocProgramQuota(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: getBioflocProgramQuotasQueryKey(),

@@ -1,83 +1,41 @@
 "use client";
 
 import Datatable from "@/components/datatable/datatable";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ProposalSubmissionTableColumns } from "./ProposalSubmissionTableColumns";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import ProvinceSelect from "@/components/shared/ProvinceSelect";
+import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
+import { Input } from "@/components/ui/input";
+import { PaginationState } from "@tanstack/react-table";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
-const ALL_PROVINCES_VALUE = "ALL";
+type ProposalSubmissionTableProps = {
+  enabled?: boolean;
+};
 
-const PROPOSAL_PROVINCES = ["Jawa Barat", "Jawa Tengah", "Jawa Timur"];
-
-const DUMMY_SUBMISSIONS = [
-  {
-    id: 1,
-    kdmp_name: "KDMP Maju Jaya",
-    province: "Jawa Barat",
-    regency: "Bekasi",
-    district: "Cikarang",
-    village: "Sukatani",
-    status: "Pending",
-  },
-  {
-    id: 2,
-    kdmp_name: "KDMP Mina Mandiri",
-    province: "Jawa Tengah",
-    regency: "Demak",
-    district: "Sayung",
-    village: "Bedono",
-    status: "Diverifikasi",
-  },
-  {
-    id: 3,
-    kdmp_name: "KDMP Tani Nelayan",
-    province: "Jawa Timur",
-    regency: "Gresik",
-    district: "Manyar",
-    village: "Lerep",
-    status: "Divalidasi",
-  },
-];
-
-type ProposalSubmission = (typeof DUMMY_SUBMISSIONS)[number];
-
-async function fetchProposalSubmissions(): Promise<ProposalSubmission[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(DUMMY_SUBMISSIONS), 300);
+export default function ProposalSubmissionTable({
+  enabled = true,
+}: ProposalSubmissionTableProps) {
+  const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   });
-}
 
-export default function ProposalSubmissionTable() {
-  const [selectedProvince, setSelectedProvince] =
-    useState<string>(ALL_PROVINCES_VALUE);
-  const [submissions, setSubmissions] = useState<ProposalSubmission[]>([]);
-  const [isPending, setIsPending] = useState(true);
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
+
+  const { data, isPending } = useGetProposalBioflocPaginated(
+    {
+      page: pagination.pageIndex + 1, // TanStack table is 0-indexed, our API is 1-indexed
+      pageSize: pagination.pageSize,
+      province: selectedProvince,
+      search: debouncedSearchQuery,
+    },
+    enabled,
+  );
+
   const columns = useMemo(() => ProposalSubmissionTableColumns(), []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const load = async () => {
-      setIsPending(true);
-      const data = await fetchProposalSubmissions();
-      if (!isMounted) return;
-      setSubmissions(data);
-      setIsPending(false);
-    };
-
-    load();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const filteredData = useMemo(() => {
-    if (selectedProvince === ALL_PROVINCES_VALUE) return submissions;
-    return submissions.filter((item) => item.province === selectedProvince);
-  }, [selectedProvince, submissions]);
 
   return (
     <div className="space-y-4">
@@ -86,25 +44,34 @@ export default function ProposalSubmissionTable() {
       </h2>
       <Datatable
         columns={columns}
-        data={filteredData}
+        data={data?.data ?? []}
         isPending={isPending}
+        manualPagination={true}
+        pageCount={data?.totalPages ?? -1}
+        rowCount={data?.total ?? 0}
+        pagination={pagination}
+        onPaginationChange={setPagination}
         topContent={() => (
-          <div className="flex items-center gap-2">
-            <NativeSelect
+          <>
+            <ProvinceSelect
               value={selectedProvince}
-              onChange={(e) => setSelectedProvince(e.target.value)}
+              onChange={(val) => {
+                setSelectedProvince(val);
+                setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
+              }}
               className="w-[200px]"
-            >
-              <NativeSelectOption value={ALL_PROVINCES_VALUE}>
-                Semua Provinsi
-              </NativeSelectOption>
-              {PROPOSAL_PROVINCES.map((p) => (
-                <NativeSelectOption key={p} value={p}>
-                  {p}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </div>
+            />
+            <div className="ml-auto w-1/4">
+              <Input
+                placeholder="Cari kelompok kdmp..."
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
+                }}
+              />
+            </div>
+          </>
         )}
       />
     </div>

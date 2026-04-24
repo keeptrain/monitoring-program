@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import * as db from "../services/proposal-biofloc-services";
-export type { ProposalBioflocThematicProgram } from "../services/proposal-biofloc-services";
+export type {
+  ProposalBioflocThematicProgram,
+  ProposalBioflocPaginationParams,
+  PaginatedProposalBioflocResult,
+} from "../services/proposal-biofloc-services";
 
 export async function createProposalBioflocThematicProgram(
   payload: ProposalBioflocFormValues,
@@ -19,4 +23,23 @@ export async function createProposalBioflocThematicProgram(
 
 export async function getProposalBioflocThematicPrograms() {
   return db.getProposalBioflocThematicProgramsService();
+}
+
+export async function getProposalBioflocPaginated(
+  params: db.ProposalBioflocPaginationParams,
+) {
+  return db.getProposalBioflocPaginatedService(params);
+}
+
+export async function updateProposalBioflocStatus(
+  id: number,
+  status: "Disetujui" | "Ditolak",
+) {
+  const data = await db.updateProposalStatusService(id, status);
+
+  revalidatePath("/monitoring");
+  revalidatePath("/monitoring/biofloc_thematic/proposal");
+  revalidatePath("/monitoring/biofloc_thematic/bantuan-2025");
+
+  return data;
 }

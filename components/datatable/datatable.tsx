@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { Loader2Icon } from "lucide-react";
 import DataTablePagination from "./data-table-pagination";
+import { PaginationState, Updater } from "@tanstack/react-table";
 
 interface TableOptions {
   defaultPageSize?: number;
@@ -36,6 +37,12 @@ interface DataTableProps<TData, TValue> {
   options?: TableOptions;
   topContent?: (table: TanstackTable<TData>) => React.ReactNode;
   onRowClick?: (row: TData) => void;
+  // Manual server-side pagination support
+  manualPagination?: boolean;
+  pageCount?: number;
+  rowCount?: number;
+  pagination?: PaginationState;
+  onPaginationChange?: (updater: Updater<PaginationState>) => void;
 }
 
 export default function DataTable<TData, TValue>({
@@ -45,6 +52,11 @@ export default function DataTable<TData, TValue>({
   isPending = false,
   onRowClick,
   options: userOptions,
+  manualPagination,
+  pageCount,
+  rowCount,
+  pagination,
+  onPaginationChange,
 }: DataTableProps<TData, TValue>) {
   const options = {
     defaultPageSize: 10,
@@ -56,17 +68,25 @@ export default function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
+  // Local fallback pagination state if controlled is not provided
+  const [localPagination, setLocalPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: options.defaultPageSize,
+  });
+
+  const currentPagination = pagination ?? localPagination;
+  const setPagination = onPaginationChange ?? setLocalPagination;
+
   const table = useReactTable({
     data,
     columns,
-    initialState: {
-      pagination: {
-        pageSize: options.defaultPageSize,
-      },
-    },
+    pageCount,
+    rowCount,
+    manualPagination,
     state: {
       sorting,
       columnFilters,
+      pagination: currentPagination,
     },
     meta: {
       isLoading: isPending,
@@ -74,6 +94,7 @@ export default function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),

@@ -5,46 +5,50 @@ import { useMemo } from "react";
 import getProposalProvinceTableColumns, {
   ProvinceSummary,
 } from "./ProposalProvinceTableColumns";
-import { useInViewOnce } from "@/hooks/useInViewOnce";
-import { useGetBioflocProgramQuotas } from "@/features/monitoring/api/getBioflocProgramQuotas";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const TableOptions = {
   defaultPageSize: 5,
   showRowsText: false,
   showPagination: true,
-};
+} as const;
 
-export default function ProposalProvinceTable() {
-  const { ref: tableRef, isInView } = useInViewOnce<HTMLDivElement>({
-    root: null,
-    rootMargin: "120px 0px",
-    threshold: 0.1,
-  });
-  const { data: quotas = [], isPending } = useGetBioflocProgramQuotas(isInView);
-
+export default function ProposalProvinceTable({
+  data,
+  isPending,
+}: {
+  data: ProvinceSummary[];
+  isPending: boolean;
+}) {
   const columns = useMemo(() => getProposalProvinceTableColumns(), []);
-  const provinceData = useMemo<ProvinceSummary[]>(
-    () =>
-      quotas
-        .filter((item) => item.quota_limit > 0)
-        .map((item) => ({
-          province: item.region_name,
-          // DUMMY sementara sampai schema proposal final.
-          count: 0,
-          quota: item.quota_limit,
-        }))
-        .sort((a, b) => b.quota - a.quota),
-    [quotas],
-  );
+
+  if (isPending) {
+    return <ProposalProvinceTableSkeleton />;
+  }
 
   return (
-    <div ref={tableRef}>
-      <Datatable
-        columns={columns}
-        data={provinceData}
-        isPending={isPending}
-        options={TableOptions}
-      />
+    <Datatable
+      columns={columns}
+      data={data}
+      isPending={false}
+      options={TableOptions}
+    />
+  );
+}
+
+function ProposalProvinceTableSkeleton() {
+  return (
+    <div className="space-y-3 border p-4">
+      <div className="grid grid-cols-3 gap-3">
+        <Skeleton className="h-5 w-full" />
+        <Skeleton className="h-5 w-full" />
+        <Skeleton className="h-5 w-full" />
+      </div>
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-full" />
+      <Skeleton className="h-8 w-full" />
     </div>
   );
 }

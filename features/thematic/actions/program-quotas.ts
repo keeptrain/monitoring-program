@@ -6,10 +6,7 @@ import {
   PROGRAM_QUOTA_YEAR,
   programQuotaUpdateSchema,
 } from "../forms/program-quota-schema";
-import {
-  getProgramQuotasByTypeAndYearService,
-  upsertProgramQuotaByRegionService,
-} from "../services/program-quotas";
+import * as db from "../services/program-quota-services";
 
 export type ProgramQuotaView = {
   id: number | null;
@@ -21,10 +18,12 @@ export type ProgramQuotaView = {
   updated_at: string | null;
 };
 
-export async function getBioflocProgramQuotas2026() {
-  const existing =
-    await getProgramQuotasByTypeAndYearService(PROGRAM_QUOTA_YEAR);
-  const byRegion = new Map(existing.map((row) => [row.region_id, row]));
+export async function getBioflocProgramQuotas(): Promise<{
+  data: ProgramQuotaView[];
+  proposal_total: number;
+}> {
+  const existing = await db.getProgramQuotasByTypeAndYear(PROGRAM_QUOTA_YEAR);
+  const byRegion = new Map(existing.data.map((row) => [row.region_id, row]));
 
   const rows: ProgramQuotaView[] = INDONESIA_PROVINCES.map((province) => {
     const row = byRegion.get(province.region_id);
@@ -39,10 +38,13 @@ export async function getBioflocProgramQuotas2026() {
     };
   });
 
-  return rows;
+  return {
+    data: rows,
+    proposal_total: existing.proposal_total,
+  };
 }
 
-export async function upsertBioflocProgramQuota2026(input: {
+export async function upsertBioflocProgramQuota(input: {
   region_id: string;
   quota_limit: number;
 }) {
@@ -57,7 +59,7 @@ export async function upsertBioflocProgramQuota2026(input: {
     throw new Error("Region tidak valid.");
   }
 
-  const row = await upsertProgramQuotaByRegionService({
+  const row = await db.upsertProgramQuotaByRegion({
     region_id: input.region_id,
     year: PROGRAM_QUOTA_YEAR,
     quota_limit: parsed.quota_limit,
