@@ -162,7 +162,7 @@ export function Header({
     : "Select Dashboard";
 
   return (
-    <div className="sticky top-14 z-40 border-b border-zinc-200 bg-white px-6 py-2">
+    <div className="bg-backdrop-blur-sm sticky top-14 z-40 border-b border-zinc-200 bg-white/80 px-6 py-2">
       <div className="mx-auto flex items-center justify-between">
         <div>
           <h2 className="text-xs font-semibold text-zinc-400 uppercase">
