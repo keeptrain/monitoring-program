@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Providers from "@/app/providers";
+import { Toaster } from "sonner";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -36,6 +37,7 @@ export default function RootLayout({
     >
       <body className="bg-background text-foreground min-h-full">
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );
