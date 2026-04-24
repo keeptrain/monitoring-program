@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -162,7 +162,11 @@ export default function ProposalBioflocForm() {
         </CardContent>
       </Card>
 
-      <Button type="submit" className="w-full" disabled={isPending || isUploading}>
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isPending || isUploading}
+      >
         {(isPending || isUploading) && (
           <Loader2 className="mr-2 size-4 animate-spin" />
         )}
