@@ -33,7 +33,7 @@ export default function BioflocDetailSheet({
 
       <SheetFooter>
         <Button className="w-full" asChild>
-          <Link href={`/monitoring/biofloc_thematic/${data.id}`}>
+          <Link href={`/monitoring/biofloc-thematic/${data.id}`}>
             Data Detail
             <ArrowRightIcon />
           </Link>

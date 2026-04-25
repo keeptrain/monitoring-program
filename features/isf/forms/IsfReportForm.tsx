@@ -96,7 +96,7 @@ export default function IsfReportForm({
                 mode="create"
                 form={form}
                 externalErrorMessage={documentationError}
-                storageBasePath="isf"
+                storageBasePath="documentations/isf"
               />
             </CardContent>
           </Card>

@@ -65,7 +65,7 @@ export default function ManageDocumentationsSheet({
             form={form}
             mode="edit"
             maxGroups={5}
-            storageBasePath={`documentations/${programType}/${programId}`}
+            storageBasePath={`documentations/${programType === "biofloc_thematic" ? "biofloc-thematic" : programType}/${programId}`}
           />
         )}
       </div>

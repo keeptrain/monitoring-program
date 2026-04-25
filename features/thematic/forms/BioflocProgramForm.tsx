@@ -83,7 +83,7 @@ export default function BioflocProgramForm({
               <DocumentationsFormSection
                 mode="create"
                 form={form}
-                storageBasePath="thematic"
+                storageBasePath="documentations/biofloc-thematic"
               />
             </CardContent>
           </Card>
