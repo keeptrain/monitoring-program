@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import * as db from "../services/proposal-biofloc-services";
+import { ProposalBioflocStatus } from "../types/thematic";
 export type {
   ProposalBioflocThematicProgram,
   ProposalBioflocPaginationParams,
@@ -33,7 +34,7 @@ export async function getProposalBioflocPaginated(
 
 export async function updateProposalBioflocStatus(
   id: number,
-  status: "Disetujui" | "Ditolak",
+  status: ProposalBioflocStatus,
 ) {
   const data = await db.updateProposalStatusService(id, status);
 

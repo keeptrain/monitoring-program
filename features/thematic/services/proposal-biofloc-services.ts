@@ -2,10 +2,11 @@ import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { ProposalBioflocStatus } from "../types/thematic";
 
 export type ProposalBioflocThematicProgram = {
   id: number;
-  status: string;
+  status: ProposalBioflocStatus;
   name: string;
   province: string;
   regency: string;
@@ -49,7 +50,7 @@ export async function createAvailableLocationForBioflocProposalService(
   supabase: SupabaseClient,
   payload: ProposalBioflocFormValues,
 ) {
-  const { data: location, error } = await supabase
+  const { data: locationId, error } = await supabase
     .from(TABLES.AVAILABLE_LOCATIONS)
     .insert({
       type: "biofloc_thematic",
@@ -64,7 +65,7 @@ export async function createAvailableLocationForBioflocProposalService(
     throw new Error(`Gagal menyimpan lokasi: ${error.message}`);
   }
 
-  return location;
+  return locationId;
 }
 
 export async function createProposalBioflocThematicProgramService(
@@ -76,26 +77,24 @@ export async function createProposalBioflocThematicProgramService(
     payload,
   );
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
     .insert({
+      location_id: locationId.id,
+      status: "pending",
       name: payload.name,
       province: payload.province,
       regency: payload.regency,
       district: payload.district,
       village: payload.village,
-      location_id: locationId.id,
       proposal_path: payload.proposal_path,
-      status: "Pending",
-    })
-    .select("*")
-    .single();
+    });
 
   if (error) {
     throw new Error(`Gagal menyimpan proposal: ${error.message}`);
   }
 
-  return data as ProposalBioflocThematicProgram;
+  return { message: "Proposal berhasil diajukan." };
 }
 
 /**
@@ -117,7 +116,7 @@ export async function getProposalBioflocPaginatedService(
 
   // Optimized search: use the name_search (lowercase) generated column
   if (search && search.trim().length > 0) {
-    query = query.ilike("name_search", `%${search.trim().toLowerCase()}%`);
+    query = query.like("name_search", `%${search.trim().toLowerCase()}%`);
   }
 
   // Province filter
@@ -199,7 +198,7 @@ export async function getProposalBioflocProvinceSummary(
 /** Update proposal status (admin action) */
 export async function updateProposalStatusService(
   id: number,
-  status: "Disetujui" | "Ditolak",
+  status: ProposalBioflocStatus,
 ) {
   const supabase = await createClient();
 

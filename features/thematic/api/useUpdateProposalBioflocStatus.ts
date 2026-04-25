@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateProposalBioflocStatus } from "@/features/thematic/actions/proposal-biofloc";
+import { ProposalBioflocStatus } from "../types/thematic";
 
 export const useUpdateProposalBioflocStatus = () => {
   const queryClient = useQueryClient();
@@ -10,10 +11,9 @@ export const useUpdateProposalBioflocStatus = () => {
       status,
     }: {
       id: number;
-      status: "Disetujui" | "Ditolak";
+      status: ProposalBioflocStatus;
     }) => updateProposalBioflocStatus(id, status),
     onSuccess: () => {
-      // Invalidate relevant queries so the table refreshes
       queryClient.invalidateQueries({ queryKey: ["proposal-biofloc"] });
     },
   });

@@ -1,3 +1,5 @@
+export type ProposalBioflocStatus = "pending" | "approved" | "rejected";
+
 export interface ThematicPrograms {
   id: number;
   location_id: number;

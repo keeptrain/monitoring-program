@@ -4,6 +4,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Check, X, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
+
+const STATUS_CONFIG: Record<
+  ProposalBioflocStatus,
+  {
+    variant: "default" | "secondary" | "destructive" | "outline";
+    label: string;
+  }
+> = {
+  pending: { variant: "secondary", label: "Menunggu" },
+  approved: { variant: "default", label: "Disetujui" },
+  rejected: { variant: "destructive", label: "Ditolak" },
+};
+
+const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
+  const config = STATUS_CONFIG[status];
+  return <Badge variant={config.variant}>{config.label}</Badge>;
+};
 
 export const ProposalSubmissionTableColumns =
   (): ColumnDef<ProposalBioflocThematicProgram>[] => [
@@ -37,61 +55,19 @@ export const ProposalSubmissionTableColumns =
     {
       header: "Status Proposal",
       accessorKey: "status",
-      cell: ({ row }) => {
-        const status = row.original.status;
-        let variant: "default" | "secondary" | "destructive" | "outline" =
-          "outline";
-        if (status === "Disetujui") variant = "default";
-        if (status === "Ditolak") variant = "destructive";
-        if (status === "Pending") variant = "secondary";
-
-        return <Badge variant={variant}>{status}</Badge>;
-      },
+      cell: ({ row: { original } }) => <StatusBadge status={original.status} />,
     },
   ];
 
 // Admin Actions component extracted to handle loading states
 function AdminActions({
   row,
-  onApprove,
-  onReject,
+  onAction,
 }: {
   row: ProposalBioflocThematicProgram;
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
+  onAction: (id: number, status: ProposalBioflocStatus) => void;
 }) {
   const [isDownloading, setIsDownloading] = useState(false);
-
-  // const handleDownload = async () => {
-  //   try {
-  //     setIsDownloading(true);
-  //     const supabase = await createClient();
-  //     const { data, error } = await supabase.storage
-  //       .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET as string)
-  //       .download(row.proposal_path);
-
-  //     if (error) {
-  //       throw error;
-  //     }
-
-  //     // Create a download link
-  //     const url = window.URL.createObjectURL(data);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     // Extract filename from path
-  //     const filename = row.proposal_path.split("/").pop() || "proposal.pdf";
-  //     a.download = filename;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     window.URL.revokeObjectURL(url);
-  //     document.body.removeChild(a);
-  //   } catch (error) {
-  //     console.error("Error downloading file:", error);
-  //     toast.error("Gagal mendownload proposal");
-  //   } finally {
-  //     setIsDownloading(false);
-  //   }
-  // };
 
   return (
     <div className="flex items-center gap-2">
@@ -108,12 +84,12 @@ function AdminActions({
           <Download className="size-4 text-zinc-600" />
         )}
       </Button>
-      {row.status === "Pending" && (
+      {row.status === "pending" && (
         <>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onApprove(row.id)}
+            onClick={() => onAction(row.id, "approved")}
             className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
             title="Setujui"
           >
@@ -122,7 +98,7 @@ function AdminActions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onReject(row.id)}
+            onClick={() => onAction(row.id, "rejected")}
             className="text-red-600 hover:bg-red-50 hover:text-red-700"
             title="Tolak"
           >
@@ -135,19 +111,12 @@ function AdminActions({
 }
 
 export const ProposalAdminTableColumns = (
-  onApprove: (id: number) => void,
-  onReject: (id: number) => void,
+  onAction: (id: number, status: ProposalBioflocStatus) => void,
 ): ColumnDef<ProposalBioflocThematicProgram>[] => [
   ...ProposalSubmissionTableColumns(),
   {
     header: "Aksi",
     id: "actions",
-    cell: ({ row }) => (
-      <AdminActions
-        row={row.original}
-        onApprove={onApprove}
-        onReject={onReject}
-      />
-    ),
+    cell: ({ row }) => <AdminActions row={row.original} onAction={onAction} />,
   },
 ];
