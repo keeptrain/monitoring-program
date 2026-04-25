@@ -1,55 +1,25 @@
 "use client";
 
-import { CameraIcon, MapPin } from "lucide-react";
 import { ProgressPieChartZoneIsf } from "../components/isf-detail/ProgressPieChartZoneIsf";
+import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
 
 export default function BioflocDetailPage({ data }: { data: any }) {
-  // Dummy data
-  const dummyData = {
-    kdmp_name: "POKDAKAN MINA JAYA",
-    address:
-      "Kelurahan Sukamaju, Desa Maju Terus, Kabupaten Sumba Timur, Provinsi NTT",
-    komoditas_bantuan: "Ikan Nila",
-    komoditas_potensi: "Ikan Lele",
-    jumlah_pengurus: 5,
-    jumlah_anggota: 15,
-    volume_produksi: "1.200 Kg",
-    nilai_produksi: "Rp 36.000.000",
-    progress: 85,
-    siklus: {
-      padat_tebar: "100 ekor/m3",
-      jumlah_tebar: "10.000 ekor",
-      jumlah_panen: "8.500 ekor",
-    },
-  };
-
+  const { data: bioflocData } = data;
   return (
     <div className="animate-in fade-in space-y-12 duration-700">
-      {/* 1. Header Section - Clean & Minimalist */}
-      <div className="border-primary border-l-4 py-2 pl-6">
-        <h1 className="text-xl font-semibold">{dummyData.kdmp_name}</h1>
-        <div className="text-muted-foreground mt-1 flex items-center gap-2 text-sm font-medium">
-          <MapPin className="size-4" />
-          <p>{dummyData.address}</p>
-        </div>
-      </div>
-
       {/* 2. Top Content: Stats Grid & Chart */}
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
         {/* Left Side: Stats Grid */}
         <div className="grid grid-cols-2 gap-4 lg:col-span-2 lg:gap-6">
+          <StatsBox title="Komoditas Bantuan" value={bioflocData.commodity} />
+          <StatsBox title="Komoditas Potensi" value={"-"} />
+          <StatsBox title="Jumlah Pengurus" value={bioflocData.total_admin} />
+          <StatsBox title="Jumlah Anggota" value={"-"} />
+          <StatsBox title="Volume Produksi" value={bioflocData.production} />
           <StatsBox
-            title="Komoditas Bantuan"
-            value={dummyData.komoditas_bantuan}
+            title="Nilai Produksi"
+            value={bioflocData.distribution_amount}
           />
-          <StatsBox
-            title="Komoditas Potensi"
-            value={dummyData.komoditas_potensi}
-          />
-          <StatsBox title="Jumlah Pengurus" value={dummyData.jumlah_pengurus} />
-          <StatsBox title="Jumlah Anggota" value={dummyData.jumlah_anggota} />
-          <StatsBox title="Volume Produksi" value={dummyData.volume_produksi} />
-          <StatsBox title="Nilai Produksi" value={dummyData.nilai_produksi} />
         </div>
 
         {/* Right Side: Progress Chart Section */}
@@ -61,7 +31,7 @@ export default function BioflocDetailPage({ data }: { data: any }) {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="size-44 rounded-full border border-zinc-100 bg-white" />
             </div>
-            <ProgressPieChartZoneIsf progress={dummyData.progress} />
+            <ProgressPieChartZoneIsf progress={bioflocData.progress_percent} />
           </div>
         </div>
       </div>
@@ -77,31 +47,16 @@ export default function BioflocDetailPage({ data }: { data: any }) {
             </p>
           </div>
           <div className="space-y-4 p-6">
-            <CycleItem
-              label="Padat Tebar"
-              value={dummyData.siklus.padat_tebar}
-            />
-            <CycleItem
-              label="Jumlah Tebar"
-              value={dummyData.siklus.jumlah_tebar}
-            />
-            <CycleItem
-              label="Jumlah Panen"
-              value={dummyData.siklus.jumlah_panen}
-            />
+            <CycleItem label="Padat Tebar" value={"-"} />
+            <CycleItem label="Jumlah Tebar" value={"-"} />
+            <CycleItem label="Jumlah Panen" value={"-"} />
           </div>
         </div>
       </div>
-      <div className="lg:col-span-2">
-        <div className="mb-2 flex items-center gap-2">
-          <CameraIcon className="size-4" />
-          <p className="text-base font-semibold text-zinc-400">Dokumentasi</p>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          <DocumentationBox label="Foto Sebelum" />
-          <DocumentationBox label="Foto Sesudah" />
-        </div>
-      </div>
+      <DocumentationCarouselGallery
+        type="biofloc_thematic"
+        id={bioflocData.id}
+      />
     </div>
   );
 }
@@ -124,17 +79,6 @@ function CycleItem({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span className="text-sm font-semibold uppercase">{value}</span>
-    </div>
-  );
-}
-
-function DocumentationBox({ label }: { label: string }) {
-  return (
-    <div className="group relative flex aspect-video flex-col items-center justify-center overflow-hidden border-2 border-dashed border-zinc-100 bg-zinc-50/50 transition-all hover:bg-zinc-100/50">
-      <div className="absolute inset-0 bg-linear-to-t from-zinc-900/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-      <span className="relative z-10 text-[10px] font-black tracking-widest text-zinc-400 uppercase italic">
-        {label}
-      </span>
     </div>
   );
 }
