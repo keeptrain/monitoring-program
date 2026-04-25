@@ -7,15 +7,10 @@ import { createLocationFromProgram } from "@/features/dashboard/actions/availabl
 import * as db from "../services/biofloc-services";
 import { createClient } from "@/utils/supabase";
 import { UpdateProgressFormValues } from "../forms/update-progress-schema";
-import { BioflocScope } from "../types/thematic";
 import {
   BioflocProgramsPaginatedInput,
   bioflocProgramsPaginatedSchema,
 } from "../forms/biofloc-program-query-schema";
-
-export async function getThematicPrograms(type: BioflocScope) {
-  return db.getBioflocThematicProgramsService(type);
-}
 
 export async function getBioflocProgramsPaginated(
   input: BioflocProgramsPaginatedInput,
