@@ -5,44 +5,32 @@ import { ArrowDownIcon, UploadIcon } from "lucide-react";
 import ProposalProvinceTable from "./ProposalProvinceTable";
 import ProposalSubmissionTable from "./ProposalSubmissionTable";
 import Link from "next/link";
-import { useMemo } from "react";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { useGetBioflocProgramQuotas } from "@/features/monitoring/api/getBioflocProgramQuotas";
 
 const IN_VIEW_OPTIONS = {
   root: null,
   rootMargin: "120px 0px",
-  threshold: 0.1,
+  threshold: 0.5,
 } as const;
 
-export default function BioflocProposalSection() {
+export default function PublicBioflocProposalSection() {
   const { ref: provinceTableRef, isInView: isProvinceTableInView } =
     useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
+
   const { ref: submissionTableRef, isInView: isSubmissionTableInView } =
     useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
+
   const { data: quotaResponse, isPending } = useGetBioflocProgramQuotas(
     isProvinceTableInView,
   );
-  const proposalTotal = quotaResponse?.proposal_total ?? 0;
 
-  const provinceData = useMemo(
-    () =>
-      (quotaResponse?.data ?? [])
-        .filter((item) => item.quota_limit > 0)
-        .map((item) => ({
-          province: item.region_name,
-          // DUMMY sementara sampai schema proposal per provinsi final.
-          count: proposalTotal,
-          quota: item.quota_limit,
-        }))
-        .sort((a, b) => b.quota - a.quota),
-    [proposalTotal, quotaResponse?.data],
-  );
+  const proposalTotal = quotaResponse?.proposal_total ?? 0;
 
   return (
     <section className="space-y-8">
       {/* 1. Upload Banner */}
-      <Button className="h-10 w-full text-base font-bold uppercase" asChild>
+      <Button className="h-10 w-full text-base" asChild>
         <Link href="/monitoring/biofloc/proposal">
           <UploadIcon />
           Upload Pengajuan Proposal Bioflok Tematik 2026
@@ -76,8 +64,11 @@ export default function BioflocProposalSection() {
         </div>
 
         {/* Small Provincial Summary Table */}
-        <div className="lg:col-span-4" ref={provinceTableRef}>
-          <ProposalProvinceTable data={provinceData} isPending={isPending} />
+        <div ref={provinceTableRef} className="lg:col-span-4">
+          <ProposalProvinceTable
+            data={quotaResponse?.data ?? []}
+            isPending={isPending}
+          />
         </div>
       </div>
 

@@ -38,10 +38,7 @@ export default function ProposalSubmissionTable({
   const columns = useMemo(() => ProposalSubmissionTableColumns(), []);
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">
-        Data Antrian Pengajuan Proposal Tahun 2026
-      </h2>
+    <>
       <Datatable
         columns={columns}
         data={data?.data ?? []}
@@ -74,6 +71,6 @@ export default function ProposalSubmissionTable({
           </>
         )}
       />
-    </div>
+    </>
   );
 }

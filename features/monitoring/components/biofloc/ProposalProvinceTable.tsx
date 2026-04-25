@@ -3,7 +3,7 @@
 import Datatable from "@/components/datatable/datatable";
 import { useMemo } from "react";
 import getProposalProvinceTableColumns, {
-  ProvinceSummary,
+  ProposalProvinceRow,
 } from "./ProposalProvinceTableColumns";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -17,7 +17,7 @@ export default function ProposalProvinceTable({
   data,
   isPending,
 }: {
-  data: ProvinceSummary[];
+  data: ProposalProvinceRow[];
   isPending: boolean;
 }) {
   const columns = useMemo(() => getProposalProvinceTableColumns(), []);

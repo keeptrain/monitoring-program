@@ -16,12 +16,19 @@ import { ProgressPercentage } from "./components/ProgressPercentage";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { LocationType } from "../dashboard/actions/available-locations";
-import { iconIsf, iconThematic } from "./components/MapPinIcon";
+import { MapPin, iconIsf, iconThematic } from "./components/MapPinIcon";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
 import BioflocDetailSheet from "./components/biofloc-detail/BioflocDetailSheet";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
 import { MonitoringDetailTypeMap } from "./types/monitoring-types";
 import Link from "next/link";
+import { useGetPublicLocationsByType } from "./api/getPublicLocationsByType";
+
+const INDONESIA_CENTER: [number, number] = [-1.2, 118] as const;
+const INDONESIA_BOUNDS: [[number, number], [number, number]] = [
+  [-11.5, 94.5],
+  [6.5, 141.5],
+] as const;
 
 const SHEET_CONTENTS: {
   [K in Exclude<LocationType, "isf">]: React.ComponentType<{
@@ -33,14 +40,6 @@ const SHEET_CONTENTS: {
   revitalization: BioflocDetailSheet,
 };
 
-const INDONESIA_CENTER: [number, number] = [-1.2, 118];
-const INDONESIA_BOUNDS: [[number, number], [number, number]] = [
-  [-11.5, 94.5],
-  [6.5, 141.5],
-];
-
-import { useGetPublicLocationsByType } from "./api/getPublicLocationsByType";
-
 export type PublicMonitoringMapProps = {
   type: Exclude<LocationType, "isf">;
 };
@@ -48,13 +47,11 @@ export type PublicMonitoringMapProps = {
 export default function PublicMonitoringMap({
   type,
 }: PublicMonitoringMapProps) {
-  const { data: locations = [] } = useGetPublicLocationsByType(type);
-  const [openSheet, setOpenSheet] = useState<boolean>(false);
-
-  const selectedIcon = type === "biofloc_thematic" ? iconThematic : iconIsf;
   const [selectedLocation, setSelectedLocation] =
     useState<PublicAvailableLocation | null>(null);
+  const [openSheet, setOpenSheet] = useState<boolean>(false);
 
+  const { data: locations = [] } = useGetPublicLocationsByType(type);
   const { data: detailData, isLoading } = useGetPublicLocationByTypeAndId(
     type,
     selectedLocation?.id ?? 0,
@@ -69,14 +66,18 @@ export default function PublicMonitoringMap({
     data: unknown;
   }>;
 
+  const selectedIcon = type === "biofloc_thematic" ? iconThematic : iconIsf;
+
   return (
     <>
-      {type === "biofloc_thematic" && <MapTopContent />}
+      {type === "biofloc_thematic" && (
+        <MapTopContent kdmpCount={locations.length} />
+      )}
       <MapContainer
         center={INDONESIA_CENTER}
+        maxBounds={INDONESIA_BOUNDS}
         zoom={5}
         minZoom={3}
-        maxBounds={INDONESIA_BOUNDS}
         maxBoundsViscosity={1}
         scrollWheelZoom={true}
         className="absolute inset-0 z-0 h-full w-full"
@@ -96,22 +97,10 @@ export default function PublicMonitoringMap({
               ]}
             >
               <Popup>
-                <div className="w-40 space-y-2 sm:w-64">
-                  <h3 className="text-sm">
-                    {location.location_name} <br />
-                    <span className="text-muted-foreground">
-                      {location.program_name}
-                    </span>
-                  </h3>
-                  <ProgressPercentage value={location.progress_percent} />
-                  <Button
-                    onClick={() => handleDetailClick(location)}
-                    variant="outline"
-                  >
-                    Detail
-                    <ArrowRightIcon />
-                  </Button>
-                </div>
+                <MapPopUpContent
+                  location={location}
+                  onDetailClick={handleDetailClick}
+                />
               </Popup>
             </Marker>
           );
@@ -149,44 +138,40 @@ export default function PublicMonitoringMap({
   );
 }
 
-function MapTopContent() {
+function MapTopContent({ kdmpCount }: { kdmpCount: number }) {
   return (
     <>
-      <div className="absolute top-3 left-15 z-5 flex items-center gap-4 rounded-sm border border-zinc-200 bg-white/95 backdrop-blur-md">
-        <div className="flex items-center gap-4 px-2">
-          <div className="flex items-center gap-3">
-            <div className="relative flex size-10 items-center justify-center">
-              <div className="absolute size-8 rotate-45 rounded-full rounded-bl-none border bg-emerald-600 shadow-sm" />
-              <div className="relative z-10 flex size-6 items-center justify-center rounded-full bg-white">
-                <Grid3x3Icon className="size-4 text-emerald-700" />
-              </div>
-            </div>
+      <div className="absolute top-3 left-15 z-1 border border-zinc-300 bg-white shadow-xs">
+        <div className="flex items-center gap-2 px-3 py-1">
+          <div className="flex items-center gap-1">
+            <MapPin
+              bgColor="bg-emerald-600"
+              icon={Grid3x3Icon}
+              iconColor="text-emerald-700"
+              className="pb-1"
+            />
             <div className="flex flex-col gap-1">
               <span className="text-[9px] leading-none font-bold tracking-widest text-zinc-400 uppercase">
                 KDMP
               </span>
-              <span className="text-sm leading-none font-black text-zinc-800">
-                100
+              <span className="text-sm leading-none font-semibold">
+                {kdmpCount}
               </span>
             </div>
           </div>
 
-          <div className="h-8 w-px bg-zinc-100" />
-
-          <div className="flex items-center gap-3">
-            <div className="relative flex size-10 items-center justify-center">
-              <div className="absolute size-8 rotate-45 rounded-full rounded-bl-none border bg-red-600 shadow-sm" />
-              <div className="relative z-10 flex size-6 items-center justify-center rounded-full bg-white">
-                <AlertCircleIcon className="size-4 text-red-700" />
-              </div>
-            </div>
+          <div className="flex items-center gap-1">
+            <MapPin
+              bgColor="bg-red-600"
+              icon={AlertCircleIcon}
+              iconColor="text-red-700"
+              className="pb-1"
+            />
             <div className="flex flex-col gap-1">
               <span className="text-[9px] leading-none font-bold tracking-widest text-zinc-400 uppercase">
-                Potensial
+                Potensi
               </span>
-              <span className="text-sm leading-none font-black text-zinc-800">
-                10.000
-              </span>
+              <span className="text-sm leading-none font-semibold">10.000</span>
             </div>
           </div>
         </div>
@@ -199,5 +184,27 @@ function MapTopContent() {
         </Button>
       </div>
     </>
+  );
+}
+
+function MapPopUpContent({
+  location,
+  onDetailClick,
+}: {
+  location: PublicAvailableLocation;
+  onDetailClick: (location: PublicAvailableLocation) => void;
+}) {
+  return (
+    <div className="w-40 space-y-2 sm:w-64">
+      <h3 className="text-sm">
+        {location.location_name} <br />
+        <span className="text-muted-foreground">{location.program_name}</span>
+      </h3>
+      <ProgressPercentage value={location.progress_percent} />
+      <Button onClick={() => onDetailClick(location)} variant="outline">
+        Detail
+        <ArrowRightIcon />
+      </Button>
+    </div>
   );
 }

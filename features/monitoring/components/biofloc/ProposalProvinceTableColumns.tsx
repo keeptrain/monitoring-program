@@ -1,35 +1,35 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-export interface ProvinceSummary {
-  province: string;
-  count: number;
-  quota: number;
-}
+export type ProposalProvinceRow = {
+  region_name: string;
+  proposal_count: number;
+  quota_limit: number;
+};
 
-export default function getProposalProvinceTableColumns(): ColumnDef<ProvinceSummary>[] {
+export default function getProposalProvinceTableColumns(): ColumnDef<ProposalProvinceRow>[] {
   return [
     {
       header: "Provinsi",
-      accessorKey: "province",
+      accessorKey: "region_name",
       cell: ({ row }) => (
-        <span className="font-semibold">{row.original.province}</span>
+        <span className="font-semibold">{row.original.region_name}</span>
       ),
     },
     {
       header: "Jumlah Proposal",
-      accessorKey: "count",
+      accessorKey: "proposal_count",
       cell: ({ row }) => (
         <div className="text-primary font-bold tabular-nums">
-          {row.original.count}
+          {row.original.proposal_count}
         </div>
       ),
     },
     {
       header: "Kuota",
-      accessorKey: "quota",
+      accessorKey: "quota_limit",
       cell: ({ row }) => (
         <div className="text-muted-foreground font-bold tabular-nums">
-          {row.original.quota}
+          {row.original.quota_limit}
         </div>
       ),
     },

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
@@ -39,8 +39,8 @@ const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
   loading: () => <LoadingLazyMap />,
 });
 
-const LazyBioflocProposalSection = dynamic(
-  () => import("./components/biofloc/BioflocProposalSection"),
+const LazyPublicBioflocProposalSection = dynamic(
+  () => import("./components/biofloc/PublicBioflocProposalSection"),
   {
     ssr: false,
     loading: () => <LoadingLazyMap />,
@@ -77,34 +77,6 @@ export default function PublicMonitoringPage() {
   const [activeTab, setActiveTab] = useState<LocationType | null>(
     "biofloc_thematic",
   );
-  const [shouldLoadBioflocTable, setShouldLoadBioflocTable] = useState(false);
-  const bioflocTableRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (activeTab !== "biofloc_thematic" || shouldLoadBioflocTable) {
-      return;
-    }
-
-    const target = bioflocTableRef.current;
-    if (!target) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShouldLoadBioflocTable(true);
-          observer.disconnect();
-        }
-      },
-      {
-        root: null,
-        rootMargin: "200px 0px",
-        threshold: 0.1,
-      },
-    );
-
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, [activeTab, shouldLoadBioflocTable]);
 
   return (
     <>
@@ -134,18 +106,11 @@ export default function PublicMonitoringPage() {
 
           {/* Table Container - Bottom Section */}
           {activeTab === "biofloc_thematic" && (
-            <div ref={bioflocTableRef}>
-              {shouldLoadBioflocTable ? (
-                <LazyBioflocProposalSection />
-              ) : (
-                <div className="h-24 border border-zinc-200 bg-zinc-50/40" />
-              )}
-            </div>
+            <LazyPublicBioflocProposalSection />
           )}
         </div>
-
-        <BottomToolbarMap />
       </div>
+      <ScrollToTopButton />
     </>
   );
 }
@@ -215,12 +180,11 @@ export function Header({
   );
 }
 
-function BottomToolbarMap() {
+function ScrollToTopButton() {
   const handleScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   return (
     <div className="fixed right-8 bottom-8 z-50">
       <Button

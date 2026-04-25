@@ -20,7 +20,7 @@ const pinIcon = L.divIcon({
   html: renderToStaticMarkup(
     <div className="relative flex size-10 items-center justify-center">
       <div className="absolute size-7 rotate-45 rounded-full rounded-br-none border-2 bg-red-600 shadow-sm" />
-      <div className="relative z-10 mb-1 flex size-5 items-center justify-center rounded-full bg-white shadow-sm">
+      <div className="relative z-10 flex size-5 items-center justify-center rounded-full bg-white shadow-sm">
         <MapPinIcon className="size-3 text-red-700" />
       </div>
     </div>,
