@@ -1,4 +1,4 @@
-import { Grid3x3Icon, LucideIcon, WavesIcon } from "lucide-react";
+import { FishIcon, LucideIcon, WavesIcon } from "lucide-react";
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export const MapPin = ({
         bgColor,
       )}
     />
-    <div className="relative z-10 mb-0.5 flex size-5 items-center justify-center rounded-full bg-white shadow-sm">
+    <div className="relative z-10 mb-0.5 flex size-4 items-center justify-center rounded-full bg-white shadow-sm">
       <Icon className={cn("size-3", iconColor)} />
     </div>
   </div>
@@ -35,7 +35,7 @@ export const MapPin = ({
 export const ThematicPin = (props: { className?: string }) => (
   <MapPin
     bgColor="bg-emerald-600"
-    icon={Grid3x3Icon}
+    icon={FishIcon}
     iconColor="text-emerald-700"
     {...props}
   />

@@ -9,14 +9,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { AlertCircleIcon, ArrowRightIcon, Grid3x3Icon } from "lucide-react";
+import { AlertCircleIcon, ArrowRightIcon, FishIcon } from "lucide-react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import type { PublicAvailableLocation } from "../dashboard/actions/public-available-locations";
 import { ProgressPercentage } from "./components/ProgressPercentage";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { LocationType } from "../dashboard/actions/available-locations";
-import { MapPin, iconIsf, iconThematic } from "./components/MapPinIcon";
+import { MapPin, iconThematic } from "./components/MapPinIcon";
 import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
 import BioflocDetailSheet from "./components/biofloc-detail/BioflocDetailSheet";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
@@ -66,8 +66,6 @@ export default function PublicMonitoringMap({
     data: unknown;
   }>;
 
-  const selectedIcon = type === "biofloc_thematic" ? iconThematic : iconIsf;
-
   return (
     <>
       {type === "biofloc_thematic" && (
@@ -90,7 +88,7 @@ export default function PublicMonitoringMap({
           return (
             <Marker
               key={location.id}
-              icon={selectedIcon}
+              icon={iconThematic}
               position={[
                 location.position.latitude,
                 location.position.longitude,
@@ -146,7 +144,7 @@ function MapTopContent({ kdmpCount }: { kdmpCount: number }) {
           <div className="flex items-center gap-1">
             <MapPin
               bgColor="bg-emerald-600"
-              icon={Grid3x3Icon}
+              icon={FishIcon}
               iconColor="text-emerald-700"
               className="pb-1"
             />
