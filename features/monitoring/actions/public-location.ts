@@ -49,7 +49,9 @@ export async function getPublicBiofloc(id: number): Promise<any> {
     throw error;
   }
 
-  return data || "";
+  return {
+    data: data[0] || null,
+  };
 }
 
 export async function getPublicMonitoringIsf(): Promise<PublicMonitoringIsf> {

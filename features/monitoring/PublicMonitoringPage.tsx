@@ -52,7 +52,7 @@ const FILTER_STATE: Record<
   { label: string; sub: string; icon: LucideIcon }
 > = {
   biofloc_thematic: {
-    label: "Tematik Bioflok 2025",
+    label: "Tematik Bioflok",
     sub: "Budidaya Ikan Sistem Bioflok",
     icon: Grid3X3Icon,
   },
