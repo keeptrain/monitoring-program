@@ -1,7 +1,14 @@
 import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
 import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
-import { ThematicProgramDetail, ThematicProgramIndex } from "../types/thematic";
+import {
+  BioflocProgramListItem,
+  BioflocProgramsPaginatedResult,
+  BioflocScope,
+  ThematicProgramDetail,
+  ThematicProgramIndex,
+} from "../types/thematic";
+import { BioflocProgramsPaginatedParams } from "../forms/biofloc-program-query-schema";
 
 type NormalizedDocumentation = {
   id: string;
@@ -39,19 +46,125 @@ export function normalizeDocumentations(
   }));
 }
 
-export async function getBioflocThematicProgramsService() {
+export async function getBioflocThematicProgramsService(type: BioflocScope) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(LIST_SELECT)
     .order("updated_at", { ascending: false })
-    .limit(20);
+    .limit(10);
 
   if (error) {
     throw error;
   }
 
   return data as unknown as ThematicProgramIndex[];
+}
+
+const INTERNAL_PAGINATED_SELECT = `
+  id,
+  name,
+  kusuka_number,
+  commodity,
+  progress_percent,
+  distribution_amount,
+  total_admin,
+  created_at,
+  updated_at,
+  available_locations (
+    name
+  )
+` as const;
+
+const PUBLIC_PAGINATED_SELECT = `
+  id,
+  name,
+  commodity,
+  progress_percent,
+  distribution_amount,
+  total_admin,
+  created_at,
+  updated_at,
+  available_locations (
+    name
+  )
+` as const;
+
+type BioflocProgramListRow = {
+  id: number;
+  name: string;
+  kusuka_number?: string;
+  commodity: string;
+  progress_percent: number;
+  distribution_amount: number;
+  total_admin: number;
+  created_at: string;
+  updated_at: string;
+  available_locations: {
+    name: string;
+  } | null;
+};
+
+export async function getBioflocProgramsPaginatedService(
+  params: BioflocProgramsPaginatedParams,
+): Promise<BioflocProgramsPaginatedResult> {
+  const supabase = await createClient();
+  const { page, pageSize, province, scope, search, year } = params;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const selectColumns =
+    scope === "internal" ? INTERNAL_PAGINATED_SELECT : PUBLIC_PAGINATED_SELECT;
+
+  let query = supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .select(selectColumns, { count: "exact" });
+
+  if (search.length > 0) {
+    query = query.ilike("name", `%${search}%`);
+  }
+
+  if (province.length > 0) {
+    query = query.ilike("available_locations.name", `%${province}%`);
+  }
+
+  if (year !== undefined) {
+    const start = `${year}-01-01T00:00:00.000Z`;
+    const end = `${year + 1}-01-01T00:00:00.000Z`;
+    query = query.gte("created_at", start).lt("created_at", end);
+  }
+
+  const { data, error, count } = await query
+    .order("updated_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw error;
+  }
+
+  const rows = (data ?? []) as unknown as BioflocProgramListRow[];
+  const mappedRows: BioflocProgramListItem[] = rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    location_name: row.available_locations?.name ?? "-",
+    commodity: row.commodity,
+    progress_percent: row.progress_percent,
+    distribution_amount: row.distribution_amount,
+    total_admin: row.total_admin,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    year: new Date(row.created_at).getUTCFullYear(),
+    ...(scope === "internal" ? { kusuka_number: row.kusuka_number ?? "" } : {}),
+  }));
+
+  const total = count ?? 0;
+  return {
+    data: mappedRows,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
 }
 
 export async function getBioflocThematicProgramByIdService(

@@ -1,5 +1,7 @@
 export type ProposalBioflocStatus = "pending" | "approved" | "rejected";
 
+export type BioflocScope = "internal" | "public";
+
 export interface ThematicPrograms {
   id: number;
   location_id: number;
@@ -45,3 +47,25 @@ export type ThematicProgramIndex = Pick<
     name: string;
   };
 };
+
+export interface BioflocProgramListItem {
+  id: number;
+  name: string;
+  location_name: string;
+  commodity: string;
+  progress_percent: number;
+  distribution_amount: number;
+  total_admin: number;
+  created_at: string;
+  updated_at: string;
+  year: number;
+  kusuka_number?: string;
+}
+
+export interface BioflocProgramsPaginatedResult {
+  data: BioflocProgramListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}

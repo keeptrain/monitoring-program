@@ -8,12 +8,14 @@ import {
   UpdateProgressFormInput,
   UpdateProgressFormValues,
 } from "../forms/update-progress-schema";
-import { ThematicProgramIndex } from "../types/thematic";
+import { BioflocProgramListItem } from "../types/thematic";
 import { updateThematicProgramProgress } from "../actions/biofloc";
+
+type UpdateProgressRow = Pick<BioflocProgramListItem, "id" | "progress_percent">;
 
 export function useUpdateProgressSheet() {
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState<ThematicProgramIndex | null>(
+  const [selectedRow, setSelectedRow] = useState<UpdateProgressRow | null>(
     null,
   );
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function useUpdateProgressSheet() {
   });
 
   const openForRow = useCallback(
-    (row: ThematicProgramIndex) => {
+    (row: UpdateProgressRow) => {
       setSelectedRow(row);
       setSubmitError(null);
       setSheetOpen(true);

@@ -176,9 +176,7 @@ function MapTopContent({ kdmpCount }: { kdmpCount: number }) {
       </div>
       <div className="absolute top-3 right-3 z-5">
         <Button size="lg" asChild>
-          <Link href="/monitoring/biofloc_thematic/bantuan-2025">
-            Lihat Data
-          </Link>
+          <Link href="/monitoring/biofloc-thematic">Lihat Data</Link>
         </Button>
       </div>
     </>

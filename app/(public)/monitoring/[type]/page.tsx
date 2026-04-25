@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ProposalTable from "@/features/monitoring/components/biofloc/ProposalTable";
+import PublicBioflocTable from "@/features/monitoring/components/biofloc/PublicBioflocTable";
 
 type Props = {
   params: Promise<{
@@ -13,7 +13,7 @@ type Props = {
 export default async function MonitoringBantuan2025Page({ params }: Props) {
   const { type } = await params;
 
-  if (type !== "biofloc_thematic") {
+  if (type !== "biofloc-thematic") {
     return notFound();
   }
 
@@ -29,9 +29,9 @@ export default async function MonitoringBantuan2025Page({ params }: Props) {
 
         <section className="space-y-4">
           <h2 className="text-lg font-bold">
-            Penerima Bantuan Tematik Bioflok Tahun 2025
+            Penerima Bantuan Tematik Bioflok
           </h2>
-          <ProposalTable />
+          <PublicBioflocTable />
         </section>
       </div>
     </main>
