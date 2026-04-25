@@ -10,6 +10,7 @@ import {
 } from "../forms/proposal-biofloc-schema";
 import { createProposalBioflocThematicProgram } from "../actions/proposal-biofloc";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const DEFAULT_VALUES: ProposalBioflocFormInput = {
   name: "",
@@ -42,7 +43,7 @@ export function useProposalBioflocForm() {
       try {
         await createProposalBioflocThematicProgram(values);
         router.push("/monitoring");
-        router.refresh();
+        toast.success("Proposal berhasil diajukan.");
       } catch (error) {
         if (error instanceof Error) {
           setSubmitError(error.message);

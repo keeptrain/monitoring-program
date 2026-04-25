@@ -37,7 +37,7 @@ export default function RootLayout({
     >
       <body className="bg-background text-foreground min-h-full">
         <Providers>{children}</Providers>
-        <Toaster />
+        <Toaster position="top-center" />
       </body>
     </html>
   );
