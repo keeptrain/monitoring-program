@@ -32,6 +32,19 @@ export type PaginatedProposalBioflocResult = {
   totalPages: number;
 };
 
+type ProposalProvinceRow = {
+  province: string | null;
+};
+
+export type ProposalBioflocProvinceSummary = {
+  proposal_total: number;
+  proposal_count_by_province: Record<string, number>;
+};
+
+function normalizeProvinceName(province: string): string {
+  return province.trim().toLowerCase();
+}
+
 export async function createAvailableLocationForBioflocProposalService(
   supabase: SupabaseClient,
   payload: ProposalBioflocFormValues,
@@ -149,15 +162,38 @@ export async function getProposalBioflocThematicProgramsService() {
 export async function getProposalBioflocTotal(
   supabase: SupabaseClient,
 ): Promise<number> {
-  const { count, error } = await supabase
+  const summary = await getProposalBioflocProvinceSummary(supabase);
+  return summary.proposal_total;
+}
+
+export async function getProposalBioflocProvinceSummary(
+  supabase: SupabaseClient,
+): Promise<ProposalBioflocProvinceSummary> {
+  const { data, error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("id", { count: "exact", head: true });
+    .select("province");
 
   if (error) {
     throw error;
   }
 
-  return count ?? 0;
+  const rows = (data ?? []) as ProposalProvinceRow[];
+  const proposal_count_by_province = rows.reduce<Record<string, number>>(
+    (acc, row) => {
+      if (!row.province) {
+        return acc;
+      }
+      const key = normalizeProvinceName(row.province);
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+
+  return {
+    proposal_total: rows.length,
+    proposal_count_by_province,
+  };
 }
 
 /** Update proposal status (admin action) */

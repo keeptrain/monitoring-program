@@ -7,39 +7,32 @@ import {
   programQuotaUpdateSchema,
 } from "../forms/program-quota-schema";
 import * as db from "../services/program-quota-services";
+import type { ProgramQuotaViewRow } from "../services/program-quota-services";
 
-export type ProgramQuotaView = {
-  id: number | null;
-  region_id: string;
-  region_name: string;
-  program_type: "biofloc_thematic";
-  year: number;
-  quota_limit: number;
-  updated_at: string | null;
-};
+export type ProgramQuotaView = ProgramQuotaViewRow;
 
 export async function getBioflocProgramQuotas(): Promise<{
   data: ProgramQuotaView[];
   proposal_total: number;
 }> {
   const existing = await db.getProgramQuotasByTypeAndYear(PROGRAM_QUOTA_YEAR);
-  const byRegion = new Map(existing.data.map((row) => [row.region_id, row]));
+  return {
+    data: existing.data,
+    proposal_total: existing.proposal_total,
+  };
+}
 
-  const rows: ProgramQuotaView[] = INDONESIA_PROVINCES.map((province) => {
-    const row = byRegion.get(province.region_id);
-    return {
-      id: row?.id ?? null,
-      region_id: province.region_id,
-      region_name: province.name,
-      program_type: "biofloc_thematic",
-      year: PROGRAM_QUOTA_YEAR,
-      quota_limit: row?.quota_limit ?? 0,
-      updated_at: row?.updated_at ?? null,
-    };
-  });
+export async function getBioflocProgramQuotasPublic(): Promise<{
+  data: ProgramQuotaView[];
+  proposal_total: number;
+}> {
+  const existing = await db.getProgramQuotasByTypeAndYearWithMinQuota(
+    PROGRAM_QUOTA_YEAR,
+    0,
+  );
 
   return {
-    data: rows,
+    data: existing.data,
     proposal_total: existing.proposal_total,
   };
 }
@@ -74,6 +67,7 @@ export async function upsertBioflocProgramQuota(input: {
     program_type: "biofloc_thematic" as const,
     year: row.year,
     quota_limit: row.quota_limit,
+    proposal_count: 0,
     updated_at: row.updated_at,
   } satisfies ProgramQuotaView;
 }
