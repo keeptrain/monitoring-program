@@ -3,8 +3,9 @@ import { ProposalBioflocThematicProgram } from "@/features/thematic/services/pro
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Check, X, Loader2 } from "lucide-react";
-import { useState } from "react";
 import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
+import { useMutation } from "@tanstack/react-query";
+import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
 
 const STATUS_CONFIG: Record<
   ProposalBioflocStatus,
@@ -67,23 +68,9 @@ function AdminActions({
   row: ProposalBioflocThematicProgram;
   onAction: (id: number, status: ProposalBioflocStatus) => void;
 }) {
-  const [isDownloading, setIsDownloading] = useState(false);
-
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        // onClick={handleDownload}
-        disabled={isDownloading}
-        title="Download Dokumen"
-      >
-        {isDownloading ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Download className="size-4 text-zinc-600" />
-        )}
-      </Button>
+      <ProposalDownloadButton id={row.id} />
       {row.status === "pending" && (
         <>
           <Button
@@ -120,3 +107,39 @@ export const ProposalAdminTableColumns = (
     cell: ({ row }) => <AdminActions row={row.original} onAction={onAction} />,
   },
 ];
+
+function ProposalDownloadButton({ id }: { id: number }) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: () => createSignedUrlForProposalBiofloc(id),
+    onSuccess: (data) => {
+      const url = URL.createObjectURL(data.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = data.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  const handleDownload = async () => {
+    mutate();
+  };
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleDownload}
+      title="Download Dokumen"
+    >
+      {isPending ? (
+        <Loader2 className="size-4 animate-spin text-zinc-600" />
+      ) : (
+        <Download className="size-4 text-zinc-600" />
+      )}
+    </Button>
+  );
+}

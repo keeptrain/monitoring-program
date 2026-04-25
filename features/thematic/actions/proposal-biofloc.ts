@@ -44,3 +44,9 @@ export async function updateProposalBioflocStatus(
 
   return data;
 }
+
+export async function createSignedUrlForProposalBiofloc(id: number) {
+  const { blob, originalPath } = await db.createSignedUrl(id);
+  const fileName = originalPath.split("/").pop();
+  return { blob, fileName };
+}

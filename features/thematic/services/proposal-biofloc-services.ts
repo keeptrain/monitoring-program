@@ -112,7 +112,10 @@ export async function getProposalBioflocPaginatedService(
 
   let query = supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("*", { count: "exact" });
+    .select(
+      "id, name, province, regency, district, village, status, created_at",
+      { count: "exact" },
+    );
 
   // Optimized search: use the name_search (lowercase) generated column
   if (search && search.trim().length > 0) {
@@ -214,4 +217,35 @@ export async function updateProposalStatusService(
   }
 
   return data as ProposalBioflocThematicProgram;
+}
+
+export async function createSignedUrl(id: number) {
+  const supabase = await createClient();
+  const { data: proposalBiofloc, error: proposalBioflocError } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .select("proposal_path")
+    .eq("id", id)
+    .single();
+
+  if (proposalBioflocError) {
+    throw new Error(
+      `Error failed signed url for proposal biofloc: ${proposalBioflocError.message}`,
+    );
+  }
+
+  if (!proposalBiofloc?.proposal_path) {
+    throw new Error("Proposal tidak ditemukan.");
+  }
+
+  const { data: blob, error } = await supabase.storage
+    .from("demo")
+    .download(proposalBiofloc.proposal_path);
+
+  if (error) {
+    throw new Error(
+      `Error failed signed url for proposal biofloc: ${error.message}`,
+    );
+  }
+
+  return { blob, originalPath: proposalBiofloc.proposal_path };
 }

@@ -10,6 +10,10 @@ import { ProposalAdminTableColumns } from "@/features/monitoring/components/biof
 import { useUpdateProposalBioflocStatus } from "@/features/thematic/api/useUpdateProposalBioflocStatus";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { ProposalBioflocStatus } from "../types/thematic";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 
 export default function ProposalBioflocProgramPage() {
   const [selectedProvince, setSelectedProvince] = useState<string>("");
@@ -71,7 +75,7 @@ export default function ProposalBioflocProgramPage() {
       rowCount={data?.total ?? 0}
       pagination={pagination}
       onPaginationChange={setPagination}
-      topContent={() => (
+      topContent={(table) => (
         <>
           <ProvinceSelect
             value={selectedProvince}
@@ -79,8 +83,19 @@ export default function ProposalBioflocProgramPage() {
               setSelectedProvince(val);
               setPagination((prev) => ({ ...prev, pageIndex: 0 }));
             }}
-            className="w-[200px]"
+            className="mr-2 w-[200px]"
           />
+          <NativeSelect
+            value={table.getColumn("status")?.getFilterValue() as string}
+            onChange={(event) => {
+              table.getColumn("status")?.setFilterValue(event.target.value);
+            }}
+          >
+            <NativeSelectOption value="">Semua Status</NativeSelectOption>
+            <NativeSelectOption value="pending">Menunggu</NativeSelectOption>
+            <NativeSelectOption value="approved">Disetujui</NativeSelectOption>
+            <NativeSelectOption value="rejected">Ditolak</NativeSelectOption>
+          </NativeSelect>
           <div className="ml-auto w-1/4">
             <Input
               placeholder="Cari kelompok kdmp..."
