@@ -57,7 +57,8 @@ export async function getAvailableLocationsByType(
       )
     `,
     )
-    .eq("type", type);
+    .eq("type", type)
+    .limit(10);
 
   if (error) {
     console.error("getAvailableLocationsByType error:", error);
