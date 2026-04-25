@@ -44,7 +44,8 @@ export async function getBioflocThematicProgramsService() {
   const { data, error } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(LIST_SELECT)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(20);
 
   if (error) {
     throw error;
@@ -80,7 +81,9 @@ export async function createBioflocThematicProgramService(
   },
 ) {
   const supabase = await createClient();
-  const { error } = await supabase.from(TABLES.BIOFLOC_THEMATIC_PROGRAMS).insert(data);
+  const { error } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .insert(data);
 
   if (error) {
     throw error;
