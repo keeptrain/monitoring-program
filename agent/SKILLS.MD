@@ -14,6 +14,7 @@
   - **Column Names:** Use the exact column names from the schema (e.g., `progress_percent`, `distribution_amount`).
   - **Enums:** Use the exact enum values defined in the schema (e.g., `biofloc_thematic`, `minapadi_thematic`, `isf`).
 - **Data Fetching:**
+  - **Selective Column Selection:** Never use `.select("*")`. Always explicitly list only the columns required for the current operation to minimize payload size and improve performance.
   - **Server Actions:** Use server actions for all database operations.
   - **Type Safety:** Always parse and validate data from Supabase using Zod schemas to ensure type safety.
   - **Error Handling:** Always handle potential errors from Supabase operations.
@@ -165,3 +166,10 @@
 4. **Avoid Type Duplication:**
    - Use `Pick`, `Omit`, or `Partial` instead of creating near-identical types.
    - Leverage `z.infer<typeof schema>` from Zod to synchronize form types with TypeScript types.
+
+## 10. UI/UX & Responsive Design
+
+- **Mobile-First Approach:** Always prioritize mobile layouts first. Use Tailwind CSS utility classes starting with the default (mobile) and adding prefixes like `sm:`, `md:`, `lg:`, `xl:` for larger screens.
+- **Progressive Enhancement:** Ensure core functionality works on basic mobile devices before adding complex features for desktops.
+- **Consistent Spacing:** Use the standard Tailwind spacing scale to maintain a consistent rhythm across the UI.
+- **Touch Targets:** Ensure interactive elements (buttons, links) on mobile have a minimum size of 44x44 pixels for accessibility.
