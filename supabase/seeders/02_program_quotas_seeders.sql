@@ -2,7 +2,7 @@
 -- Year: 2026
 -- Program Type: biofloc_thematic
 
-INSERT INTO program_quotas (region_id, program_type, year, quota_limit)
+INSERT INTO program_quotas (province_id, program_type, year, quota_limit)
 VALUES
   ('11', 'biofloc_thematic', 2026, 10),
   ('12', 'biofloc_thematic', 2026, 15),
@@ -42,5 +42,5 @@ VALUES
   ('94', 'biofloc_thematic', 2026, 5),
   ('95', 'biofloc_thematic', 2026, 5),
   ('96', 'biofloc_thematic', 2026, 5)
-ON CONFLICT (region_id, program_type, year) 
+ON CONFLICT (province_id, program_type, year) 
 DO UPDATE SET quota_limit = EXCLUDED.quota_limit;
