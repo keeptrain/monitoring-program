@@ -2,7 +2,7 @@ import React from "react";
 import { formatDate, formatDateWithTime } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
-import { CameraIcon, PencilIcon } from "lucide-react";
+import { CameraIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import IsfStatusBadge from "./IsfStatusBadge";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -17,8 +17,10 @@ export interface IsfReport {
 
 export const IsfStepProgramTableColumns = ({
   onUpdateDocumentations,
+  onDeleteReport,
 }: {
   onUpdateDocumentations: (id: number) => void;
+  onDeleteReport: (id: number) => void;
 }): ColumnDef<IsfReport>[] => [
   {
     header: "Dilaporkan Pada",
@@ -74,6 +76,13 @@ export const IsfStepProgramTableColumns = ({
           label: "Update Dokumentasi",
           icon: CameraIcon,
           onClick: () => onUpdateDocumentations(original.id),
+        },
+        {
+          type: "action",
+          key: "delete",
+          label: "Hapus",
+          icon: Trash2Icon,
+          onClick: () => onDeleteReport(original.id),
         },
       ];
       return <MoreButton menuItems={menuItems} />;
