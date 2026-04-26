@@ -217,10 +217,7 @@ export async function createIsfProgramLog(
 
   const { data: createdLog, error } = await supabase
     .from("isf_program_logs")
-    .upsert(
-      { ...toDbPayload(data), step_id: stepId },
-      { onConflict: "step_id, reporting_week" },
-    )
+    .insert({ ...toDbPayload(data), step_id: stepId })
     .select("id, step_id")
     .single();
 

@@ -22,7 +22,7 @@ CREATE TABLE isf_program_logs (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 
-  UNIQUE(step_id, reporting_week)
+  UNIQUE(step_id, progress_date)
 );
 
 CREATE INDEX idx_logs_step_date 

@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { FieldError } from "@/components/ui/field";
+import { toast } from "sonner";
 
 export default function IsfStepProgramPage({
   step,
@@ -55,6 +56,7 @@ export default function IsfStepProgramPage({
           // Note: using 'step' which is the zone id
           await deleteIsfProgramLog(id, step);
           router.refresh();
+          toast.success("Laporan berhasil dihapus.");
         } catch (error) {
           console.error(error);
           alert("Gagal menghapus laporan.");
