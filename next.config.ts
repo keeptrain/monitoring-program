@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "avwjfkzabutafobnvsmq.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.shadcnstudio.com",
+      },
     ],
   },
 };
