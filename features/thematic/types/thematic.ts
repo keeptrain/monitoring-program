@@ -7,10 +7,12 @@ export interface ThematicPrograms {
   location_id: number;
   name: string;
   progress_percent: number;
-  commodity: string;
+  commodity_aid: string;
+  commodity_potential: string | null;
   land_area: string;
-  production: string;
-  total_admin: number;
+  production_value: string;
+  total_management: number;
+  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
@@ -38,7 +40,7 @@ export type ThematicProgramIndex = Pick<
   | "id"
   | "location_id"
   | "name"
-  | "commodity"
+  | "commodity_aid"
   | "progress_percent"
   | "created_at"
   | "updated_at"
@@ -52,10 +54,10 @@ export interface BioflocProgramListItem {
   id: number;
   name: string;
   location_name: string;
-  commodity: string;
+  commodity_aid: string;
   progress_percent: number;
   distribution_amount: number;
-  total_admin: number;
+  total_management: number;
   created_at: string;
   updated_at: string;
   year: number;

@@ -126,8 +126,13 @@ export function ThematicProgramDetailComponent({
             <CardContent className="space-y-4">
               <DetailItem
                 icon={<Leaf className="text-muted-foreground size-4" />}
-                label="Komoditas"
-                value={data.commodity}
+                label="Komoditas Bantuan"
+                value={data.commodity_aid}
+              />
+              <DetailItem
+                icon={<Leaf className="text-muted-foreground size-4" />}
+                label="Komoditas Potensi"
+                value={data.commodity_potential || "-"}
               />
               <DetailItem
                 icon={<MapPin className="text-muted-foreground size-4" />}
@@ -137,12 +142,17 @@ export function ThematicProgramDetailComponent({
               <DetailItem
                 icon={<Building2 className="text-muted-foreground size-4" />}
                 label="Produksi"
-                value={data.production}
+                value={data.production_value}
               />
               <DetailItem
                 icon={<Users className="text-muted-foreground size-4" />}
-                label="Total Admin"
-                value={data.total_admin?.toString() || "0"}
+                label="Jumlah Pengurus"
+                value={data.total_management?.toString() || "0"}
+              />
+              <DetailItem
+                icon={<Users className="text-muted-foreground size-4" />}
+                label="Jumlah Anggota"
+                value={data.total_members?.toString() || "0"}
               />
               <DetailItem
                 icon={<Truck className="text-muted-foreground size-4" />}

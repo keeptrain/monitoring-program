@@ -9,10 +9,12 @@ export const bioflocBaseProgramSchema = z.object({
     .number()
     .min(0, "Pastikan persentasi lebih besar dari laporan sebelumnya")
     .max(100, "Persentase maksimal 100"),
-  commodity: z.string().min(1, "Komoditas dibutuhkan"),
+  commodity_aid: z.string().min(1, "Komoditas dibutuhkan"),
+  commodity_potential: z.string().optional(),
   land_area: z.string().min(1, "Luas Lahan dibutuhkan"),
-  production: z.string().min(1, "Produksi dibutuhkan"),
-  total_admin: z.coerce.number().int().min(0, "Minimal 0 admin"),
+  production_value: z.string().min(1, "Produksi dibutuhkan"),
+  total_management: z.coerce.number().int().min(0, "Minimal 0 pengurus"),
+  total_members: z.coerce.number().int().min(0, "Minimal 0 anggota"),
   distribution_amount: z.coerce.number().int().min(0, "Minimal 0 distribusi"),
   sppg_partner: z.string().min(1, "Mitra SPPG dibutuhkan"),
 });

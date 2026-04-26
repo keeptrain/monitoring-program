@@ -65,10 +65,10 @@ const INTERNAL_PAGINATED_SELECT = `
   id,
   name,
   kusuka_number,
-  commodity,
+  commodity_aid,
   progress_percent,
   distribution_amount,
-  total_admin,
+  total_management,
   created_at,
   updated_at,
   available_locations (
@@ -79,10 +79,10 @@ const INTERNAL_PAGINATED_SELECT = `
 const PUBLIC_PAGINATED_SELECT = `
   id,
   name,
-  commodity,
+  commodity_aid,
   progress_percent,
   distribution_amount,
-  total_admin,
+  total_management,
   created_at,
   updated_at,
   available_locations (
@@ -94,10 +94,10 @@ type BioflocProgramListRow = {
   id: number;
   name: string;
   kusuka_number?: string;
-  commodity: string;
+  commodity_aid: string;
   progress_percent: number;
   distribution_amount: number;
-  total_admin: number;
+  total_management: number;
   created_at: string;
   updated_at: string;
   available_locations: {
@@ -147,10 +147,10 @@ export async function getBioflocProgramsPaginatedService(
     id: row.id,
     name: row.name,
     location_name: row.available_locations?.name ?? "-",
-    commodity: row.commodity,
+    commodity_aid: row.commodity_aid,
     progress_percent: row.progress_percent,
     distribution_amount: row.distribution_amount,
-    total_admin: row.total_admin,
+    total_management: row.total_management,
     created_at: row.created_at,
     updated_at: row.updated_at,
     year: new Date(row.created_at).getUTCFullYear(),
