@@ -14,11 +14,6 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
     ),
   },
   {
-    header: "Provinsi",
-    accessorKey: "location_name",
-    cell: ({ row }) => row.original.location_name,
-  },
-  {
     header: "Komoditas",
     accessorKey: "commodity_aid",
     cell: ({ row }) => row.original.commodity_aid,

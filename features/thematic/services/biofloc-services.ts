@@ -4,7 +4,6 @@ import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import {
   BioflocProgramListItem,
   BioflocProgramsPaginatedResult,
-  BioflocScope,
   ThematicProgramDetail,
   ThematicProgramIndex,
 } from "../types/thematic";
@@ -46,7 +45,7 @@ export function normalizeDocumentations(
   }));
 }
 
-export async function getBioflocThematicProgramsService(type: BioflocScope) {
+export async function getBioflocThematicProgramsService() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
@@ -71,8 +70,9 @@ const INTERNAL_PAGINATED_SELECT = `
   total_management,
   created_at,
   updated_at,
-  available_locations (
-    name
+  available_locations!inner (
+    name,
+    province_id
   )
 ` as const;
 
@@ -85,8 +85,9 @@ const PUBLIC_PAGINATED_SELECT = `
   total_management,
   created_at,
   updated_at,
-  available_locations (
-    name
+  available_locations!inner (
+    name,
+    province_id
   )
 ` as const;
 
@@ -102,6 +103,7 @@ type BioflocProgramListRow = {
   updated_at: string;
   available_locations: {
     name: string;
+    province_id: string;
   } | null;
 };
 
@@ -125,13 +127,11 @@ export async function getBioflocProgramsPaginatedService(
   }
 
   if (province.length > 0) {
-    query = query.ilike("available_locations.name", `%${province}%`);
+    query = query.eq("available_locations.province_id", province);
   }
 
-  if (year !== undefined) {
-    const start = `${year}-01-01T00:00:00.000Z`;
-    const end = `${year + 1}-01-01T00:00:00.000Z`;
-    query = query.gte("created_at", start).lt("created_at", end);
+  if (year && year > 0) {
+    query = query.eq("fiscal_year", year);
   }
 
   const { data, error, count } = await query

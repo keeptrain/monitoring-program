@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/native-select";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { PaginationState } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useGetBioflocProgramsPaginated } from "@/features/thematic/api/getBioflocProgramsPaginated";
 import { BioflocProgramsPublicTableColumns } from "./BioflocProgramsTableColumns";
 import { useURLSearchParams } from "@/hooks/useURLSearchParams";
 
-const YEAR_OPTIONS = [2026, 2025, 2024] as const;
+const YEAR_OPTIONS = [2026, 2025] as const;
 
 export default function PublicBioflocTable() {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
@@ -32,12 +32,12 @@ export default function PublicBioflocTable() {
   const pageSize = parseInt(params.pageSize as string) || 10;
   const searchQuery = (params.search as string) || "";
   const selectedProvince = (params.province as string) || "";
-  const selectedYear = parseInt(params.year as string) || YEAR_OPTIONS[0];
+  const selectedYear = parseInt(params.year as string) || 0;
 
   const debouncedSearchQuery = useDebouncedValue(localSearchQuery, 400);
 
   // Update URL when debounced search changes
-  useMemo(() => {
+  useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
       setParams({
         search: debouncedSearchQuery,
@@ -90,6 +90,7 @@ export default function PublicBioflocTable() {
                 });
               }}
             >
+              <NativeSelectOption value="0">Semua Tahun</NativeSelectOption>
               {YEAR_OPTIONS.map((year) => (
                 <NativeSelectOption key={year} value={String(year)}>
                   {year}
