@@ -38,7 +38,7 @@ export async function getBioflocProgramQuotasPublic(): Promise<{
 }
 
 export async function upsertBioflocProgramQuota(input: {
-  region_id: string;
+  province_id: string;
   quota_limit: number;
 }) {
   const parsed = programQuotaUpdateSchema.parse({
@@ -46,14 +46,14 @@ export async function upsertBioflocProgramQuota(input: {
   });
 
   const province = INDONESIA_PROVINCES.find(
-    (item) => item.region_id === input.region_id,
+    (item) => item.province_id === input.province_id,
   );
   if (!province) {
-    throw new Error("Region tidak valid.");
+    throw new Error("Provinsi tidak valid.");
   }
 
-  const row = await db.upsertProgramQuotaByRegion({
-    region_id: input.region_id,
+  const row = await db.upsertProgramQuotaByProvince({
+    province_id: input.province_id,
     year: PROGRAM_QUOTA_YEAR,
     quota_limit: parsed.quota_limit,
   });
@@ -62,7 +62,7 @@ export async function upsertBioflocProgramQuota(input: {
 
   return {
     id: row.id,
-    region_id: row.region_id,
+    province_id: row.province_id,
     region_name: province.name,
     program_type: "biofloc_thematic" as const,
     year: row.year,

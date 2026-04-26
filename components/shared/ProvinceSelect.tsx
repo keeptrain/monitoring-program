@@ -39,7 +39,7 @@ export default function ProvinceSelect({
       {PROVINCES_BY_ISLAND.map(({ island, provinces }) => (
         <NativeSelectOptGroup key={island} label={island}>
           {provinces.map((p) => (
-            <NativeSelectOption key={p.region_id} value={p.name}>
+            <NativeSelectOption key={p.province_id} value={p.name}>
               {p.name}
             </NativeSelectOption>
           ))}
