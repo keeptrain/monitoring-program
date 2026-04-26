@@ -11,11 +11,23 @@ export default function BioflocDetailPage({ data }: { data: any }) {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
         {/* Left Side: Stats Grid */}
         <div className="grid grid-cols-2 gap-4 lg:col-span-2 lg:gap-6">
-          <StatsBox title="Komoditas Bantuan" value={bioflocData.commodity} />
-          <StatsBox title="Komoditas Potensi" value={"-"} />
-          <StatsBox title="Jumlah Pengurus" value={bioflocData.total_admin} />
-          <StatsBox title="Jumlah Anggota" value={"-"} />
-          <StatsBox title="Volume Produksi" value={bioflocData.production} />
+          <StatsBox
+            title="Komoditas Bantuan"
+            value={bioflocData.commodity_aid}
+          />
+          <StatsBox
+            title="Komoditas Potensi"
+            value={bioflocData.commodity_potential || "-"}
+          />
+          <StatsBox
+            title="Jumlah Pengurus"
+            value={bioflocData.total_management}
+          />
+          <StatsBox title="Jumlah Anggota" value={bioflocData.total_members} />
+          <StatsBox
+            title="Volume Produksi"
+            value={bioflocData.production_value}
+          />
           <StatsBox
             title="Nilai Produksi"
             value={bioflocData.distribution_amount}

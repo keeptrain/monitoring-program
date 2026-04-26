@@ -43,7 +43,7 @@ export default function getProposalTableColumns(): ColumnDef<BioflocProposal>[] 
     },
     {
       header: "Komoditas Bantuan",
-      accessorKey: "commodity_assisted",
+      accessorKey: "commodity_aid",
       cell: ({ row }) => <p>Test</p>,
     },
     {
@@ -53,17 +53,17 @@ export default function getProposalTableColumns(): ColumnDef<BioflocProposal>[] 
     },
     {
       header: "Jumlah Pengurus",
-      accessorKey: "total_manager",
+      accessorKey: "total_management",
       cell: ({ row }) => <p>Test</p>,
     },
     {
       header: "Jumlah Anggota",
-      accessorKey: "total_member",
+      accessorKey: "total_members",
       cell: ({ row }) => <p>Test</p>,
     },
     {
       header: "Volume Produksi",
-      accessorKey: "production_volume",
+      accessorKey: "production_value",
       cell: ({ row }) => <p>Test</p>,
     },
     {

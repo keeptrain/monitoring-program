@@ -9,7 +9,9 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   {
     header: "Nama KDMP",
     accessorKey: "name",
-    cell: ({ row }) => <span className="font-semibold">{row.original.name}</span>,
+    cell: ({ row }) => (
+      <span className="font-semibold">{row.original.name}</span>
+    ),
   },
   {
     header: "Provinsi",
@@ -18,8 +20,8 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   },
   {
     header: "Komoditas",
-    accessorKey: "commodity",
-    cell: ({ row }) => row.original.commodity,
+    accessorKey: "commodity_aid",
+    cell: ({ row }) => row.original.commodity_aid,
   },
   {
     header: "Capaian (%)",

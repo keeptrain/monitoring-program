@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
+import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 
 export interface AvailableLocation {
   id: number;
@@ -47,18 +48,18 @@ export async function getAvailableLocationsByType(
     .select(
       `
       id,
+      province_id,
       name,
       latitude,
       longitude,
       ${programTable}!inner (
         id,
-        name,
         progress_percent
       )
     `,
     )
     .eq("type", type)
-    .limit(10);
+    .limit(100);
 
   if (error) {
     console.error("getAvailableLocationsByType error:", error);
@@ -67,6 +68,7 @@ export async function getAvailableLocationsByType(
 
   type LocationWithProgramRow = {
     id: number;
+    province_id: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -79,10 +81,14 @@ export async function getAvailableLocationsByType(
         : item[programTable]
     ) as { id: number; name: string; progress_percent: number } | null;
 
+    const provinceName =
+      INDONESIA_PROVINCES.find((p) => p.province_id === item.province_id)
+        ?.name ?? "Provinsi Tidak Diketahui";
+
     return {
       id: program?.id ?? item.id,
-      program_name: program?.name ?? "Unknown Program",
       location_name: item.name,
+      province_name: provinceName,
       progress_percent: program?.progress_percent ?? 0,
       position: {
         latitude: item.latitude ?? 0,

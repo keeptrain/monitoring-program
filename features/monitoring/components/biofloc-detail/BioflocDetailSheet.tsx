@@ -17,8 +17,11 @@ export default function BioflocDetailSheet({
     <div className="no-scrollbar h-full space-y-6 overflow-y-auto px-4 pb-10">
       {/* Details Grid */}
       <div className="bg-muted/20 border-border grid grid-cols-2 gap-px overflow-hidden border">
-        <DetailItem label="Komoditas Bantuan" value={data.commodity} />
-        <DetailItem label="Komoditas Potensi" value={data.production} />
+        <DetailItem label="Komoditas Bantuan" value={data.commodity_aid} />
+        <DetailItem
+          label="Komoditas Potensi"
+          value={data.commodity_potential || "-"}
+        />
       </div>
 
       {/* Progress Section */}

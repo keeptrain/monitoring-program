@@ -120,7 +120,7 @@ export default function PublicMonitoringMap({
               <SheetDescription
                 className={cn("invisible", !isLoading && "visible text-lg")}
               >
-                {selectedLocation?.program_name}
+                {selectedLocation?.province_name}
               </SheetDescription>
             </SheetHeader>
 
@@ -194,7 +194,7 @@ function MapPopUpContent({
     <div className="w-40 space-y-2 sm:w-64">
       <h3 className="text-sm">
         {location.location_name} <br />
-        <span className="text-muted-foreground">{location.program_name}</span>
+        <span className="text-muted-foreground">{location.province_name}</span>
       </h3>
       <ProgressPercentage value={location.progress_percent} />
       <Button onClick={() => onDetailClick(location)} variant="outline">
