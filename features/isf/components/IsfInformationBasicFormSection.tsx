@@ -15,12 +15,10 @@ import { handleInputNumberValueChange } from "@/lib/utils";
 
 export default function IsfInformationBasicFormSection({
   form,
-  minDate,
-  maxDate,
+  isEdit,
 }: {
   form: UseFormReturn<IsfReportFormInput, undefined, IsfReportFormValues>;
-  minDate?: string;
-  maxDate?: string;
+  isEdit: boolean;
 }) {
   return (
     <div className="space-y-4">
@@ -38,8 +36,7 @@ export default function IsfInformationBasicFormSection({
           <FieldLabel>Tanggal Laporan</FieldLabel>
           <Input
             type="date"
-            min={minDate}
-            max={maxDate}
+            disabled={isEdit}
             {...form.register("progress_date")}
             aria-invalid={!!form.formState.errors.progress_date}
           />

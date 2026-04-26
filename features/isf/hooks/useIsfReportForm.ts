@@ -31,12 +31,7 @@ const DEFAULT_VALUES = (data?: IsfProgramLog) => {
   };
 };
 
-export function useIsfReportForm(
-  zone: string,
-  initialData?: IsfProgramLog,
-  initialMinDate?: string,
-  initialMaxDate?: string,
-) {
+export function useIsfReportForm(zone: string, initialData?: IsfProgramLog) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [documentationError, setDocumentationError] = useState<string | null>(
@@ -52,28 +47,7 @@ export function useIsfReportForm(
     startTransition(async () => {
       setDocumentationError(null);
       try {
-        if (!initialData) {
-          if (
-            initialMinDate &&
-            values.progress_date &&
-            values.progress_date < initialMinDate
-          ) {
-            throw new Error(
-              `Tanggal laporan tidak boleh lebih kecil dari batas: ${initialMinDate}.`,
-            );
-          }
-
-          if (
-            initialMaxDate &&
-            values.progress_date &&
-            values.progress_date > initialMaxDate
-          ) {
-            throw new Error(
-              `Tanggal laporan tidak boleh melebihi batas: ${initialMaxDate}.`,
-            );
-          }
-        }
-
+        // Remove previous date check constraints
         const parsedDocumentations =
           documentationFormSchema.shape.documentations.safeParse(
             values.documentations ?? [],
