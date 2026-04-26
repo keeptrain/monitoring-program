@@ -71,9 +71,8 @@ export default function PublicBioflocTable() {
       rowCount={data?.total ?? 0}
       pagination={pagination}
       onPaginationChange={(updater) => {
-        const newState = typeof updater === "function" 
-          ? updater(pagination)
-          : updater;
+        const newState =
+          typeof updater === "function" ? updater(pagination) : updater;
         setParams({
           page: String(newState.pageIndex + 1),
           pageSize: String(newState.pageSize),
