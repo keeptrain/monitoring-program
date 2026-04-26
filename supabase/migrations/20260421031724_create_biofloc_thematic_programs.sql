@@ -4,11 +4,9 @@ CREATE TABLE biofloc_thematic_programs (
 
   -- Indentity
   status VARCHAR(20) NOT NULL CHECK (status IN ('potential', 'active', 'inactive')),
-  kusuka_number TEXT NOT NULL,   -- fetch on outside API
-  fiscal_year INTEGER NOT NULL,
-
-
-  name TEXT NOT NULL,
+  kusuka_number TEXT NOT NULL, -- fetch on outside API
+  fiscal_year INTEGER NOT NULL, -- 2025,2026 tahun anggaran 
+  name TEXT NOT NULL, -- nama kelompok
 
   -- program details
   progress_percent INTEGER CHECK (progress_percent BETWEEN 0 AND 100),
@@ -19,12 +17,26 @@ CREATE TABLE biofloc_thematic_programs (
   distribution_amount INTEGER NOT NULL,
   sppg_partner TEXT NOT NULL,
 
+  -- cached from outside API
+  nib TEXT,
+  legal_entity_number TEXT,
+
   -- s-curve
   s_curve_path TEXT,
   
   -- Timestamps
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  -- UNIQUE(kusuka_number, fiscal_year)
 );
+
+-- Index for relationship
+CREATE INDEX idx_biofloc_programs_location ON biofloc_thematic_programs (location_id);
+
+-- Index for searching and filtering
+CREATE INDEX idx_biofloc_programs_status ON biofloc_thematic_programs (status);
+CREATE INDEX idx_biofloc_programs_year ON biofloc_thematic_programs (fiscal_year);
+CREATE INDEX idx_biofloc_programs_kusuka ON biofloc_thematic_programs (kusuka_number);
 
 GRANT ALL ON TABLE biofloc_thematic_programs TO anon, authenticated, service_role;
