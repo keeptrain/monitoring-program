@@ -74,9 +74,7 @@ const FILTER_STATE: Record<
 };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>(
-    "biofloc_thematic",
-  );
+  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
 
   return (
     <>
@@ -127,7 +125,7 @@ export function Header({
     : "Select Dashboard";
 
   return (
-    <div className="bg-backdrop-blur-sm sticky top-14 z-40 border-b border-zinc-200 bg-white/80 px-6 py-2">
+    <div className="bg-backdrop-blur-sm sticky top-14 z-40 bg-white/80 px-6 py-2">
       <div className="mx-auto flex items-center justify-between">
         <div>
           <h2 className="text-xs font-semibold text-zinc-400 uppercase">

@@ -12,6 +12,16 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   ClipboardXIcon,
   TractorIcon,
   UsersIcon,
@@ -25,12 +35,6 @@ import { PIN_LOCATIONS } from "./utils/monitoring-constants";
 import OverallSummaryIsf from "./components/OverallSummaryIsf";
 import ProgressChartIsf from "./components/ProgressChartIsf";
 import PublicMonitoringIsfDetailSheet from "./components/isf-detail/PublicMonitoringIsfDetailSheet";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { Separator } from "@/components/ui/separator";
 import Autoplay from "embla-carousel-autoplay";
 import { PublicMonitoringIsf as PublicMonitoringIsfType } from "./types/monitoring-types";
 
@@ -182,11 +186,21 @@ function IsfPinPoint({
     </button>
   );
 }
-function RightSideStats({ data }: { data?: PublicMonitoringIsfType }) {
-  const [showRincian, setShowRincian] = useState(false);
 
+const EQUIPMENT_DATA = [
+  { label: "Excavator", value: 39 },
+  { label: "Buldozer", value: 7 },
+  { label: "Grader", value: 1 },
+  { label: "Vibro", value: 10 },
+  { label: "Dumptruck", value: 33 },
+  { label: "Fuel Truck", value: 2 },
+  { label: "Dutro Truck", value: 1 },
+  { label: "Kendaraan Operasional", value: 10 },
+];
+
+function RightSideStats({ data }: { data?: PublicMonitoringIsfType }) {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 text-center md:w-fit">
+    <div className="flex w-full flex-col items-center justify-center gap-8 text-center md:w-fit">
       <div className="w-full space-y-6">
         <p className="text-muted-foreground border-b pb-2 text-sm font-bold tracking-[0.2em] uppercase">
           Statistik Jumlah
@@ -236,61 +250,59 @@ function RightSideStats({ data }: { data?: PublicMonitoringIsfType }) {
                   </span>
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs"
-                onClick={() => setShowRincian(!showRincian)}
-              >
-                {showRincian ? "Tutup" : "Rincian Alat Berat"}
-                <InfoIcon className="ml-1 size-4" />
-              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    Rincian Alat Berat <InfoIcon className="ml-1 size-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-80 p-4">
+                  <PopoverEquiptment />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
       </div>
-
-      <Separator className="opacity-50" />
-
-      {/* Rincian Section (Conditional) */}
-      {showRincian && (
-        <div className="animate-in fade-in slide-in-from-top-1 w-full space-y-4 px-2 pb-2 duration-300">
-          <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-            Detail Rincian Alat
-          </p>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-left text-xs leading-tight font-semibold">
-            <div className="space-y-1">
-              <p>a) Excavator : 39 Unit</p>
-              <p>b) Buldozer : 7 Unit</p>
-              <p>c) Grader : 1 Unit</p>
-              <p>d) Vibro : 10 Unit</p>
-            </div>
-            <div className="space-y-1">
-              <p>e) Dumptruck : 33 Unit</p>
-              <p>f) Fuel Truck : 2 Unit</p>
-              <p>g) Dutro Truck : 1 Unit</p>
-              <div>
-                <p>h) Kendaraan Operasional</p>
-                <p className="ml-2">: 10 Unit</p>
-              </div>
-            </div>
-          </div>
-          <Separator className="opacity-50" />
-        </div>
-      )}
 
       <DocumentationCarousel />
     </div>
   );
 }
 
-function DocumentationCarousel() {
-  const images = [
-    "/images/bioflok.jpeg",
-    "/images/revitalisasi-tambak-pantura.jpg",
-    "/images/tambak-udang.jpg",
-  ];
+function PopoverEquiptment() {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 border-b border-zinc-100 pb-2">
+        <TractorIcon className="text-primary size-4" />
+        <p className="text-sm font-semibold">Rincian Unit Alat Berat</p>
+      </div>
+      <div className="grid grid-cols-1 gap-y-1.5">
+        {EQUIPMENT_DATA.map((item) => (
+          <div
+            key={item.label}
+            className="flex items-center justify-between text-sm transition-colors hover:bg-zinc-50"
+          >
+            <span className="text-muted-foreground font-medium">
+              {item.label}
+            </span>
+            <span className="inline-flex min-w-[50px] justify-center rounded bg-zinc-100 px-1.5 py-0.5 font-bold text-zinc-900">
+              {item.value} Unit
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
+const images = [
+  "/images/bioflok.jpeg",
+  "/images/revitalisasi-tambak-pantura.jpg",
+  "/images/tambak-udang.jpg",
+];
+
+function DocumentationCarousel() {
   return (
     <Carousel
       className="w-80"

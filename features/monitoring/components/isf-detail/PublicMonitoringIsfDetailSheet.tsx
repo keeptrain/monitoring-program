@@ -2,30 +2,47 @@
 
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRightIcon,
-  ArrowUpRightIcon,
-  TractorIcon,
-  UsersIcon,
-} from "lucide-react";
+import { ArrowRightIcon, TractorIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { PieChart, Pie, Label } from "recharts";
 import { IsfDetailSheet } from "../../types/monitoring-types";
 import { SheetFooter } from "@/components/ui/sheet";
+import React from "react";
+
+import { getIsfProgramLogById } from "@/features/isf/actions/isf-program-logs";
+import { ReportDatePicker } from "@/components/shared/ReportDatePicker";
 
 export default function PublicMonitoringIsfDetailSheet({
-  data,
+  data: initialData,
 }: {
   data: IsfDetailSheet;
 }) {
-  const { id, step_id, progress_percent, total_worker, updated_at } = data;
+  const [data, setData] = React.useState(initialData);
+
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  const { id, step_id, progress_percent, progress_date, total_worker } = data;
+
+  const handleReportSelect = async (reportId: number) => {
+    try {
+      const res = await getIsfProgramLogById(reportId);
+      setData(res.data as unknown as IsfDetailSheet);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col overflow-scroll">
       {/* Scrollable Content */}
       <div className="flex-1 space-y-10 overflow-y-auto px-4 pb-8">
-        {/* Last Updated Status */}
-        <LastUpdateStatus updatedAt={updated_at} />
+        <LastUpdateStatus
+          progressDate={progress_date}
+          stepId={step_id}
+          onReportSelect={handleReportSelect}
+        />
 
         <div className="flex w-full items-center gap-12">
           <div className="size-[140px] shrink-0">
@@ -44,13 +61,6 @@ export default function PublicMonitoringIsfDetailSheet({
                     {total_worker} <span className="text-sm">Orang</span>
                   </p>
                 </div>
-
-                <Button variant="outline" size="sm" className="w-full" asChild>
-                  <Link href={`/monitoring/recruitment`}>
-                    Progress rekrutmen tenaga kerja
-                    <ArrowUpRightIcon className="size-4" />
-                  </Link>
-                </Button>
               </div>
             </div>
 
@@ -92,10 +102,16 @@ export default function PublicMonitoringIsfDetailSheet({
   );
 }
 
-function LastUpdateStatus({ updatedAt }: { updatedAt?: string | null }) {
-  const parsedDate = updatedAt ? new Date(updatedAt) : null;
-  const hasValidDate =
-    parsedDate !== null && !Number.isNaN(parsedDate.getTime());
+function LastUpdateStatus({
+  progressDate,
+  stepId,
+  onReportSelect,
+}: {
+  progressDate?: string | null;
+  stepId: number;
+  onReportSelect: (id: number) => void;
+}) {
+  const parsedDate = progressDate ? new Date(progressDate) : undefined;
 
   return (
     <div className="flex flex-col items-start gap-4 border-y border-dashed py-4 sm:flex-row sm:items-center sm:justify-between">
@@ -107,24 +123,11 @@ function LastUpdateStatus({ updatedAt }: { updatedAt?: string | null }) {
         <p>Data Terakhir Diperbarui</p>
       </div>
       <div className="flex flex-col items-end text-lg">
-        <p className="text-foreground uppercase">
-          {hasValidDate
-            ? parsedDate.toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })
-            : "-"}
-        </p>
-        <p className="text-muted-foreground uppercase">
-          {hasValidDate
-            ? `${parsedDate.toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })} WIB`
-            : "-"}
-        </p>
+        <ReportDatePicker
+          zoneId={stepId}
+          initialDate={parsedDate}
+          onReportSelect={onReportSelect}
+        />
       </div>
     </div>
   );

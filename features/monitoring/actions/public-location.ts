@@ -122,6 +122,7 @@ export async function getIsfPerMonthByZone(zoneNumber: number) {
   const datas = data.map((row) => {
     return {
       id: row.id,
+      step_id: zoneNumber,
       progress_date: row.progress_date,
       reporting_week: row.reporting_week,
       progress_percent: row.progress_percent,
