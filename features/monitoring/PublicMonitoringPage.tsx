@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import dynamic from "next/dynamic";
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
@@ -74,7 +73,9 @@ const FILTER_STATE: Record<
 };
 
 export default function PublicMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<LocationType | null>("isf");
+  const [activeTab, setActiveTab] = useState<LocationType | null>(
+    "biofloc_thematic",
+  );
 
   return (
     <>
@@ -85,12 +86,7 @@ export default function PublicMonitoringPage() {
       <div className="flex flex-1 flex-col">
         <div className="mx-auto w-full max-w-6xl space-y-8 pb-8">
           {/* Map Container - Top Section */}
-          <section
-            className={cn(
-              "relative h-[65vh] min-h-[400px] w-full",
-              activeTab !== "isf" && "mt-6",
-            )}
-          >
+          <section className="relative h-[65vh] min-h-[400px] w-full">
             {activeTab && (
               <div className="flex h-full w-full">
                 {activeTab === "isf" ? (
@@ -125,8 +121,8 @@ export function Header({
     : "Select Dashboard";
 
   return (
-    <div className="bg-backdrop-blur-sm sticky top-14 z-40 bg-white/80 px-6 py-2">
-      <div className="mx-auto flex items-center justify-between">
+    <div className="bg-backdrop-blur-sm z-5 bg-white/80">
+      <div className="mx-auto flex max-w-6xl items-center justify-between p-4 sm:px-0">
         <div>
           <h2 className="text-xs font-semibold text-zinc-400 uppercase">
             Monitoring
@@ -137,14 +133,9 @@ export function Header({
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center rounded-none border-zinc-200"
-            >
+            <Button variant="outline">
               <MenuIcon className="size-4" />
-              <span className="ml-2 hidden sm:block">
-                Dashboard: {activeLabel}
-              </span>
+              <p className="ml-2 hidden sm:block">Dashboard: {activeLabel}</p>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-64 rounded-none" align="end">

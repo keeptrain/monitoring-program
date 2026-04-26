@@ -60,10 +60,10 @@ export default function PublicMonitoringIsf() {
 
   return (
     <div className="bg-background flex flex-1 flex-col py-4">
-      <div className="flex flex-1 flex-col p-4 md:p-4 lg:flex-row lg:gap-8">
+      <div className="flex flex-1 flex-col p-4 md:p-0 lg:flex-row lg:gap-8">
         <div className="flex flex-1 flex-col items-center justify-center gap-8 md:flex-row">
           {/* Main Map Area */}
-          <div className="relative aspect-video w-full max-w-3xl">
+          <div className="relative aspect-video w-full max-w-4xl">
             <Image
               src="/images/isf_map.webp"
               alt="ISF Map"
@@ -305,7 +305,7 @@ const images = [
 function DocumentationCarousel() {
   return (
     <Carousel
-      className="w-80"
+      className="w-84"
       plugins={[Autoplay({ delay: 2000 })]}
       opts={{
         align: "start",
