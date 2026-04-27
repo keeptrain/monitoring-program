@@ -14,8 +14,10 @@ import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
+import { useRouter } from "next/navigation";
 
 export default function ProposalBioflocProgramPage() {
+  const router = useRouter();
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -49,6 +51,9 @@ export default function ProposalBioflocProgramPage() {
     [handleAction],
   );
 
+  const handleRowClick = (id: number) =>
+    router.push(`/dashboard/thematic/biofloc/${id}`);
+
   if (!isAdmin) {
     return (
       <div className="rounded border border-red-200 bg-red-50 p-4 text-red-800">
@@ -75,6 +80,7 @@ export default function ProposalBioflocProgramPage() {
       rowCount={data?.total ?? 0}
       pagination={pagination}
       onPaginationChange={setPagination}
+      onRowClick={({ id }) => handleRowClick(id)}
       topContent={(table) => (
         <>
           <ProvinceSelect
