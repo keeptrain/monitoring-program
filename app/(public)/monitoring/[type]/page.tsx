@@ -18,7 +18,7 @@ export default async function MonitoringBantuan2025Page({ params }: Props) {
   }
 
   return (
-    <main className="py-4 md:py-8">
+    <div className="py-4 md:py-8">
       <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-0">
         <Button variant="outline" size="sm" asChild>
           <Link href="/monitoring">
@@ -28,12 +28,12 @@ export default async function MonitoringBantuan2025Page({ params }: Props) {
         </Button>
 
         <section className="space-y-4">
-          <h2 className="text-lg font-bold">
+          <h2 className="text-lg font-semibold">
             Penerima Bantuan Tematik Bioflok
           </h2>
           <PublicBioflocTable />
         </section>
       </div>
-    </main>
+    </div>
   );
 }

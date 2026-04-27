@@ -9,6 +9,10 @@ import {
   getIsfPerMonthByZone,
   getPublicBiofloc,
 } from "@/features/monitoring/actions/public-location";
+import { InformationDetail } from "@/features/thematic/components/biofloc-detail/InformationDetail";
+import { CycleDataDetail } from "@/features/thematic/components/biofloc-detail/CycleDataDetail";
+import { ProgressPieChartZoneIsf } from "@/features/monitoring/components/isf-detail/ProgressPieChartZoneIsf";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LazyMonitoringDetailClient = dynamic(
   () => import("@/features/monitoring/components/MonitoringDetailClient"),
@@ -23,7 +27,7 @@ const DETAIL_CONTENT: Record<
   {
     title: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    Component?: React.ComponentType<{ data: any }>;
+    Component?: React.ComponentType<any>;
     query?: (id: number) => Promise<any>;
     resolveId: (id: string) => number | null;
     getSubtitle: (data: any, resolvedId: number) => string | undefined;
@@ -36,7 +40,7 @@ const DETAIL_CONTENT: Record<
     query: getPublicBiofloc,
     resolveId: (id) => (isNaN(parseInt(id, 10)) ? null : parseInt(id, 10)),
     getSubtitle: (data) => data?.data?.name,
-    getLocation: (data) => data?.data?.land_area,
+    getLocation: (data) => data?.data?.address,
   },
   isf: {
     title: "Integrated Shrimp Farming",
@@ -68,6 +72,9 @@ type Props = {
   }>;
 };
 
+/*
+ * Used on public monitoring clicked at detail sheet
+ */
 export default async function PublicMonitoringDetailPage({ params }: Props) {
   const { type: rawType, id: rawId } = await params;
 
@@ -104,8 +111,8 @@ export default async function PublicMonitoringDetailPage({ params }: Props) {
   const locationPath = config.getLocation?.(data);
 
   return (
-    <main className="py-6 md:py-10">
-      <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-0">
+    <div className="px-4 py-6 md:px-0 md:py-10">
+      <div className="mx-auto max-w-6xl space-y-4">
         {/* Header */}
         <div className="space-y-6">
           <Button variant="outline" size="sm" asChild>
@@ -140,8 +147,33 @@ export default async function PublicMonitoringDetailPage({ params }: Props) {
         </div>
 
         {/* Content Section */}
-        <div className="mt-8">
-          {config.Component ? (
+        <div className="mt-6 space-y-4">
+          {/* Layout for Biofloc Thematic */}
+          {type === "biofloc_thematic" && data?.data ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="col-span-3">
+                <InformationDetail data={data.data} />
+              </div>
+              <div className="col-span-3 md:col-span-1">
+                <CycleDataDetail />
+              </div>
+              <div className="col-span-3 md:col-span-2">
+                <Card className="h-full">
+                  <CardHeader>
+                    <CardTitle>Grafik Progress</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[175px]">
+                    <ProgressPieChartZoneIsf
+                      progress={data.data.progress_percent}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+              {config.Component && (
+                <config.Component documentations={data.data.documentations} />
+              )}
+            </div>
+          ) : config.Component ? (
             <config.Component data={data} />
           ) : (
             <div className="bg-muted flex h-40 items-center justify-center rounded-lg border border-dashed">
@@ -152,6 +184,6 @@ export default async function PublicMonitoringDetailPage({ params }: Props) {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
