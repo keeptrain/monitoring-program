@@ -171,17 +171,60 @@ export async function getBioflocThematicProgramByIdService(
   id: number,
 ): Promise<ThematicProgramDetail> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  // 1. Fetch program data
+  const { data: program, error: programError } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(DETAIL_SELECT)
     .eq("id", id)
     .single();
 
-  if (error) {
-    throw error;
+  if (programError) {
+    throw programError;
   }
 
-  return data;
+  // 2. Fetch documentations from the documentations table
+  const { data: docs, error: docsError } = await supabase
+    .from("documentations")
+    .select("*")
+    .eq("program_type", "biofloc_thematic")
+    .eq("program_id", id);
+
+  if (docsError) {
+    console.error("Error fetching documentations:", docsError);
+    // Continue even if docs fail, just return empty list
+  }
+
+  // 3. Group documentations by group_id
+  interface DocGroup {
+    id: string;
+    image_before_path: string | null;
+    image_after_path: string | null;
+    created_at: string;
+    updated_at: string;
+  }
+  const docGroups: Record<string, DocGroup> = {};
+  (docs || []).forEach((d) => {
+    if (!docGroups[d.group_id]) {
+      docGroups[d.group_id] = {
+        id: d.group_id,
+        image_before_path: null,
+        image_after_path: null,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      };
+    }
+    if (d.type === "before") {
+      docGroups[d.group_id].image_before_path = d.path;
+    } else {
+      docGroups[d.group_id].image_after_path = d.path;
+    }
+  });
+
+  return {
+    ...program,
+    documentations: Object.values(docGroups),
+  } as unknown as ThematicProgramDetail;
 }
 
 export async function createBioflocThematicProgramService(

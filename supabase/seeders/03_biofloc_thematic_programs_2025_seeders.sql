@@ -219,3 +219,27 @@ VALUES
 -- Baris 94 (ID 1089): -7.0, 43.0 (Longitude 43 itu ada di Afrika, Somalia).
 -- Baris 95 (ID 1090): 17.34, 115.5 (Latitude 17 ada di Vietnam/Tiongkok).
 -- Baris 97 (ID 1092): 16.12, 127.7 (Di Laut Filipina, jauh dari Jawa Timur).
+-- Seeders for Documentations (Fiscal Year 2025)
+
+INSERT INTO documentations (program_type, program_id, group_id, type, path, file_name)
+SELECT 
+  'biofloc_thematic' as program_type,
+  id as program_id,
+  'seed-group-' || id as group_id,
+  'after' as type,
+  'documentations/biofloc-thematic/bioflok_thematic_2.webp' as path,
+  'bioflok_thematic_2.webp' as file_name
+FROM biofloc_thematic_programs
+WHERE fiscal_year = 2025;
+
+-- Adding 'before' documentations for variety
+INSERT INTO documentations (program_type, program_id, group_id, type, path, file_name)
+SELECT 
+  'biofloc_thematic' as program_type,
+  id as program_id,
+  'seed-group-' || id as group_id,
+  'before' as type,
+  'documentations/biofloc-thematic/bioflok_thematic_1.webp' as path,
+  'bioflok_thematic_1.webp' as file_name
+FROM biofloc_thematic_programs
+WHERE fiscal_year = 2025;
