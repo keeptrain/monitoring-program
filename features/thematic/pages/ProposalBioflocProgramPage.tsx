@@ -52,7 +52,7 @@ export default function ProposalBioflocProgramPage() {
   );
 
   const handleRowClick = (id: number) =>
-    router.push(`/dashboard/thematic/biofloc/${id}`);
+    router.push(`/dashboard/thematic/biofloc/proposals/${id}`);
 
   if (!isAdmin) {
     return (

@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<
   rejected: { variant: "destructive", label: "Ditolak" },
 };
 
-const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
+export const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
   const config = STATUS_CONFIG[status];
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
@@ -114,7 +114,7 @@ export const ProposalAdminTableColumns = (
   },
 ];
 
-function ProposalDownloadButton({ id }: { id: number }) {
+export function ProposalDownloadButton({ id }: { id: number }) {
   const { mutate, isPending } = useMutation({
     mutationFn: () => createSignedUrlForProposalBiofloc(id),
     onSuccess: (data) => {

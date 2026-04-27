@@ -19,6 +19,13 @@ export type ProposalBioflocThematicProgram = {
   updated_at: string;
 };
 
+export type ProposalBioflocDetail = ProposalBioflocThematicProgram & {
+  available_locations: {
+    latitude: number;
+    longitude: number;
+  } | null;
+};
+
 export type ProposalBioflocPaginationParams = {
   page: number;
   pageSize: number;
@@ -254,4 +261,47 @@ export async function createSignedUrl(id: number) {
   }
 
   return { blob, originalPath: proposalBiofloc.proposal_path };
+}
+
+/**
+ * Get single proposal detail with location info (lat/lng)
+ */
+export async function getProposalBioflocDetailService(
+  id: number,
+): Promise<ProposalBioflocDetail> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .select(
+      `
+      id,
+      status,
+      name,
+      province_id,
+      regency_id,
+      district,
+      village,
+      location_id,
+      proposal_path,
+      created_at,
+      updated_at,
+      available_locations (
+        latitude,
+        longitude
+      )
+    `,
+    )
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("Proposal tidak ditemukan.");
+  }
+
+  return data as unknown as ProposalBioflocDetail;
 }
