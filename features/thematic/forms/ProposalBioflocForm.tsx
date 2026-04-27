@@ -56,7 +56,7 @@ export default function ProposalBioflocForm() {
             <FieldLabel>Provinsi</FieldLabel>
             <Controller
               control={form.control}
-              name="province"
+              name="province_id"
               render={({ field }) => (
                 <ProvinceSelect
                   value={field.value}
@@ -64,21 +64,21 @@ export default function ProposalBioflocForm() {
                   allLabel="Pilih Provinsi"
                   showAll={true}
                   className="w-full"
-                  aria-invalid={!!errors.province}
+                  aria-invalid={!!errors.province_id}
                 />
               )}
             />
-            <FieldError>{errors.province?.message}</FieldError>
+            <FieldError>{errors.province_id?.message}</FieldError>
           </Field>
 
           <Field>
             <FieldLabel>Kabupaten/Kota</FieldLabel>
             <Input
-              {...register("regency")}
-              aria-invalid={!!errors.regency}
+              {...register("regency_id")}
+              aria-invalid={!!errors.regency_id}
               placeholder="Contoh: Sidoarjo"
             />
-            <FieldError>{errors.regency?.message}</FieldError>
+            <FieldError>{errors.regency_id?.message}</FieldError>
           </Field>
 
           <Field>

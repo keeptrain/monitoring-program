@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Check, X, Loader2 } from "lucide-react";
 import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
+import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 import { useMutation } from "@tanstack/react-query";
 import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
 
@@ -35,13 +36,18 @@ export const ProposalSubmissionTableColumns =
     },
     {
       header: "Provinsi",
-      accessorKey: "province",
-      cell: ({ row: { original } }) => <span>{original.province}</span>,
+      accessorKey: "province_id",
+      cell: ({ row: { original } }) => {
+        const name = INDONESIA_PROVINCES.find(
+          (p) => p.province_id === original.province_id,
+        )?.name;
+        return <span>{name || original.province_id}</span>;
+      },
     },
     {
       header: "Kab / Kota",
-      accessorKey: "regency",
-      cell: ({ row: { original } }) => <span>{original.regency}</span>,
+      accessorKey: "regency_id",
+      cell: ({ row: { original } }) => <span>{original.regency_id}</span>,
     },
     {
       header: "Kelurahan",

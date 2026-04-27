@@ -61,7 +61,7 @@ export default function FileUploadField({
   return (
     <Field>
       {!value ? (
-        <div className="relative w-full md:w-1/2">
+        <div className="relative w-full">
           <Input
             type="file"
             accept={accept}
@@ -75,7 +75,7 @@ export default function FileUploadField({
           )}
         </div>
       ) : (
-        <div className="border-border flex w-full items-center justify-between border bg-zinc-50/50 p-2 text-sm md:w-1/2">
+        <div className="border-input flex h-10 w-full items-center justify-between border bg-zinc-50/50 px-3 text-sm">
           <div className="flex items-center gap-2 overflow-hidden">
             <FileIcon className="size-4 shrink-0 text-zinc-400" />
             <span className="truncate font-medium text-zinc-700">
@@ -88,7 +88,7 @@ export default function FileUploadField({
             size="icon-sm"
             onClick={handleRemove}
             disabled={disabled}
-            className="hover:text-destructive h-7 w-7"
+            className="hover:text-destructive size-7"
           >
             <X className="size-3.5" />
           </Button>

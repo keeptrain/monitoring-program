@@ -4,8 +4,8 @@ import { locationCoordinateSchemaPattern } from "@/components/shared/LocationFor
 export const proposalBioflocSchema = z
   .object({
     name: z.string().min(1, "Nama KDMP wajib diisi"),
-    province: z.string().min(1, "Provinsi wajib diisi"),
-    regency: z.string().min(1, "Kabupaten/Kota wajib diisi"),
+    province_id: z.string().min(1, "Provinsi wajib diisi"),
+    regency_id: z.string().min(1, "Kabupaten/Kota wajib diisi"),
     district: z.string().min(1, "Kelurahan wajib diisi"),
     village: z.string().min(1, "Desa wajib diisi"),
     proposal_path: z.string().min(1, "File proposal wajib diunggah"),

@@ -14,8 +14,8 @@ import { toast } from "sonner";
 
 const DEFAULT_VALUES: ProposalBioflocFormInput = {
   name: "",
-  province: "",
-  regency: "",
+  province_id: "",
+  regency_id: "",
   district: "",
   village: "",
   latitude: "",

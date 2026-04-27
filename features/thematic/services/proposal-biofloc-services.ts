@@ -3,13 +3,14 @@ import { createClient } from "@/utils/supabase";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ProposalBioflocStatus } from "../types/thematic";
+import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 
 export type ProposalBioflocThematicProgram = {
   id: number;
   status: ProposalBioflocStatus;
   name: string;
-  province: string;
-  regency: string;
+  province_id: string;
+  regency_id: string;
   district: string;
   village: string;
   location_id: number | null;
@@ -34,7 +35,7 @@ export type PaginatedProposalBioflocResult = {
 };
 
 type ProposalProvinceRow = {
-  province: string | null;
+  province_id: string | null;
 };
 
 export type ProposalBioflocProvinceSummary = {
@@ -54,6 +55,8 @@ export async function createAvailableLocationForBioflocProposalService(
     .from(TABLES.AVAILABLE_LOCATIONS)
     .insert({
       type: "biofloc_thematic",
+      province_id: payload.province_id,
+      regency_id: payload.regency_id,
       name: payload.name,
       latitude: payload.latitude,
       longitude: payload.longitude,
@@ -83,8 +86,8 @@ export async function createProposalBioflocThematicProgramService(
       location_id: locationId.id,
       status: "pending",
       name: payload.name,
-      province: payload.province,
-      regency: payload.regency,
+      province_id: payload.province_id,
+      regency_id: payload.regency_id,
       district: payload.district,
       village: payload.village,
       proposal_path: payload.proposal_path,
@@ -113,7 +116,7 @@ export async function getProposalBioflocPaginatedService(
   let query = supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
     .select(
-      "id, name, province, regency, district, village, status, created_at",
+      "id, name, province_id, regency_id, district, village, status, created_at",
       { count: "exact" },
     );
 
@@ -124,7 +127,7 @@ export async function getProposalBioflocPaginatedService(
 
   // Province filter
   if (province && province.trim().length > 0) {
-    query = query.eq("province", province);
+    query = query.eq("province_id", province);
   }
 
   const { data, error, count } = await query
@@ -173,7 +176,7 @@ export async function getProposalBioflocProvinceSummary(
 ): Promise<ProposalBioflocProvinceSummary> {
   const { data, error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("province");
+    .select("province_id");
 
   if (error) {
     throw error;
@@ -182,10 +185,13 @@ export async function getProposalBioflocProvinceSummary(
   const rows = (data ?? []) as ProposalProvinceRow[];
   const proposal_count_by_province = rows.reduce<Record<string, number>>(
     (acc, row) => {
-      if (!row.province) {
+      if (!row.province_id) {
         return acc;
       }
-      const key = normalizeProvinceName(row.province);
+      const province =
+        INDONESIA_PROVINCES.find((p) => p.province_id === row.province_id)
+          ?.name ?? row.province_id;
+      const key = normalizeProvinceName(province);
       acc[key] = (acc[key] ?? 0) + 1;
       return acc;
     },
