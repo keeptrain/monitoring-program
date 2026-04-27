@@ -68,9 +68,7 @@ export default function PublicMonitoringMap({
 
   return (
     <>
-      {type === "biofloc_thematic" && (
-        <MapTopContent kdmpCount={locations.length} />
-      )}
+      <MapTopContent type={type} kdmpCount={locations.length} />
       <MapContainer
         center={INDONESIA_CENTER}
         maxBounds={INDONESIA_BOUNDS}
@@ -136,7 +134,14 @@ export default function PublicMonitoringMap({
   );
 }
 
-function MapTopContent({ kdmpCount }: { kdmpCount: number }) {
+function MapTopContent({
+  type,
+  kdmpCount,
+}: {
+  type: LocationType;
+  kdmpCount: number;
+}) {
+  const activeLagendaLabel = type === "biofloc_thematic" ? "KDMP" : "POKDAKA";
   return (
     <>
       <div className="absolute top-3 left-15 z-1 border border-zinc-300 bg-white shadow-xs">
@@ -150,7 +155,7 @@ function MapTopContent({ kdmpCount }: { kdmpCount: number }) {
             />
             <div className="flex flex-col gap-1">
               <span className="text-[9px] leading-none font-bold tracking-widest text-zinc-400 uppercase">
-                KDMP
+                {activeLagendaLabel}
               </span>
               <span className="text-sm leading-none font-semibold">
                 {kdmpCount}
