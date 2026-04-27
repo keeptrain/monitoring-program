@@ -15,6 +15,10 @@ export interface ThematicPrograms {
   total_members: number;
   distribution_amount: number;
   sppg_partner: string;
+  address: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   s_curve_path: string;
   documentations: {
     id: string;
