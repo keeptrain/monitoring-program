@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
 import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
+import { LocationStatus } from "@/features/monitoring/api/getPublicLocationsByType";
 
 export interface AvailableLocation {
   id: number;
@@ -35,6 +36,7 @@ export async function getAvailableLocations() {
 
 export async function getAvailableLocationsByType(
   type: LocationType,
+  status: LocationStatus,
 ): Promise<PublicAvailableLocation[]> {
   const supabase = await createClient();
 
@@ -43,7 +45,7 @@ export async function getAvailableLocationsByType(
       ? TABLES.BIOFLOC_THEMATIC_PROGRAMS
       : "isf_programs";
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("available_locations")
     .select(
       `
@@ -54,12 +56,18 @@ export async function getAvailableLocationsByType(
       longitude,
       ${programTable}!inner (
         id,
+        status,
         progress_percent
       )
     `,
     )
-    .eq("type", type)
-    .limit(100);
+    .eq("type", type);
+
+  if (type === "biofloc_thematic") {
+    query = query.eq(`${programTable}.status`, status);
+  }
+
+  const { data, error } = await query.limit(100);
 
   if (error) {
     console.error("getAvailableLocationsByType error:", error);
