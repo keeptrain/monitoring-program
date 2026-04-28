@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import * as db from "../services/proposal-biofloc-services";
 import { ProposalBioflocStatus } from "../types/thematic";
+import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
+import { redirect } from "next/navigation";
 export type {
   ProposalBioflocThematicProgram,
   ProposalBioflocDetail,
@@ -54,4 +56,13 @@ export async function createSignedUrlForProposalBiofloc(id: number) {
 
 export async function getProposalBioflocDetail(id: number) {
   return db.getProposalBioflocDetailService(id);
+}
+
+export async function convertProposalToProgram(
+  proposalId: number,
+  values: BioflocProgramFormValues,
+) {
+  await db.convertProposalToThematicProgramService(proposalId, values);
+  redirect("/dashboard/thematic/biofloc");
+  return { success: true, message: "Proposal berhasil diubah menjadi program" };
 }

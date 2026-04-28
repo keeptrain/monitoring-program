@@ -7,6 +7,7 @@ import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
 import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 import { useMutation } from "@tanstack/react-query";
 import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
+import { ConvertProposalButton } from "@/features/thematic/components/biofloc/ConvertProposalButton";
 
 const STATUS_CONFIG: Record<
   ProposalBioflocStatus,
@@ -82,7 +83,10 @@ function AdminActions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onAction(row.id, "approved")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction(row.id, "approved");
+            }}
             className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
             title="Setujui"
           >
@@ -91,13 +95,19 @@ function AdminActions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onAction(row.id, "rejected")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction(row.id, "rejected");
+            }}
             className="text-red-600 hover:bg-red-50 hover:text-red-700"
             title="Tolak"
           >
             <X className="size-4" />
           </Button>
         </>
+      )}
+      {row.status === "approved" && (
+        <ConvertProposalButton proposalId={row.id} proposalName={row.name} />
       )}
     </div>
   );
@@ -131,7 +141,8 @@ export function ProposalDownloadButton({ id }: { id: number }) {
       console.log(error);
     },
   });
-  const handleDownload = async () => {
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     mutate();
   };
   return (

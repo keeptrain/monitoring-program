@@ -102,3 +102,15 @@ export async function updateThematicProgramProgress(
   revalidatePath("/dashboard/thematic");
   revalidatePath(`/dashboard/thematic/${id}`);
 }
+
+export async function deleteThematicProgram(id: number) {
+  try {
+    await db.deleteBioflocThematicProgramService(id);
+  } catch (error) {
+    console.error("Error deleting thematic program:", error);
+    throw error;
+  }
+
+  revalidatePath("/dashboard/thematic");
+  redirect("/dashboard/thematic");
+}

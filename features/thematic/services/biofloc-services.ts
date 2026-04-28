@@ -234,6 +234,7 @@ export async function createBioflocThematicProgramService(
   > & {
     location_id: number;
     documentations: NormalizedDocumentation[];
+    proposal_id?: number;
   },
 ) {
   const supabase = await createClient();
@@ -277,6 +278,18 @@ export async function updateBioflocThematicProgramProgressService(
       progress_percent,
       updated_at: new Date().toISOString(),
     })
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function deleteBioflocThematicProgramService(id: number) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .delete()
     .eq("id", id);
 
   if (error) {

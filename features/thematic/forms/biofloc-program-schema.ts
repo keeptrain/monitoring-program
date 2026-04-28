@@ -20,8 +20,8 @@ export const bioflocBaseProgramSchema = z.object({
 });
 
 export const bioflocProgramSchema = bioflocBaseProgramSchema
-  .extend(locationFormSchemaPattern)
   .extend(sCurveSchema.shape)
+  .extend(locationFormSchemaPattern)
   .extend({
     documentations: documentationFormSchema.shape.documentations.optional(),
   });

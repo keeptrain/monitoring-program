@@ -11,6 +11,7 @@ import {
 } from "../actions/biofloc";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
+import { convertProposalToProgram } from "../actions/proposal-biofloc";
 
 const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   name: "",
@@ -23,10 +24,10 @@ const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   total_members: 0,
   distribution_amount: 0,
   sppg_partner: "",
-  s_curve_path: "",
   location_name: "",
-  latitude: "",
-  longitude: "",
+  latitude: 0,
+  longitude: 0,
+  s_curve_path: "",
   documentations: [],
 };
 
@@ -53,10 +54,10 @@ function getDefaultValues(
     total_members: initialData.total_members ?? 0,
     distribution_amount: initialData.distribution_amount ?? 0,
     sppg_partner: initialData.sppg_partner ?? "",
+    location_name: initialData.available_locations.name ?? "",
+    latitude: initialData.available_locations.latitude ?? 0,
+    longitude: initialData.available_locations.longitude ?? 0,
     s_curve_path: initialData.s_curve_path ?? "",
-    location_name: initialData.available_locations?.name ?? "",
-    latitude: String(initialData.available_locations?.latitude ?? ""),
-    longitude: String(initialData.available_locations?.longitude ?? ""),
     documentations:
       initialData.documentations?.map((doc) => ({
         image_before_paths: doc.image_before_path
@@ -81,8 +82,12 @@ function getDefaultValues(
 
 export function useThematicProgramForm(
   initialData?: ThematicProgramDetail | null,
+  proposalId?: number,
+  isConvertingFromProposal?: boolean,
 ) {
   const [isPending, startTransition] = useTransition();
+
+  console.log(initialData);
 
   const form = useForm<
     BioflocProgramFormInput,
@@ -96,8 +101,10 @@ export function useThematicProgramForm(
   const onSubmit = (values: BioflocProgramFormValues) => {
     startTransition(async () => {
       try {
-        if (initialData) {
+        if (initialData && initialData.id !== 0) {
           await updateThematicPrograms(initialData.id, values);
+        } else if (isConvertingFromProposal && proposalId) {
+          await convertProposalToProgram(proposalId, values);
         } else {
           await createThematicPrograms(values);
         }
@@ -107,5 +114,5 @@ export function useThematicProgramForm(
     });
   };
 
-  return { form, onSubmit, isPending };
+  return { form, onSubmit: form.handleSubmit(onSubmit), isPending };
 }

@@ -4,6 +4,7 @@ import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ProposalBioflocStatus } from "../types/thematic";
 import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
+import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 
 export type ProposalBioflocThematicProgram = {
   id: number;
@@ -287,6 +288,7 @@ export async function getProposalBioflocDetailService(
       created_at,
       updated_at,
       available_locations (
+        name,
         latitude,
         longitude
       )
@@ -304,4 +306,58 @@ export async function getProposalBioflocDetailService(
   }
 
   return data as unknown as ProposalBioflocDetail;
+}
+
+/**
+ * Convert an approved proposal into a thematic program (KDMP)
+ * This creates a new thematic program using the proposal data
+ */
+export async function convertProposalToThematicProgramService(
+  proposalId: number,
+  value: BioflocProgramFormValues,
+): Promise<{ message: string }> {
+  const supabase = await createClient();
+
+  // Get the approved proposal with location details
+  const { data: proposal, error: proposalError } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .select("id, location_id, name, district, village")
+    .eq("id", proposalId)
+    .single();
+
+  if (proposalError || !proposal) {
+    throw new Error(
+      "Proposal tidak ditemukan atau belum disetujui untuk dikonversi.",
+    );
+  }
+
+  // Create new thematic program with proposal data
+  const { error: programError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .insert({
+      proposal_id: proposalId,
+      location_id: proposal.location_id,
+      name: proposal.name,
+      status: "potential",
+      kusuka_number: "",
+      commodity_aid: value.commodity_aid,
+      commodity_potential: value.commodity_potential,
+      land_area: value.land_area,
+      production_value: value.production_value,
+      total_management: value.total_management,
+      total_members: value.total_members,
+      distribution_amount: value.distribution_amount,
+      sppg_partner: value.sppg_partner,
+      address: `${proposal.village}, ${proposal.district}`,
+      s_curve_path: value.s_curve_path,
+      progress_percent: value.progress_percent,
+    });
+
+  if (programError) {
+    throw new Error(`Gagal membuat program tematik: ${programError.message}`);
+  }
+
+  return {
+    message: `Program tematik berhasil dibuat dari proposal.`,
+  };
 }

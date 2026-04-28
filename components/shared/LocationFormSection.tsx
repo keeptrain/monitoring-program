@@ -91,8 +91,10 @@ function CoordinateMapSync<T extends FieldValues>({
 // ─── Main Component ─────────────────────────────────────────────────
 export default function LocationFormSection<T extends FieldValues>({
   form,
+  isReadOnly = false,
 }: {
   form: UseFormReturn<T>;
+  isReadOnly?: boolean;
 }) {
   const [isManualInput, setIsManualInput] = useState(false);
 
@@ -108,16 +110,18 @@ export default function LocationFormSection<T extends FieldValues>({
       <CoordinateMapSync
         control={control}
         setValue={setValue}
-        isManualInput={isManualInput}
+        isManualInput={isManualInput || isReadOnly}
       />
 
-      <div className="flex items-center gap-2">
-        <Checkbox
-          checked={isManualInput}
-          onCheckedChange={setIsManualInput}
-          label="Input manual koordinat"
-        />
-      </div>
+      {!isReadOnly && (
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={isManualInput}
+            onCheckedChange={setIsManualInput}
+            label="Input manual koordinat"
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field>
@@ -130,7 +134,7 @@ export default function LocationFormSection<T extends FieldValues>({
             inputMode="decimal"
             aria-invalid={!!errors["latitude"]}
             placeholder="-6.93095"
-            disabled={!isManualInput}
+            disabled={!isManualInput || isReadOnly}
           />
           <FieldError>
             {errors["latitude"]?.message as string | undefined}
@@ -147,7 +151,7 @@ export default function LocationFormSection<T extends FieldValues>({
             inputMode="decimal"
             aria-invalid={!!errors["longitude"]}
             placeholder="107.46755"
-            disabled={!isManualInput}
+            disabled={!isManualInput || isReadOnly}
           />
           <FieldError>
             {errors["longitude"]?.message as string | undefined}

@@ -1,6 +1,5 @@
 import { PublicThematicProgram } from "../../../thematic/actions/public-thematic-programs";
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
-import { SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
@@ -34,14 +33,12 @@ export default function BioflocDetailSheet({
         </div>
       </div>
 
-      <SheetFooter>
-        <Button className="w-full" asChild>
-          <Link href={`/monitoring/biofloc-thematic/${data.id}`}>
-            Data Detail
-            <ArrowRightIcon />
-          </Link>
-        </Button>
-      </SheetFooter>
+      <Button className="w-full" asChild>
+        <Link href={`/monitoring/biofloc-thematic/${data.id}`}>
+          Data Detail
+          <ArrowRightIcon />
+        </Link>
+      </Button>
 
       {/* Documentation Section - source from `documentations` table */}
       <DocumentationCarouselGallery type="biofloc_thematic" id={data.id} />
