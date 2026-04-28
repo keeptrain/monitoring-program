@@ -17,6 +17,9 @@ export type PublicThematicProgram = {
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations: {
     name: string | null;
     latitude: number | null;
@@ -38,6 +41,9 @@ type PublicThematicProgramRow = {
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations:
     | {
         name: string | null;
@@ -71,6 +77,9 @@ export async function getPublicThematicProgram(id: number) {
       distribution_amount,
       sppg_partner,
       s_curve_path,
+      kusuka_number,
+      nib,
+      legal_entity_number,
       available_locations (
         name,
         latitude,
@@ -109,6 +118,9 @@ export async function getPublicThematicProgram(id: number) {
     distribution_amount: data.distribution_amount,
     sppg_partner: data.sppg_partner,
     s_curve_path: data.s_curve_path,
+    kusuka_number: data.kusuka_number,
+    nib: data.nib,
+    legal_entity_number: data.legal_entity_number,
     available_locations: location ?? null,
   } satisfies PublicThematicProgram;
 }
