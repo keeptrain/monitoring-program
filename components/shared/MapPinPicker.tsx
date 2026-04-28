@@ -158,7 +158,7 @@ export default function MapPinPicker({
           type="button"
           onClick={handleLocateMe}
           disabled={locating || disabled}
-          className="absolute right-2 bottom-2 z-400 rounded-md border bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-zinc-50 disabled:opacity-50"
+          className="absolute right-2 bottom-2 z-5 rounded-md border bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-zinc-50 disabled:opacity-50"
         >
           {locating ? "Mencari..." : "📍 Lokasi Saya"}
         </button>

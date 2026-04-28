@@ -3,13 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import {
-  CalendarPlusIcon,
-  HomeIcon,
-  HouseIcon,
-  MapPinIcon,
-  RefreshCwIcon,
-} from "lucide-react";
+import { MapPinIcon } from "lucide-react";
 import { getProposalBioflocDetail } from "../actions/proposal-biofloc";
 import { proposalBioflocDetailQueryKey } from "../api/getProposalBioflocDetail";
 import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
@@ -21,13 +15,11 @@ import { DetailItem } from "@/components/shared/DetailItem";
 import ProposalDetailClient from "../components/biofloc/ProposalDetailClient";
 import { notFound } from "next/navigation";
 
-interface ProposalBioflocDetailPageProps {
-  params: Promise<{ type: string; id: string }>;
-}
-
 export default async function ProposalBioflocDetailPage({
   params,
-}: ProposalBioflocDetailPageProps) {
+}: {
+  params: Promise<{ type: string; id: string }>;
+}) {
   const { type, id } = await params;
 
   if (type !== "biofloc") {
@@ -84,31 +76,23 @@ export default async function ProposalBioflocDetailPage({
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2">
-              <CalendarPlusIcon className="size-4" />
-              <p className="text-muted-foreground text-sm">
-                {formatDateWithTime(created_at)}
-              </p>
-            </span>
-            <span className="flex items-center gap-2">
-              <RefreshCwIcon className="size-4" />
-              <p className="text-muted-foreground text-sm">
-                {formatDateWithTime(updated_at)}
-              </p>
-            </span>
-          </div>
-          <StatusBadge status={status} />
-        </div>
-
-        <Card className="rounded-none">
+        <Card>
           <CardHeader>
             <CardTitle>Informasi</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <DetailItem icon={HouseIcon} label="Kelurahan" value={district} />
-            <DetailItem icon={HomeIcon} label="Desa" value={village} />
+            <DetailItem
+              label="Status"
+              value={<StatusBadge status={status} />}
+            />
+            <DetailItem label="Dibuat" value={formatDateWithTime(created_at)} />
+            <DetailItem
+              label="Diperbarui"
+              value={formatDateWithTime(updated_at)}
+            />
+
+            <DetailItem label="Kelurahan" value={district} />
+            <DetailItem label="Desa" value={village} />
           </CardContent>
         </Card>
 

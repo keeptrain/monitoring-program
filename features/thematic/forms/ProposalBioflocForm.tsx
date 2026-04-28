@@ -9,8 +9,7 @@ import { useProposalBioflocForm } from "../hooks/useProposalBioflocForm";
 import { useCallback } from "react";
 import FileUploadField from "@/features/documentation/components/FileUploadField";
 import LocationFormSection from "@/components/shared/LocationFormSection";
-import ProvinceSelect from "@/components/shared/ProvinceSelect";
-import { Controller } from "react-hook-form";
+import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 
 export default function ProposalBioflocForm() {
   const { form, onSubmit, isPending, submitError } = useProposalBioflocForm();
@@ -35,7 +34,7 @@ export default function ProposalBioflocForm() {
   );
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-10">
+    <form onSubmit={onSubmit} className="space-y-6 pb-10">
       {/* Section 1: Informasi KDMP  */}
       <Card>
         <CardHeader>
@@ -53,35 +52,6 @@ export default function ProposalBioflocForm() {
           </Field>
 
           <Field>
-            <FieldLabel>Provinsi</FieldLabel>
-            <Controller
-              control={form.control}
-              name="province_id"
-              render={({ field }) => (
-                <ProvinceSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  allLabel="Pilih Provinsi"
-                  showAll={true}
-                  className="w-full"
-                  aria-invalid={!!errors.province_id}
-                />
-              )}
-            />
-            <FieldError>{errors.province_id?.message}</FieldError>
-          </Field>
-
-          <Field>
-            <FieldLabel>Kabupaten/Kota</FieldLabel>
-            <Input
-              {...register("regency_id")}
-              aria-invalid={!!errors.regency_id}
-              placeholder="Contoh: Sidoarjo"
-            />
-            <FieldError>{errors.regency_id?.message}</FieldError>
-          </Field>
-
-          <Field>
             <FieldLabel>Kelurahan</FieldLabel>
             <Input
               {...register("district")}
@@ -91,7 +61,7 @@ export default function ProposalBioflocForm() {
             <FieldError>{errors.district?.message}</FieldError>
           </Field>
 
-          <Field className="md:col-span-2">
+          <Field>
             <FieldLabel>Desa</FieldLabel>
             <Input
               {...register("village")}
@@ -109,7 +79,7 @@ export default function ProposalBioflocForm() {
           <CardTitle>Lokasi KDMP</CardTitle>
         </CardHeader>
         <CardContent>
-          <LocationFormSection form={form} />
+          <LocationFormSection form={form} showAdministrativeFields />
         </CardContent>
       </Card>
 
@@ -125,6 +95,21 @@ export default function ProposalBioflocForm() {
             basePath="proposal-biofloc-thematic"
             accept=".pdf,.doc,.docx"
             error={errors.proposal_path?.message || submitError || undefined}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Section 4: Upload Proposal */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Dokumentasi Proposal</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DocumentationsFormSection
+            form={form}
+            mode="create"
+            documentationType="proposal_before"
+            storageBasePath="documentations/proposal-biofloc-thematic"
           />
         </CardContent>
       </Card>

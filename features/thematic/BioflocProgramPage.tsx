@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/native-select";
 import { BioflocProgramsInternalTableColumns } from "@/features/monitoring/components/biofloc/BioflocProgramsTableColumns";
 import { useURLSearchParams } from "@/hooks/useURLSearchParams";
+import { useDeleteThematicProgram } from "./api/deleteThematicProgram";
 
 const YEAR_OPTIONS = [2026, 2025] as const;
 
@@ -86,9 +87,15 @@ export default function BioflocProgramPage({
     selectedRow,
   } = useUpdateProgressSheet();
 
+  const { mutateAsync } = useDeleteThematicProgram();
+
   const columns = useMemo(
-    () => BioflocProgramsInternalTableColumns({ onOpenProgress: openForRow }),
-    [openForRow],
+    () =>
+      BioflocProgramsInternalTableColumns({
+        onOpenProgress: openForRow,
+        onDelete: mutateAsync,
+      }),
+    [openForRow, mutateAsync],
   );
 
   const handleRowClick = useCallback(

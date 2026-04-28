@@ -2,16 +2,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
   bioflocProgramSchema,
+  bioflocProgramCreateSchema,
   BioflocProgramFormInput,
   BioflocProgramFormValues,
 } from "../forms/biofloc-program-schema";
 import {
-  createThematicPrograms,
+  createThematicProgram,
   updateThematicPrograms,
 } from "../actions/biofloc";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
 import { convertProposalToProgram } from "../actions/proposal-biofloc";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 
 const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   name: "",
@@ -24,10 +28,11 @@ const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   total_members: 0,
   distribution_amount: 0,
   sppg_partner: "",
-  location_name: "",
   latitude: 0,
   longitude: 0,
   s_curve_path: "",
+  province_id: "",
+  regency_id: "",
   documentations: [],
 };
 
@@ -44,20 +49,21 @@ function getDefaultValues(
   }
 
   return {
-    name: initialData.name ?? "",
-    progress_percent: initialData.progress_percent ?? 0,
-    commodity_aid: initialData.commodity_aid ?? "",
-    commodity_potential: initialData.commodity_potential ?? "",
-    land_area: initialData.land_area ?? "",
-    production_value: initialData.production_value ?? "",
-    total_management: initialData.total_management ?? 0,
-    total_members: initialData.total_members ?? 0,
-    distribution_amount: initialData.distribution_amount ?? 0,
-    sppg_partner: initialData.sppg_partner ?? "",
-    location_name: initialData.available_locations.name ?? "",
-    latitude: initialData.available_locations.latitude ?? 0,
-    longitude: initialData.available_locations.longitude ?? 0,
+    name: initialData.name,
+    progress_percent: initialData.progress_percent,
+    commodity_aid: initialData.commodity_aid,
+    commodity_potential: initialData?.commodity_potential ?? "",
+    land_area: initialData.land_area,
+    production_value: initialData.production_value,
+    total_management: initialData.total_management,
+    total_members: initialData.total_members,
+    distribution_amount: initialData.distribution_amount,
+    sppg_partner: initialData.sppg_partner,
+    latitude: initialData.available_locations.latitude,
+    longitude: initialData.available_locations.longitude,
     s_curve_path: initialData.s_curve_path ?? "",
+    province_id: initialData.available_locations.province_id ?? "",
+    regency_id: initialData.available_locations.regency_id ?? "",
     documentations:
       initialData.documentations?.map((doc) => ({
         image_before_paths: doc.image_before_path
@@ -85,16 +91,24 @@ export function useThematicProgramForm(
   proposalId?: number,
   isConvertingFromProposal?: boolean,
 ) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
-  console.log(initialData);
+  const isEdit = !!initialData && initialData.id !== 0;
+  const shouldRequireAdministrativeLocation =
+    !isEdit && !isConvertingFromProposal;
 
   const form = useForm<
     BioflocProgramFormInput,
     undefined,
     BioflocProgramFormValues
   >({
-    resolver: zodResolver(bioflocProgramSchema),
+    resolver: zodResolver(
+      shouldRequireAdministrativeLocation
+        ? bioflocProgramCreateSchema
+        : bioflocProgramSchema,
+    ),
     defaultValues: getDefaultValues(initialData),
   });
 
@@ -104,9 +118,24 @@ export function useThematicProgramForm(
         if (initialData && initialData.id !== 0) {
           await updateThematicPrograms(initialData.id, values);
         } else if (isConvertingFromProposal && proposalId) {
-          await convertProposalToProgram(proposalId, values);
+          const { success } = await convertProposalToProgram(
+            proposalId,
+            values,
+          );
+          if (success) {
+            router.push("/dashboard/thematic/biofloc");
+            queryClient.invalidateQueries({
+              queryKey: getBioflocProgramsPaginatedQueryKey(),
+            });
+          }
         } else {
-          await createThematicPrograms(values);
+          const { success } = await createThematicProgram(values);
+          if (success) {
+            router.push("/dashboard/thematic/biofloc");
+            queryClient.invalidateQueries({
+              queryKey: getBioflocProgramsPaginatedQueryKey(),
+            });
+          }
         }
       } catch (error) {
         console.error("Failed to submit form:", error);

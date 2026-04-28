@@ -18,6 +18,7 @@ const STATUS_CONFIG: Record<
 > = {
   pending: { variant: "secondary", label: "Menunggu" },
   approved: { variant: "default", label: "Disetujui" },
+  converted: { variant: "default", label: "Masuk KDMP" },
   rejected: { variant: "destructive", label: "Ditolak" },
 };
 

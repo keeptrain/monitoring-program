@@ -1,4 +1,8 @@
-export type ProposalBioflocStatus = "pending" | "approved" | "rejected";
+export type ProposalBioflocStatus =
+  | "pending"
+  | "approved"
+  | "converted"
+  | "rejected";
 
 export type BioflocScope = "internal" | "public";
 
@@ -36,6 +40,8 @@ export type ThematicProgramDetail = ThematicPrograms & {
     name: string;
     latitude: number;
     longitude: number;
+    province_id?: string | null;
+    regency_id?: string | null;
   };
 };
 

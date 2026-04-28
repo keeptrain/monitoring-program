@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { getProvinceNameByIdOrFallback } from "@/lib/utils";
 
 export default async function ProposalSourceCard({
   proposalId,
@@ -57,9 +58,11 @@ export default async function ProposalSourceCard({
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Provinsi ID
+                Provinsi
               </p>
-              <p className="text-sm">{proposal.province_id}</p>
+              <p className="text-sm">
+                {getProvinceNameByIdOrFallback(proposal.province_id)}
+              </p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">

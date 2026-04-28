@@ -5,6 +5,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { ProposalBioflocStatus } from "../types/thematic";
 import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
+import { saveDocumentationsAction } from "@/features/documentation/actions";
 
 export type ProposalBioflocThematicProgram = {
   id: number;
@@ -59,7 +60,7 @@ export async function createAvailableLocationForBioflocProposalService(
   supabase: SupabaseClient,
   payload: ProposalBioflocFormValues,
 ) {
-  const { data: locationId, error } = await supabase
+  const { data, error } = await supabase
     .from(TABLES.AVAILABLE_LOCATIONS)
     .insert({
       type: "biofloc_thematic",
@@ -76,7 +77,8 @@ export async function createAvailableLocationForBioflocProposalService(
     throw new Error(`Gagal menyimpan lokasi: ${error.message}`);
   }
 
-  return locationId;
+  console.log(data.id);
+  return data.id;
 }
 
 export async function createProposalBioflocThematicProgramService(
@@ -88,10 +90,10 @@ export async function createProposalBioflocThematicProgramService(
     payload,
   );
 
-  const { error } = await supabase
+  const { data: proposal, error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
     .insert({
-      location_id: locationId.id,
+      location_id: locationId,
       status: "pending",
       name: payload.name,
       province_id: payload.province_id,
@@ -99,10 +101,31 @@ export async function createProposalBioflocThematicProgramService(
       district: payload.district,
       village: payload.village,
       proposal_path: payload.proposal_path,
-    });
+    })
+    .select("id")
+    .single();
 
   if (error) {
     throw new Error(`Gagal menyimpan proposal: ${error.message}`);
+  }
+
+  if (!proposal?.id) {
+    throw new Error(
+      "Proposal berhasil dibuat tetapi ID proposal tidak ditemukan.",
+    );
+  }
+
+  const docsResult = await saveDocumentationsAction(
+    supabase,
+    proposal.id,
+    "proposal_biofloc_thematic",
+    payload.documentations,
+  );
+
+  if (!docsResult.success) {
+    throw new Error(
+      docsResult.error ?? "Gagal menyimpan dokumentasi proposal.",
+    );
   }
 
   return { message: "Proposal berhasil diajukan." };
@@ -315,13 +338,13 @@ export async function getProposalBioflocDetailService(
 export async function convertProposalToThematicProgramService(
   proposalId: number,
   value: BioflocProgramFormValues,
-): Promise<{ message: string }> {
+): Promise<{ success: boolean; message: string }> {
   const supabase = await createClient();
 
   // Get the approved proposal with location details
   const { data: proposal, error: proposalError } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("id, location_id, name, district, village")
+    .select("id, location_id, status, name, district, village")
     .eq("id", proposalId)
     .single();
 
@@ -331,15 +354,20 @@ export async function convertProposalToThematicProgramService(
     );
   }
 
+  if (proposal.status !== "approved") {
+    throw new Error("Proposal belum di setujui.");
+  }
+
   // Create new thematic program with proposal data
-  const { error: programError } = await supabase
+  const { error: bioflocInsertError } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .insert({
       proposal_id: proposalId,
       location_id: proposal.location_id,
       name: proposal.name,
       status: "potential",
-      kusuka_number: "",
+      progress_percent: value.progress_percent,
+      kusuka_number: "", // null
       commodity_aid: value.commodity_aid,
       commodity_potential: value.commodity_potential,
       land_area: value.land_area,
@@ -350,14 +378,27 @@ export async function convertProposalToThematicProgramService(
       sppg_partner: value.sppg_partner,
       address: `${proposal.village}, ${proposal.district}`,
       s_curve_path: value.s_curve_path,
-      progress_percent: value.progress_percent,
     });
 
-  if (programError) {
-    throw new Error(`Gagal membuat program tematik: ${programError.message}`);
+  if (bioflocInsertError) {
+    throw new Error(
+      `Gagal membuat program tematik: ${bioflocInsertError.message}`,
+    );
+  }
+
+  const { error: updateProposalError } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .update({ status: "converted" })
+    .eq("id", proposalId);
+
+  if (updateProposalError) {
+    throw new Error(
+      `Gagal memperbarui status proposal: ${updateProposalError.message}`,
+    );
   }
 
   return {
+    success: true,
     message: `Program tematik berhasil dibuat dari proposal.`,
   };
 }

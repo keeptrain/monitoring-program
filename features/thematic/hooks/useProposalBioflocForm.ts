@@ -20,7 +20,8 @@ const DEFAULT_VALUES: ProposalBioflocFormInput = {
   village: "",
   latitude: "",
   longitude: "",
-  proposal_path: "",
+  proposal_path: "proposal-biofloc-thematic/1777253909964-doi9.pdf",
+  documentations: [{ image_before_paths: [] }],
 };
 
 export function useProposalBioflocForm() {
@@ -41,9 +42,14 @@ export function useProposalBioflocForm() {
     startTransition(async () => {
       setSubmitError(null);
       try {
-        await createProposalBioflocThematicProgram(values);
-        router.push("/monitoring");
-        toast.success("Proposal berhasil diajukan.");
+        const { success, message } =
+          await createProposalBioflocThematicProgram(values);
+        if (success) {
+          router.push("/monitoring");
+          toast.success(message);
+        } else {
+          toast.error(message);
+        }
       } catch (error) {
         if (error instanceof Error) {
           setSubmitError(error.message);
@@ -56,7 +62,7 @@ export function useProposalBioflocForm() {
 
   return {
     form,
-    onSubmit,
+    onSubmit: form.handleSubmit(onSubmit),
     isPending,
     submitError,
   };

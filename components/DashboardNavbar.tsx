@@ -4,7 +4,7 @@ import { UserDropdown } from "./UserDropdown";
 
 export default function DashboardNavbar() {
   return (
-    <header className="border-border text-background sticky top-0 z-10 border-b bg-[#006ebf]">
+    <header className="text-background sticky top-0 z-20 bg-[#006ebf] shadow-xs">
       <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link

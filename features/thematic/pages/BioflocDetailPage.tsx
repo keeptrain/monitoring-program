@@ -19,13 +19,11 @@ import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
 
-interface BioflocDetailPageProps {
-  params: Promise<{ id: string; type: string }>;
-}
-
 export default async function BioflocDetailPage({
   params,
-}: BioflocDetailPageProps) {
+}: {
+  params: Promise<{ id: string; type: string }>;
+}) {
   const { id, type } = await params;
   const programId = Number(id);
 

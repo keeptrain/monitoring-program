@@ -125,6 +125,8 @@ export async function createLocationFromProgram(
     name: string;
     latitude: number;
     longitude: number;
+    province_id?: string;
+    regency_id?: string;
   },
 ) {
   const { data: locationData, error } = await supabase

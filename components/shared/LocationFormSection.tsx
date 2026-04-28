@@ -1,6 +1,5 @@
 "use client";
 
-import z from "zod";
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import {
@@ -9,6 +8,7 @@ import {
   Path,
   useWatch,
   Control,
+  Controller,
 } from "react-hook-form";
 import { handleGeoCoordinateValueChange } from "@/lib/utils";
 import { Checkbox } from "../ui/checkbox";
@@ -16,38 +16,14 @@ import { useCallback, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
 import type { MapPinPickerValue } from "./MapPinPicker";
+import ProvinceSelect from "./ProvinceSelect";
 
 const MapPinPicker = dynamic(() => import("./MapPinPicker"), {
   ssr: false,
   loading: () => <Skeleton className="h-[320px] w-full rounded-md" />,
 });
 
-// ─── Schema patterns (reusable across different form schemas) ────────
-export const locationCoordinateSchemaPattern = {
-  latitude: z.preprocess(
-    (v) => (v === "" ? undefined : v),
-    z.coerce
-      .number({ error: "Latitude harus diisi" })
-      .min(-90, "Latitude minimal -90")
-      .max(90, "Latitude maksimal 90"),
-  ),
-  longitude: z.preprocess(
-    (v) => (v === "" ? undefined : v),
-    z.coerce
-      .number({ error: "Longitude harus diisi" })
-      .min(-180, "Longitude minimal -180")
-      .max(180, "Longitude maksimal 180"),
-  ),
-};
-
-export const locationFormSchemaPattern = {
-  location_name: z.string().min(1, "Nama lokasi harus diisi"),
-  ...locationCoordinateSchemaPattern,
-};
-
-export const locationFormSchema = z.object(locationFormSchemaPattern);
-
-// ─── Isolated coordinate watcher (prevents parent re-render) ────────
+// Isolated coordinate watcher (prevents parent re-render)
 function CoordinateMapSync<T extends FieldValues>({
   control,
   setValue,
@@ -88,13 +64,15 @@ function CoordinateMapSync<T extends FieldValues>({
   );
 }
 
-// ─── Main Component ─────────────────────────────────────────────────
+// Main Component
 export default function LocationFormSection<T extends FieldValues>({
   form,
   isReadOnly = false,
+  showAdministrativeFields = false,
 }: {
   form: UseFormReturn<T>;
   isReadOnly?: boolean;
+  showAdministrativeFields?: boolean;
 }) {
   const [isManualInput, setIsManualInput] = useState(false);
 
@@ -107,6 +85,44 @@ export default function LocationFormSection<T extends FieldValues>({
 
   return (
     <div className="space-y-4">
+      {showAdministrativeFields && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Field>
+            <FieldLabel>Provinsi</FieldLabel>
+            <Controller
+              control={control}
+              name={"province_id" as Path<T>}
+              render={({ field }) => (
+                <ProvinceSelect
+                  value={(field.value as string) ?? ""}
+                  onChange={field.onChange}
+                  allLabel="Pilih Provinsi"
+                  showAll
+                  className="w-full"
+                  aria-invalid={!!errors["province_id"]}
+                />
+              )}
+            />
+            <FieldError>
+              {errors["province_id"]?.message as string | undefined}
+            </FieldError>
+          </Field>
+
+          <Field>
+            <FieldLabel>Kabupaten/Kota</FieldLabel>
+            <Input
+              {...register("regency_id" as Path<T>)}
+              aria-invalid={!!errors["regency_id"]}
+              placeholder="Contoh: Sidoarjo"
+              disabled={isReadOnly}
+            />
+            <FieldError>
+              {errors["regency_id"]?.message as string | undefined}
+            </FieldError>
+          </Field>
+        </div>
+      )}
+
       <CoordinateMapSync
         control={control}
         setValue={setValue}

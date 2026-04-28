@@ -53,6 +53,7 @@ export default function BioflocProgramForm({
           <LocationFormSection
             form={form}
             isReadOnly={isConvertingFromProposal}
+            showAdministrativeFields={!isConvertingFromProposal}
           />
         </CardContent>
       </Card>
