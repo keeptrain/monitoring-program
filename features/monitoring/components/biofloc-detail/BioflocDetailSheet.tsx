@@ -7,8 +7,10 @@ import { ProgressPieChartZoneIsf } from "@/features/monitoring/components/isf-de
 
 export default function BioflocDetailSheet({
   data,
+  isAuthenticated = false,
 }: {
   data: PublicThematicProgram | null;
+  isAuthenticated?: boolean;
 }) {
   if (!data) return null;
 
@@ -22,6 +24,17 @@ export default function BioflocDetailSheet({
           value={data.commodity_potential || "-"}
         />
       </div>
+
+      {isAuthenticated && (
+        <div className="bg-muted/20 border-border grid grid-cols-1 gap-px overflow-hidden border">
+          <DetailItem label="Nomor KUSUKA" value={data.kusuka_number || "-"} />
+          <DetailItem label="NIB" value={data.nib || "-"} />
+          <DetailItem
+            label="Nomor Badan Hukum"
+            value={data.legal_entity_number || "-"}
+          />
+        </div>
+      )}
 
       {/* Progress Section */}
       <div className="flex items-center justify-center gap-6">

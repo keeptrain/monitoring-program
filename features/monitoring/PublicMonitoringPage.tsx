@@ -72,7 +72,11 @@ const FILTER_STATE: Record<
   },
 };
 
-export default function PublicMonitoringPage() {
+export default function PublicMonitoringPage({
+  isAuthenticated = false,
+}: {
+  isAuthenticated?: boolean;
+}) {
   const [activeTab, setActiveTab] = useState<LocationType | null>(
     "biofloc_thematic",
   );
@@ -92,7 +96,7 @@ export default function PublicMonitoringPage() {
                 {activeTab === "isf" ? (
                   <LazyIsf />
                 ) : (
-                  <LazyMap type={activeTab} />
+                  <LazyMap type={activeTab} isAuthenticated={isAuthenticated} />
                 )}
               </div>
             )}

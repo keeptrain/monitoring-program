@@ -50,6 +50,17 @@ export const IsfPin = (props: { className?: string }) => (
   />
 );
 
+import { AlertCircleIcon } from "lucide-react";
+
+export const PotentialPin = (props: { className?: string }) => (
+  <MapPin
+    bgColor="bg-red-600"
+    icon={AlertCircleIcon}
+    iconColor="text-red-700"
+    {...props}
+  />
+);
+
 export const iconThematic = L.divIcon({
   html: renderToStaticMarkup(<ThematicPin />),
   className: "",
@@ -59,6 +70,13 @@ export const iconThematic = L.divIcon({
 
 export const iconIsf = L.divIcon({
   html: renderToStaticMarkup(<IsfPin />),
+  className: "",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+});
+
+export const iconPotential = L.divIcon({
+  html: renderToStaticMarkup(<PotentialPin />),
   className: "",
   iconSize: [40, 40],
   iconAnchor: [20, 40],
