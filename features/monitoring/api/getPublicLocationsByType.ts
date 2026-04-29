@@ -7,19 +7,21 @@ import { getPublicMonitoringIsf } from "@/features/monitoring/actions/public-loc
 import { PublicMonitoringIsf } from "../types/monitoring-types";
 import { useQuery } from "@tanstack/react-query";
 
-export const getFilterStateQueryKey = (type: LocationType | null) => [
-  "filter-state",
-  type,
-];
+export type LocationStatus = "potential" | "active";
 
-export const useGetPublicLocationsByType = (type: LocationType | null) =>
+export const getLocationsQueryKey = (
+  type: LocationType,
+  status: LocationStatus,
+) => ["locations", type, status];
+
+export const useGetPublicLocationsByType = (
+  type: LocationType,
+  status: LocationStatus,
+) =>
   useQuery({
-    queryKey: getFilterStateQueryKey(type),
-    queryFn: async (): Promise<PublicAvailableLocation[]> => {
-      if (!type) return [];
-      return getAvailableLocationsByType(type);
-    },
-    enabled: !!type && type !== "isf",
+    queryKey: getLocationsQueryKey(type, status),
+    queryFn: async (): Promise<PublicAvailableLocation[]> =>
+      getAvailableLocationsByType(type, status),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

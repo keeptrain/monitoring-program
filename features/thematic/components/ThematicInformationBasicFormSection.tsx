@@ -39,7 +39,6 @@ export default function ThematicInformationBasicFormSection({
         />
         <FieldError>{errors.name?.message}</FieldError>
       </Field>
-
       <Field>
         <FieldLabel htmlFor="progress_percent">
           Persentase Pengerjaan (%)

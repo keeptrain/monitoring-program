@@ -3,7 +3,7 @@ import { BioflocProgramListItem } from "@/features/thematic/types/thematic";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
-import { ConstructionIcon, PencilIcon } from "lucide-react";
+import { ConstructionIcon, PencilIcon, TrashIcon } from "lucide-react";
 
 const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   {
@@ -42,37 +42,68 @@ export const BioflocProgramsPublicTableColumns =
 
 export const BioflocProgramsInternalTableColumns = (opts: {
   onOpenProgress?: (row: BioflocProgramListItem) => void;
-}): ColumnDef<BioflocProgramListItem>[] => [
-  BASE_COLUMNS[0],
-  {
-    header: "No. KUSUKA",
-    accessorKey: "kusuka_number",
-    cell: ({ row }) => row.original.kusuka_number || "-",
-  },
-  ...BASE_COLUMNS.slice(1),
-  {
-    header: "Aksi",
-    id: "actions",
-    cell: ({ row }) => {
-      const item = row.original;
-      const menuItems: MoreButtonMenuItem[] = [
-        {
-          type: "link",
-          key: "edit",
-          label: "Ubah",
-          href: `/dashboard/thematic/biofloc/${item.id}/edit`,
-          icon: PencilIcon,
-        },
-        {
-          type: "action",
-          key: "progress-update",
-          label: "Update Progress",
-          onClick: () => opts.onOpenProgress?.(item),
-          icon: ConstructionIcon,
-        },
-      ];
+  onDelete?: (id: number) => Promise<unknown>;
+}): ColumnDef<BioflocProgramListItem>[] => {
+  const handleDelete = async (item: BioflocProgramListItem) => {
+    if (!opts.onDelete) {
+      alert("Delete functionality is not available");
+      return;
+    }
 
-      return <MoreButton menuItems={menuItems} />;
+    const confirmed = confirm(
+      `Apakah Anda yakin ingin menghapus program KDMP "${item.name}"? Tindakan ini tidak dapat dibatalkan.`,
+    );
+    if (confirmed) {
+      try {
+        await opts.onDelete(item.id);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Gagal menghapus program";
+        alert(errorMessage);
+      }
+    }
+  };
+
+  return [
+    BASE_COLUMNS[0],
+    {
+      header: "No. KUSUKA",
+      accessorKey: "kusuka_number",
+      cell: ({ row }) => row.original.kusuka_number || "-",
     },
-  },
-];
+    ...BASE_COLUMNS.slice(1),
+    {
+      header: "Aksi",
+      id: "actions",
+      cell: ({ row }) => {
+        const item = row.original;
+        const menuItems: MoreButtonMenuItem[] = [
+          {
+            type: "link",
+            key: "edit",
+            label: "Ubah",
+            href: `/dashboard/thematic/biofloc/${item.id}/edit`,
+            icon: PencilIcon,
+          },
+          {
+            type: "action",
+            key: "progress-update",
+            label: "Update Progress",
+            onClick: () => opts.onOpenProgress?.(item),
+            icon: ConstructionIcon,
+          },
+          {
+            type: "action",
+            key: "delete",
+            label: "Hapus",
+            onClick: () => handleDelete(item),
+            icon: TrashIcon,
+            className: "text-red-600 hover:text-red-700 hover:bg-red-50",
+          },
+        ];
+
+        return <MoreButton menuItems={menuItems} />;
+      },
+    },
+  ];
+};

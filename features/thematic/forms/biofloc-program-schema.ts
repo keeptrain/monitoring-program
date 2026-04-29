@@ -1,4 +1,5 @@
-import { locationFormSchemaPattern } from "@/components/shared/LocationFormSection";
+import { locationFormSchemaPattern } from "@/components/shared/location-schema";
+import { requiredLocationAdministrativeSchemaPattern } from "@/components/shared/location-schema";
 import { documentationFormSchema } from "@/features/documentation/forms/documentation-schema";
 import { sCurveSchema } from "@/features/documentation/forms/scurve-schema";
 import { z } from "zod";
@@ -20,11 +21,15 @@ export const bioflocBaseProgramSchema = z.object({
 });
 
 export const bioflocProgramSchema = bioflocBaseProgramSchema
-  .extend(locationFormSchemaPattern)
   .extend(sCurveSchema.shape)
+  .extend(locationFormSchemaPattern)
   .extend({
     documentations: documentationFormSchema.shape.documentations.optional(),
   });
+
+export const bioflocProgramCreateSchema = bioflocProgramSchema.extend(
+  requiredLocationAdministrativeSchemaPattern,
+);
 
 export type BioflocProgramFormInput = z.input<typeof bioflocProgramSchema>;
 export type BioflocProgramFormValues = z.output<typeof bioflocProgramSchema>;

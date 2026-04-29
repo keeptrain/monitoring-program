@@ -2,46 +2,43 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ThematicLoading() {
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-4xl">
       {/* Header Skeleton */}
-      <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-32" />
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-80" />
+      <div className="mb-6 space-y-2">
+        <Skeleton className="h-4 w-40" />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-96" />
+          </div>
+          <Skeleton className="h-9 w-32" />
         </div>
-        <Skeleton className="h-10 w-36" />
       </div>
 
-      {/* Stats/Metrics Skeleton (Optional if you have cards) */}
+      {/* Navigation Tabs Skeleton */}
+      <div className="mb-6 flex items-center gap-2">
+        <Skeleton className="h-10 w-28" />
+        <Skeleton className="h-10 w-28" />
+        <Skeleton className="h-10 w-40" />
+      </div>
 
-      {/* Table Skeleton */}
-      <div className="border-border bg-background border p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-24" />
-        </div>
-        <div className="space-y-4">
-          {/* Table Header */}
-          <div className="flex gap-4 border-b pb-4">
-            <Skeleton className="h-4 flex-1" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-20" />
+      {/* Table Skeleton (Broad strokes) */}
+      <div className="space-y-4">
+        {/* Filter Mock */}
+        <div className="flex items-center justify-between pb-2">
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-100" />
           </div>
-          {/* Table Rows */}
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 py-2">
-              <Skeleton className="h-5 flex-1" />
-              <Skeleton className="h-5 w-32" />
-              <Skeleton className="h-5 w-24" />
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-2 w-16" />
-                <Skeleton className="h-4 w-8" />
-              </div>
-              <Skeleton className="h-8 w-8 rounded-full" />
-            </div>
-          ))}
+          <Skeleton className="h-9 w-64" />
+        </div>
+
+        {/* Table Mock */}
+        <div className="border border-zinc-200 bg-white">
+          <div className="space-y-4 p-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
         </div>
       </div>
     </div>

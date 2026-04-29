@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Providers from "@/app/providers";
 import { Toaster } from "sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -36,7 +37,9 @@ export default function RootLayout({
       )}
     >
       <body className="bg-background text-foreground min-h-full">
-        <Providers>{children}</Providers>
+        <Providers>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </Providers>
         <Toaster position="top-center" />
       </body>
     </html>

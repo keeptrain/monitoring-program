@@ -8,6 +8,7 @@ import {
   ThematicProgramIndex,
 } from "../types/thematic";
 import { BioflocProgramsPaginatedParams } from "../forms/biofloc-program-query-schema";
+import { saveDocumentationsAction } from "@/features/documentation/actions";
 
 type NormalizedDocumentation = {
   id: string;
@@ -171,17 +172,131 @@ export async function getBioflocThematicProgramByIdService(
   id: number,
 ): Promise<ThematicProgramDetail> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  // 1. Fetch program data
+  const { data: program, error: programError } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(DETAIL_SELECT)
     .eq("id", id)
     .single();
 
-  if (error) {
-    throw error;
+  if (programError) {
+    throw programError;
   }
 
-  return data;
+  // 2. Fetch documentations from the documentations table
+  const { data: docs, error: docsError } = await supabase
+    .from("documentations")
+    .select("*")
+    .eq("program_type", "biofloc_thematic")
+    .eq("program_id", id);
+
+  if (docsError) {
+    console.error("Error fetching documentations:", docsError);
+    // Continue even if docs fail, just return empty list
+  }
+
+  // 3. Group documentations by group_id
+  interface DocGroup {
+    id: string;
+    image_before_path: string | null;
+    image_after_path: string | null;
+    created_at: string;
+    updated_at: string;
+  }
+  const docGroups: Record<string, DocGroup> = {};
+  (docs || []).forEach((d) => {
+    if (!docGroups[d.group_id]) {
+      docGroups[d.group_id] = {
+        id: d.group_id,
+        image_before_path: null,
+        image_after_path: null,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      };
+    }
+    if (d.type === "before") {
+      docGroups[d.group_id].image_before_path = d.path;
+    } else {
+      docGroups[d.group_id].image_after_path = d.path;
+    }
+  });
+
+  return {
+    ...program,
+    documentations: Object.values(docGroups),
+  } as unknown as ThematicProgramDetail;
+}
+
+export async function createBioflocThematicService(
+  data: BioflocProgramFormValues,
+) {
+  const supabase = await createClient();
+
+  const { data: locationData, error: locationError } = await supabase
+    .from(TABLES.AVAILABLE_LOCATIONS)
+    .insert({
+      province_id: data.province_id,
+      regency_id: data.regency_id,
+      type: "biofloc_thematic",
+      name: data.name,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    })
+    .select("id")
+    .single();
+
+  if (locationError) {
+    console.error(
+      "Error creating location when creating biofloc thematic program:",
+      locationError,
+    );
+    throw locationError;
+  }
+
+  const { data: bioflocInsertData, error: bioflocInsertError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .insert({
+      location_id: locationData.id,
+      name: data.name,
+      progress_percent: data.progress_percent,
+      commodity_aid: data.commodity_aid,
+      commodity_potential: data.commodity_potential,
+      land_area: data.land_area,
+      production_value: data.production_value,
+      total_management: data.total_management,
+      total_members: data.total_members,
+      distribution_amount: data.distribution_amount,
+      sppg_partner: data.sppg_partner,
+      kusuka_number: "", // Mandatory NOT NULL
+      status: "potential",
+      address: `${data.regency_id || ""}, ${data.province_id || ""}`,
+    })
+    .select("id")
+    .single();
+
+  if (bioflocInsertError) {
+    console.error(
+      "Error creating biofloc thematic program:",
+      bioflocInsertError,
+    );
+    throw bioflocInsertError;
+  }
+
+  if (data.documentations && data.documentations.length > 0) {
+    const docsResult = await saveDocumentationsAction(
+      supabase,
+      bioflocInsertData.id,
+      "biofloc_thematic",
+      data.documentations,
+    );
+    if (!docsResult.success) {
+      console.error("Error creating documentations:", docsResult.error);
+      throw new Error(
+        docsResult.error ?? "Gagal menyimpan dokumentasi program.",
+      );
+    }
+  }
 }
 
 export async function createBioflocThematicProgramService(
@@ -191,6 +306,7 @@ export async function createBioflocThematicProgramService(
   > & {
     location_id: number;
     documentations: NormalizedDocumentation[];
+    proposal_id?: number;
   },
 ) {
   const supabase = await createClient();
@@ -234,6 +350,50 @@ export async function updateBioflocThematicProgramProgressService(
       progress_percent,
       updated_at: new Date().toISOString(),
     })
+    .eq("id", id);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function deleteBioflocThematicProgramService(id: number) {
+  const supabase = await createClient();
+
+  // Ambil data program untuk mengecek keberadaan proposal_id dan tahun pengajuan
+  const { data: program, error: fetchError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .select("proposal_id, fiscal_year")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  // Validasi: jika tidak ada proposal_id dan merupakan tahun 2025
+  if (!program?.proposal_id && program?.fiscal_year === 2025) {
+    throw new Error(
+      "Program tahun 2025 yang bukan berasal dari proposal tidak dapat dihapus secara manual.",
+    );
+  }
+
+  // Jika ada proposal_id, kembalikan status proposal ke 'approved'
+  if (program?.proposal_id) {
+    const { error: updateProposalError } = await supabase
+      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .update({ status: "approved" })
+      .eq("id", program.proposal_id);
+
+    if (updateProposalError) {
+      throw updateProposalError;
+    }
+  }
+
+  // Hapus program (diberlakukan untuk semua yang lolos validasi)
+  const { error } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .delete()
     .eq("id", id);
 
   if (error) {

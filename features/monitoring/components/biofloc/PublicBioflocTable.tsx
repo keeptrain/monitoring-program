@@ -13,10 +13,12 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useGetBioflocProgramsPaginated } from "@/features/thematic/api/getBioflocProgramsPaginated";
 import { BioflocProgramsPublicTableColumns } from "./BioflocProgramsTableColumns";
 import { useURLSearchParams } from "@/hooks/useURLSearchParams";
+import { useRouter } from "next/navigation";
 
 const YEAR_OPTIONS = [2026, 2025] as const;
 
 export default function PublicBioflocTable() {
+  const router = useRouter();
   const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   // URL-based state management
@@ -61,6 +63,9 @@ export default function PublicBioflocTable() {
 
   const columns = useMemo(() => BioflocProgramsPublicTableColumns(), []);
 
+  const handleRowClick = (id: number) =>
+    router.push(`/monitoring/biofloc-thematic/${id}`);
+
   return (
     <Datatable
       columns={columns}
@@ -70,6 +75,7 @@ export default function PublicBioflocTable() {
       pageCount={data?.totalPages ?? -1}
       rowCount={data?.total ?? 0}
       pagination={pagination}
+      onRowClick={({ id }) => handleRowClick(id)}
       onPaginationChange={(updater) => {
         const newState =
           typeof updater === "function" ? updater(pagination) : updater;

@@ -1,4 +1,8 @@
-export type ProposalBioflocStatus = "pending" | "approved" | "rejected";
+export type ProposalBioflocStatus =
+  | "pending"
+  | "approved"
+  | "converted"
+  | "rejected";
 
 export type BioflocScope = "internal" | "public";
 
@@ -15,6 +19,10 @@ export interface ThematicPrograms {
   total_members: number;
   distribution_amount: number;
   sppg_partner: string;
+  address: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   s_curve_path: string;
   documentations: {
     id: string;
@@ -32,6 +40,8 @@ export type ThematicProgramDetail = ThematicPrograms & {
     name: string;
     latitude: number;
     longitude: number;
+    province_id?: string | null;
+    regency_id?: string | null;
   };
 };
 
