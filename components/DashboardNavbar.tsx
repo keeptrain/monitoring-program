@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import Image from "next/image";
 import { UserDropdown } from "./UserDropdown";
 
@@ -27,7 +28,9 @@ export default function DashboardNavbar() {
         </Link>
 
         {/* User Navigation (Client Part) */}
-        <UserDropdown />
+        <Suspense fallback={<div className="size-10 rounded-full bg-white/10 animate-pulse" />}>
+          <UserDropdown />
+        </Suspense>
       </nav>
     </header>
   );

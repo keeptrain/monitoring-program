@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Grid2X2PlusIcon } from "lucide-react";
@@ -42,7 +43,13 @@ export default async function Navbar() {
                 Entry Data
               </Link>
             </Button>
-            <UserDropdown />
+            <Suspense
+              fallback={
+                <div className="bg-muted size-10 animate-pulse rounded-full" />
+              }
+            >
+              <UserDropdown />
+            </Suspense>
           </div>
         ) : (
           <LoginButton />
