@@ -12,6 +12,7 @@ import { STEPS } from "./constants/isf-step";
 import { useRouter } from "next/navigation";
 import { IsfReportDateWindow } from "./utils/report-date-window";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
+import { deleteIsfProgramLog } from "@/features/isf/actions/isf-program-logs";
 import {
   Sheet,
   SheetContent,
@@ -20,6 +21,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { FieldError } from "@/components/ui/field";
+import { toast } from "sonner";
 
 export default function IsfStepProgramPage({
   step,
@@ -47,12 +49,30 @@ export default function IsfStepProgramPage({
     setOpenSheet(true);
   }, []);
 
+  const handleDeleteReport = useCallback(
+    async (id: number) => {
+      if (window.confirm("Apakah Anda yakin ingin menghapus laporan ini?")) {
+        try {
+          // Note: using 'step' which is the zone id
+          await deleteIsfProgramLog(id, step);
+          router.refresh();
+          toast.success("Laporan berhasil dihapus.");
+        } catch (error) {
+          console.error(error);
+          alert("Gagal menghapus laporan.");
+        }
+      }
+    },
+    [step, router],
+  );
+
   const columns = useMemo(
     () =>
       IsfStepProgramTableColumns({
         onUpdateDocumentations: handleUpdateDocumentations,
+        onDeleteReport: handleDeleteReport,
       }),
-    [handleUpdateDocumentations],
+    [handleUpdateDocumentations, handleDeleteReport],
   );
 
   const handleCreateHref = useMemo(() => {

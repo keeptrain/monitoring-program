@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, Check, X, Loader2 } from "lucide-react";
 import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
+import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 import { useMutation } from "@tanstack/react-query";
 import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
+import { ConvertProposalButton } from "@/features/thematic/components/biofloc/ConvertProposalButton";
 
 const STATUS_CONFIG: Record<
   ProposalBioflocStatus,
@@ -16,10 +18,11 @@ const STATUS_CONFIG: Record<
 > = {
   pending: { variant: "secondary", label: "Menunggu" },
   approved: { variant: "default", label: "Disetujui" },
+  converted: { variant: "default", label: "Masuk KDMP" },
   rejected: { variant: "destructive", label: "Ditolak" },
 };
 
-const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
+export const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
   const config = STATUS_CONFIG[status];
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
@@ -35,13 +38,18 @@ export const ProposalSubmissionTableColumns =
     },
     {
       header: "Provinsi",
-      accessorKey: "province",
-      cell: ({ row: { original } }) => <span>{original.province}</span>,
+      accessorKey: "province_id",
+      cell: ({ row: { original } }) => {
+        const name = INDONESIA_PROVINCES.find(
+          (p) => p.province_id === original.province_id,
+        )?.name;
+        return <span>{name || original.province_id}</span>;
+      },
     },
     {
       header: "Kab / Kota",
-      accessorKey: "regency",
-      cell: ({ row: { original } }) => <span>{original.regency}</span>,
+      accessorKey: "regency_id",
+      cell: ({ row: { original } }) => <span>{original.regency_id}</span>,
     },
     {
       header: "Kelurahan",
@@ -76,7 +84,10 @@ function AdminActions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onAction(row.id, "approved")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction(row.id, "approved");
+            }}
             className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
             title="Setujui"
           >
@@ -85,13 +96,19 @@ function AdminActions({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onAction(row.id, "rejected")}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction(row.id, "rejected");
+            }}
             className="text-red-600 hover:bg-red-50 hover:text-red-700"
             title="Tolak"
           >
             <X className="size-4" />
           </Button>
         </>
+      )}
+      {row.status === "approved" && (
+        <ConvertProposalButton proposalId={row.id} proposalName={row.name} />
       )}
     </div>
   );
@@ -108,7 +125,7 @@ export const ProposalAdminTableColumns = (
   },
 ];
 
-function ProposalDownloadButton({ id }: { id: number }) {
+export function ProposalDownloadButton({ id }: { id: number }) {
   const { mutate, isPending } = useMutation({
     mutationFn: () => createSignedUrlForProposalBiofloc(id),
     onSuccess: (data) => {
@@ -125,7 +142,8 @@ function ProposalDownloadButton({ id }: { id: number }) {
       console.log(error);
     },
   });
-  const handleDownload = async () => {
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     mutate();
   };
   return (

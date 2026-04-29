@@ -4,6 +4,7 @@ import {
   documentationFormRowSchema,
   documentationInsertRowSchema,
   documentationProgramTypeSchema,
+  proposalDocumentationFormRowSchema,
   DocumentationFormValue,
   DocumentationInsertRow,
   DocumentationImage,
@@ -67,11 +68,18 @@ function mapToDocumentationRows(
 ): { rows: DocumentationInsertRow[]; groupIds: number[] } {
   const normalizedProgramType =
     documentationProgramTypeSchema.parse(programType);
+  const beforeType =
+    normalizedProgramType === "proposal_biofloc_thematic"
+      ? "proposal_before"
+      : "before";
 
   const baseGroupId = Date.now();
   const groupIds: number[] = [];
   const rows = (documentations ?? []).flatMap((documentation, index) => {
-    const row = documentationFormRowSchema.parse(documentation);
+    const row =
+      normalizedProgramType === "proposal_biofloc_thematic"
+        ? proposalDocumentationFormRowSchema.parse(documentation)
+        : documentationFormRowSchema.parse(documentation);
     const groupId = String(baseGroupId + index); // Consistent with schema (string)
     groupIds.push(Number(groupId));
 
@@ -82,7 +90,7 @@ function mapToDocumentationRows(
         program_type: normalizedProgramType,
         program_id: programId,
         group_id: groupId,
-        type: "before",
+        type: beforeType,
         path: normalizeStoragePath(img.path),
         file_name: img.file_name,
       });
@@ -175,11 +183,15 @@ type DocumentationQueryRow = {
   id: number;
   program_id: number;
   group_id: string | number | null;
-  type: "before" | "after";
+  type: "before" | "after" | "proposal_before";
   path: string;
   file_name: string;
   created_at: string | null;
 };
+
+function isBeforeDocumentationType(type: DocumentationQueryRow["type"]): boolean {
+  return type === "before" || type === "proposal_before";
+}
 
 export async function getDocumentationsByTypeAndId(type: string, id: number) {
   const supabase = await createClient();
@@ -230,16 +242,16 @@ export async function getDocumentationsByProgramIds(
       groupedByProgram.set(row.program_id, {
         programId: row.program_id,
         groupId: row.group_id,
-        beforeImages: row.type === "before" ? [imgObj] : [],
+        beforeImages: isBeforeDocumentationType(row.type) ? [imgObj] : [],
         afterImages: row.type === "after" ? [imgObj] : [],
-        beforeUrls: row.type === "before" ? [publicUrl] : [],
+        beforeUrls: isBeforeDocumentationType(row.type) ? [publicUrl] : [],
         afterUrls: row.type === "after" ? [publicUrl] : [],
         allUrls: [publicUrl],
       });
       continue;
     }
 
-    if (row.type === "before") {
+    if (isBeforeDocumentationType(row.type)) {
       existing.beforeImages.push(imgObj);
       existing.beforeUrls.push(publicUrl);
     } else {
@@ -302,14 +314,14 @@ export async function getDocumentationGroupsByProgramId(
       groupMap.set(groupKey, {
         programId: row.program_id,
         groupId: row.group_id,
-        beforeImages: row.type === "before" ? [imgObj] : [],
+        beforeImages: isBeforeDocumentationType(row.type) ? [imgObj] : [],
         afterImages: row.type === "after" ? [imgObj] : [],
-        beforeUrls: row.type === "before" ? [publicUrl] : [],
+        beforeUrls: isBeforeDocumentationType(row.type) ? [publicUrl] : [],
         afterUrls: row.type === "after" ? [publicUrl] : [],
         allUrls: [publicUrl],
       });
     } else {
-      if (row.type === "before") {
+      if (isBeforeDocumentationType(row.type)) {
         existing.beforeImages.push(imgObj);
         existing.beforeUrls.push(publicUrl);
       } else {

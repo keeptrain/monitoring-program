@@ -6,17 +6,11 @@ export default async function IsfCreatePage({
 }: {
   searchParams: Promise<{ step?: string; minDate?: string; maxDate?: string }>;
 }) {
-  const { step, minDate, maxDate } = await searchParams;
+  const { step } = await searchParams;
 
-  if (!maxDate || !step) {
+  if (!step) {
     return notFound();
   }
 
-  return (
-    <IsfReportForm
-      zone={step}
-      initialMinDate={minDate}
-      initialMaxDate={maxDate}
-    />
-  );
+  return <IsfReportForm zone={step} />;
 }

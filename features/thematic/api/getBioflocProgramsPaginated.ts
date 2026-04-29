@@ -4,11 +4,11 @@ import { BioflocScope } from "../types/thematic";
 import { BioflocProgramsPaginatedInput } from "../forms/biofloc-program-query-schema";
 
 export const getBioflocProgramsPaginatedQueryKey = (
-  params: BioflocProgramsPaginatedInput,
-) => [
-  "biofloc-thematic-programs-paginated",
-  params,
-] as const;
+  params?: Partial<BioflocProgramsPaginatedInput>,
+) =>
+  params
+    ? (["biofloc-thematic-programs-paginated", params] as const)
+    : (["biofloc-thematic-programs-paginated"] as const);
 
 export const useGetBioflocProgramsPaginated = (
   scope: BioflocScope,

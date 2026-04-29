@@ -6,7 +6,7 @@ import { getProposalBioflocProvinceSummary } from "./proposal-biofloc-services";
 
 export type ProgramQuotaRow = {
   id: number;
-  region_id: string;
+  province_id: string;
   program_type: string;
   year: number;
   quota_limit: number;
@@ -16,7 +16,7 @@ export type ProgramQuotaRow = {
 
 export type ProgramQuotaViewRow = {
   id: number | null;
-  region_id: string;
+  province_id: string;
   region_name: string;
   program_type: "biofloc_thematic";
   year: number;
@@ -35,10 +35,10 @@ export async function getProgramQuotasByTypeAndYear(year: number) {
   const [quotaResult, proposalSummary] = await Promise.all([
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
-      .select("id, region_id, quota_limit")
+      .select("id, province_id, quota_limit")
       .eq("program_type", PROGRAM_QUOTA_TYPE)
       .eq("year", year)
-      .order("region_id", { ascending: true }),
+      .order("province_id", { ascending: true }),
     getProposalBioflocProvinceSummary(supabase),
   ]);
   const { data, error } = quotaResult;
@@ -66,11 +66,11 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
   const [quotaResult, proposalSummary] = await Promise.all([
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
-      .select("id, region_id, quota_limit")
+      .select("id, province_id, quota_limit")
       .eq("program_type", PROGRAM_QUOTA_TYPE)
       .eq("year", year)
       .gt("quota_limit", minQuota)
-      .order("region_id", { ascending: true }),
+      .order("province_id", { ascending: true }),
     getProposalBioflocProvinceSummary(supabase),
   ]);
   const { data, error } = quotaResult;
@@ -90,8 +90,8 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
   } satisfies ProgramQuotaResult;
 }
 
-export async function upsertProgramQuotaByRegion(input: {
-  region_id: string;
+export async function upsertProgramQuotaByProvince(input: {
+  province_id: string;
   year: number;
   quota_limit: number;
 }) {
@@ -100,14 +100,14 @@ export async function upsertProgramQuotaByRegion(input: {
     .from(TABLES.PROGRAM_QUOTAS)
     .upsert(
       {
-        region_id: input.region_id,
+        province_id: input.province_id,
         program_type: PROGRAM_QUOTA_TYPE,
         year: input.year,
         quota_limit: input.quota_limit,
         updated_at: new Date().toISOString(),
       },
       {
-        onConflict: "region_id,program_type,year",
+        onConflict: "province_id,program_type,year",
       },
     )
     .select("*")
@@ -127,39 +127,41 @@ function mapProgramQuotaRows(input: {
   onlyPositiveQuota: boolean;
 }): ProgramQuotaViewRow[] {
   if (input.onlyPositiveQuota) {
-    const provinceByRegionId = new Map(
-      INDONESIA_PROVINCES.map((province) => [province.region_id, province]),
+    const provinceByProvinceId = new Map(
+      INDONESIA_PROVINCES.map((province) => [province.province_id, province]),
     );
 
     return input.rows.map((row) => {
-      const province = provinceByRegionId.get(row.region_id);
-      const region_name = province?.name ?? row.region_id;
+      const province = provinceByProvinceId.get(row.province_id);
+      const region_name = province?.name ?? row.province_id;
       const normalizedProvinceName = region_name.trim().toLowerCase();
       return {
         id: row.id ?? null,
-        region_id: row.region_id,
+        province_id: row.province_id,
         region_name,
         program_type: "biofloc_thematic",
         year: input.year,
         quota_limit: row.quota_limit,
-        proposal_count: input.proposalCountByProvince[normalizedProvinceName] ?? 0,
+        proposal_count:
+          input.proposalCountByProvince[normalizedProvinceName] ?? 0,
         updated_at: row.updated_at ?? null,
       };
     });
   }
 
-  const byRegion = new Map(input.rows.map((row) => [row.region_id, row]));
+  const byProvince = new Map(input.rows.map((row) => [row.province_id, row]));
   return INDONESIA_PROVINCES.map((province) => {
-    const row = byRegion.get(province.region_id);
+    const row = byProvince.get(province.province_id);
     const normalizedProvinceName = province.name.trim().toLowerCase();
     return {
       id: row?.id ?? null,
-      region_id: province.region_id,
+      province_id: province.province_id,
       region_name: province.name,
       program_type: "biofloc_thematic",
       year: input.year,
       quota_limit: row?.quota_limit ?? 0,
-      proposal_count: input.proposalCountByProvince[normalizedProvinceName] ?? 0,
+      proposal_count:
+        input.proposalCountByProvince[normalizedProvinceName] ?? 0,
       updated_at: row?.updated_at ?? null,
     };
   });

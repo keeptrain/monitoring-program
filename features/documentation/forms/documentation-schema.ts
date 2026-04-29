@@ -4,6 +4,7 @@ export const documentationProgramTypeSchema = z.enum([
   "biofloc_thematic",
   "minapadi_thematic",
   "isf",
+  "proposal_biofloc_thematic",
 ]);
 
 export const documentationImageSchema = z.object({
@@ -22,6 +23,14 @@ export const documentationFormRowSchema = z.object({
     .default([]),
 });
 
+export const proposalDocumentationFormRowSchema = z.object({
+  image_before_paths: z
+    .array(documentationImageSchema)
+    .min(1, "Dokumentasi proposal wajib diunggah")
+    .default([]),
+  image_after_paths: z.array(documentationImageSchema).default([]),
+});
+
 export const documentationFormSchema = z.object({
   documentations: z.array(documentationFormRowSchema).optional(),
 });
@@ -30,7 +39,7 @@ export const documentationInsertRowSchema = z.object({
   program_type: documentationProgramTypeSchema,
   program_id: z.number().int().positive(),
   group_id: z.string().min(1), // Changed to string for flexibility
-  type: z.enum(["before", "after"]),
+  type: z.enum(["before", "after", "proposal_before"]),
   path: z.string().min(1, "Path wajib diisi"),
   file_name: z.string().min(1, "Nama file wajib diisi"),
 });

@@ -39,7 +39,6 @@ export default function ThematicInformationBasicFormSection({
         />
         <FieldError>{errors.name?.message}</FieldError>
       </Field>
-
       <Field>
         <FieldLabel htmlFor="progress_percent">
           Persentase Pengerjaan (%)
@@ -59,13 +58,23 @@ export default function ThematicInformationBasicFormSection({
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="commodity">Komoditas</FieldLabel>
+        <FieldLabel htmlFor="commodity_aid">Komoditas Bantuan</FieldLabel>
         <Input
-          {...register("commodity")}
-          aria-invalid={!!errors.commodity}
+          {...register("commodity_aid")}
+          aria-invalid={!!errors.commodity_aid}
           placeholder="Contoh: Udang Vaname"
         />
-        <FieldError>{errors.commodity?.message}</FieldError>
+        <FieldError>{errors.commodity_aid?.message}</FieldError>
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="commodity_potential">Komoditas Potensi</FieldLabel>
+        <Input
+          {...register("commodity_potential")}
+          aria-invalid={!!errors.commodity_potential}
+          placeholder="Contoh: Nila"
+        />
+        <FieldError>{errors.commodity_potential?.message}</FieldError>
       </Field>
 
       <Field>
@@ -79,13 +88,13 @@ export default function ThematicInformationBasicFormSection({
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="production">Produksi</FieldLabel>
+        <FieldLabel htmlFor="production_value">Produksi</FieldLabel>
         <Input
-          {...register("production")}
-          aria-invalid={!!errors.production}
+          {...register("production_value")}
+          aria-invalid={!!errors.production_value}
           placeholder="Contoh: 100 Ton"
         />
-        <FieldError>{errors.production?.message}</FieldError>
+        <FieldError>{errors.production_value?.message}</FieldError>
       </Field>
 
       <Field>
@@ -99,14 +108,25 @@ export default function ThematicInformationBasicFormSection({
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="total_admin">Total Admin</FieldLabel>
+        <FieldLabel htmlFor="total_management">Jumlah Pengurus</FieldLabel>
         <Input
-          {...register("total_admin")}
-          aria-invalid={!!errors.total_admin}
+          {...register("total_management")}
+          aria-invalid={!!errors.total_management}
           type="number"
           placeholder="0"
         />
-        <FieldError>{errors.total_admin?.message}</FieldError>
+        <FieldError>{errors.total_management?.message}</FieldError>
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="total_members">Jumlah Anggota</FieldLabel>
+        <Input
+          {...register("total_members")}
+          aria-invalid={!!errors.total_members}
+          type="number"
+          placeholder="0"
+        />
+        <FieldError>{errors.total_members?.message}</FieldError>
       </Field>
 
       <Field>

@@ -1,3 +1,4 @@
+import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -79,4 +80,23 @@ export function toPreviewUrl(
 
 export function mergeUnique(existing: string[], incoming: string[]) {
   return [...new Set([...existing, ...incoming])];
+}
+
+// Create a Map for O(1) lookup performance
+const provinceIdMap = new Map(
+  INDONESIA_PROVINCES.map((p) => [p.province_id, p.name])
+);
+
+export function getProvinceNameById(
+  provinceId?: string | number
+): string | undefined {
+  const id = String(provinceId);
+  return id ? provinceIdMap.get(id) : undefined;
+}
+
+export function getProvinceNameByIdOrFallback(
+  provinceId?: string | number,
+  fallback: string = "Provinsi Tidak Diketahui"
+): string {
+  return getProvinceNameById(provinceId) ?? fallback;
 }

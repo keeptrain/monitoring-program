@@ -64,7 +64,7 @@ export default function ManagementQuotaPage() {
       setSubmitQuotaError(null);
       try {
         await updateQuotaMutation.mutateAsync({
-          region_id: selectedQuotaRow.region_id,
+          province_id: selectedQuotaRow.province_id,
           quota_limit: values.quota_limit,
         });
         setQuotaSheetOpen(false);

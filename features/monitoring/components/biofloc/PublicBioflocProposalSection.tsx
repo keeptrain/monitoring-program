@@ -38,10 +38,10 @@ export default function PublicBioflocProposalSection() {
       </Button>
 
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-zinc-900">
           Data Pengajuan Proposal Tematik Bioflok 2026
         </h2>
-        <ArrowDownIcon className="size-4 animate-bounce" />
+        <ArrowDownIcon className="size-4 animate-bounce text-zinc-900" />
       </div>
 
       {/* 2. Summary Section: Circle + Small Table */}

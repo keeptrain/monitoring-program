@@ -14,9 +14,9 @@ export function BioflocProgramQuotaTableColumns(opts?: {
       cell: ({ row }) => row.original.region_name,
     },
     {
-      header: "Kode Region",
-      accessorKey: "region_id",
-      cell: ({ row }) => row.original.region_id,
+      header: "Kode Provinsi",
+      accessorKey: "province_id",
+      cell: ({ row }) => row.original.province_id,
     },
     {
       header: "Tahun",
@@ -32,7 +32,9 @@ export function BioflocProgramQuotaTableColumns(opts?: {
       header: "Diperbarui",
       accessorKey: "updated_at",
       cell: ({ row }) =>
-        row.original.updated_at ? formatDateWithTime(row.original.updated_at) : "-",
+        row.original.updated_at
+          ? formatDateWithTime(row.original.updated_at)
+          : "-",
     },
     {
       header: "Aksi",

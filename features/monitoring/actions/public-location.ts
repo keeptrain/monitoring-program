@@ -36,21 +36,72 @@ export async function getPublicLocationDetail<T extends LocationType>(
   return null;
 }
 
-export async function getPublicBiofloc(id: number): Promise<any> {
+export async function getPublicBiofloc(id: number): Promise<{ data: any }> {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
-    .select("*")
-    .eq("id", id)
-    .limit(1);
 
-  if (error) {
-    console.error("Error fetching biofloc data:", error);
-    throw error;
+  // 1. Fetch program data with locations
+  const { data: program, error: programError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .select(
+      `
+      *,
+      available_locations (
+        name,
+        latitude,
+        longitude
+      )
+    `,
+    )
+    .eq("id", id)
+    .single();
+
+  if (programError) {
+    console.error("Error fetching biofloc data:", programError);
+    throw programError;
   }
 
+  // 2. Fetch documentations from the documentations table
+  const { data: docs, error: docsError } = await supabase
+    .from("documentations")
+    .select("*")
+    .eq("program_type", "biofloc_thematic")
+    .eq("program_id", id);
+
+  if (docsError) {
+    console.error("Error fetching documentations:", docsError);
+  }
+
+  // 3. Group documentations by group_id
+  interface DocGroup {
+    id: string;
+    image_before_path: string | null;
+    image_after_path: string | null;
+    created_at: string;
+    updated_at: string;
+  }
+  const docGroups: Record<string, DocGroup> = {};
+  (docs || []).forEach((d) => {
+    if (!docGroups[d.group_id]) {
+      docGroups[d.group_id] = {
+        id: d.group_id,
+        image_before_path: null,
+        image_after_path: null,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+      };
+    }
+    if (d.type === "before") {
+      docGroups[d.group_id].image_before_path = d.path;
+    } else {
+      docGroups[d.group_id].image_after_path = d.path;
+    }
+  });
+
   return {
-    data: data[0] || null,
+    data: {
+      ...program,
+      documentations: Object.values(docGroups),
+    },
   };
 }
 
@@ -122,6 +173,7 @@ export async function getIsfPerMonthByZone(zoneNumber: number) {
   const datas = data.map((row) => {
     return {
       id: row.id,
+      step_id: zoneNumber,
       progress_date: row.progress_date,
       reporting_week: row.reporting_week,
       progress_percent: row.progress_percent,

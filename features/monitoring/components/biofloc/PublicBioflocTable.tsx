@@ -8,15 +8,17 @@ import {
 } from "@/components/ui/native-select";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { PaginationState } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useGetBioflocProgramsPaginated } from "@/features/thematic/api/getBioflocProgramsPaginated";
 import { BioflocProgramsPublicTableColumns } from "./BioflocProgramsTableColumns";
 import { useURLSearchParams } from "@/hooks/useURLSearchParams";
+import { useRouter } from "next/navigation";
 
-const YEAR_OPTIONS = [2026, 2025, 2024] as const;
+const YEAR_OPTIONS = [2026, 2025] as const;
 
 export default function PublicBioflocTable() {
+  const router = useRouter();
   const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   // URL-based state management
@@ -32,12 +34,12 @@ export default function PublicBioflocTable() {
   const pageSize = parseInt(params.pageSize as string) || 10;
   const searchQuery = (params.search as string) || "";
   const selectedProvince = (params.province as string) || "";
-  const selectedYear = parseInt(params.year as string) || YEAR_OPTIONS[0];
+  const selectedYear = parseInt(params.year as string) || 0;
 
   const debouncedSearchQuery = useDebouncedValue(localSearchQuery, 400);
 
   // Update URL when debounced search changes
-  useMemo(() => {
+  useEffect(() => {
     if (debouncedSearchQuery !== searchQuery) {
       setParams({
         search: debouncedSearchQuery,
@@ -61,6 +63,9 @@ export default function PublicBioflocTable() {
 
   const columns = useMemo(() => BioflocProgramsPublicTableColumns(), []);
 
+  const handleRowClick = (id: number) =>
+    router.push(`/monitoring/biofloc-thematic/${id}`);
+
   return (
     <Datatable
       columns={columns}
@@ -70,10 +75,10 @@ export default function PublicBioflocTable() {
       pageCount={data?.totalPages ?? -1}
       rowCount={data?.total ?? 0}
       pagination={pagination}
+      onRowClick={({ id }) => handleRowClick(id)}
       onPaginationChange={(updater) => {
-        const newState = typeof updater === "function" 
-          ? updater(pagination)
-          : updater;
+        const newState =
+          typeof updater === "function" ? updater(pagination) : updater;
         setParams({
           page: String(newState.pageIndex + 1),
           pageSize: String(newState.pageSize),
@@ -91,6 +96,7 @@ export default function PublicBioflocTable() {
                 });
               }}
             >
+              <NativeSelectOption value="0">Semua Tahun</NativeSelectOption>
               {YEAR_OPTIONS.map((year) => (
                 <NativeSelectOption key={year} value={String(year)}>
                   {year}

@@ -1,9 +1,16 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Grid2X2PlusIcon } from "lucide-react";
+import { UserDropdown } from "./UserDropdown";
+import { cookies } from "next/headers";
+import LoginButton from "./LoginButton";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const cookieStore = await cookies();
+  const isAuthenticated = cookieStore.get("session_id")?.value === "true";
+
   return (
     <header className="border-border bg-background/90 sticky top-0 z-10 border-b backdrop-blur-sm">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
@@ -28,12 +35,25 @@ export default function Navbar() {
         </Link>
 
         {/* Right actions */}
-        <Button asChild>
-          <Link href="/dashboard">
-            <Grid2X2PlusIcon className="size-4" />
-            Entry Data
-          </Link>
-        </Button>
+        {isAuthenticated ? (
+          <div className="flex items-center gap-4">
+            <Button size="sm" variant="ghost" asChild>
+              <Link href="/dashboard">
+                <Grid2X2PlusIcon className="mr-1 size-4" />
+                Entry Data
+              </Link>
+            </Button>
+            <Suspense
+              fallback={
+                <div className="bg-muted size-10 animate-pulse rounded-full" />
+              }
+            >
+              <UserDropdown />
+            </Suspense>
+          </div>
+        ) : (
+          <LoginButton />
+        )}
       </nav>
     </header>
   );

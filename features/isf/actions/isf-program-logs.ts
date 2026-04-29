@@ -12,34 +12,56 @@ import {
 import { STEPS } from "../constants/isf-step";
 import { insertDocumentations } from "@/features/documentation/actions";
 import { getReportBounds } from "../utils/report-date-window";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-async function assertProgressNotRegressing(
+async function validateSandwichProgress(
+  supabase: SupabaseClient,
   stepId: number,
+  progressDate: string,
   progressPercent: number,
   excludeId?: number,
 ) {
-  const supabase = await createClient();
-  let query = supabase
+  // most recent report before this date
+  let prevQuery = supabase
     .from("isf_program_logs")
-    .select("id, progress_percent")
+    .select("progress_percent")
     .eq("step_id", stepId)
+    .lt("progress_date", progressDate)
     .order("progress_date", { ascending: false })
-    .order("created_at", { ascending: false })
     .limit(1);
 
   if (excludeId !== undefined) {
-    query = query.neq("id", excludeId);
+    prevQuery = prevQuery.neq("id", excludeId);
   }
 
-  const { data, error } = await query;
-  if (error) {
-    throw error;
+  const { data: prevData, error: prevError } = await prevQuery;
+  if (prevError) throw prevError;
+
+  // first report after this date
+  let nextQuery = supabase
+    .from("isf_program_logs")
+    .select("progress_percent")
+    .eq("step_id", stepId)
+    .gt("progress_date", progressDate)
+    .order("progress_date", { ascending: true })
+    .limit(1);
+
+  if (excludeId !== undefined) {
+    nextQuery = nextQuery.neq("id", excludeId);
   }
 
-  const latest = data?.[0];
-  if (latest && progressPercent < latest.progress_percent) {
+  const { data: nextData, error: nextError } = await nextQuery;
+  if (nextError) throw nextError;
+
+  const prevReport = prevData?.[0];
+  const nextReport = nextData?.[0];
+
+  const minProgress = prevReport ? prevReport.progress_percent : 0;
+  const maxProgress = nextReport ? nextReport.progress_percent : 100;
+
+  if (progressPercent < minProgress || progressPercent > maxProgress) {
     throw new Error(
-      `Progress terbaru tidak boleh lebih kecil dari progress terakhir (${latest.progress_percent}%).`,
+      `Nilai progress harus di antara ${minProgress}% dan ${maxProgress}% sesuai urutan laporan.`,
     );
   }
 }
@@ -185,15 +207,17 @@ export async function createIsfProgramLog(
   stepId: number,
   data: IsfReportFormValues,
 ) {
-  await assertProgressNotRegressing(stepId, data.progress_percent);
-
   const supabase = await createClient();
+  await validateSandwichProgress(
+    supabase,
+    stepId,
+    data.progress_date,
+    data.progress_percent,
+  );
+
   const { data: createdLog, error } = await supabase
     .from("isf_program_logs")
-    .upsert(
-      { ...toDbPayload(data), step_id: stepId },
-      { onConflict: "step_id, reporting_week" },
-    )
+    .insert({ ...toDbPayload(data), step_id: stepId })
     .select("id, step_id")
     .single();
 
@@ -235,9 +259,15 @@ export async function updateIsfProgramLog(
   stepId: number,
   data: IsfReportFormValues,
 ) {
-  await assertProgressNotRegressing(stepId, data.progress_percent, id);
-
   const supabase = await createClient();
+  await validateSandwichProgress(
+    supabase,
+    stepId,
+    data.progress_date,
+    data.progress_percent,
+    id,
+  );
+
   const { error } = await supabase
     .from("isf_program_logs")
     .update({

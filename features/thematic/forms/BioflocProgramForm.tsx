@@ -18,82 +18,78 @@ import DocumentationsFormSection from "@/features/documentation/DocumentationsFo
 
 export default function BioflocProgramForm({
   initialData,
+  proposalId,
+  isConvertingFromProposal = false,
 }: {
   initialData?: ThematicProgramDetail | null;
+  proposalId?: number;
+  isConvertingFromProposal?: boolean;
 }) {
-  const isEdit = !!initialData;
-  const { form, onSubmit, isPending } = useThematicProgramForm(initialData);
+  const isEdit = !!initialData && initialData.id !== 0;
+  const { form, onSubmit, isPending } = useThematicProgramForm(
+    initialData,
+    proposalId,
+    isConvertingFromProposal,
+  );
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-6 space-y-1">
-        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-          Dashboard / Tematik / {isEdit ? "Ubah" : "Buat"}
-        </p>
-        <h2 className="text-foreground text-2xl font-semibold tracking-tight">
-          {isEdit ? "Ubah KDMP" : "Tambah KDMP Baru"}
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Silahkan isi informasi KDMP di bawah ini
-        </p>
-      </div>
+    <form onSubmit={onSubmit} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Dasar</CardTitle>
+          <CardDescription>Isi informasi dasar program KDMP</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ThematicInformationBasicFormSection form={form} />
+        </CardContent>
+      </Card>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Lokasi</CardTitle>
+          <CardDescription>Isi informasi lokasi program</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LocationFormSection
+            form={form}
+            isReadOnly={isConvertingFromProposal}
+            showAdministrativeFields={!isConvertingFromProposal}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Kurva S</CardTitle>
+          <CardDescription>Unggah visualisasi kurva S program</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <SCurveFormSection form={form} />
+        </CardContent>
+      </Card>
+
+      {!isEdit && (
         <Card>
           <CardHeader>
-            <CardTitle>Informasi Dasar</CardTitle>
-            <CardDescription>Isi informasi dasar program KDMP</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ThematicInformationBasicFormSection form={form} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Lokasi</CardTitle>
-            <CardDescription>Isi informasi lokasi program</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LocationFormSection form={form} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Kurva S</CardTitle>
+            <CardTitle>Dokumentasi</CardTitle>
             <CardDescription>
-              Unggah visualisasi kurva S program
+              Unggah dokumentasi pengerjaan program
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SCurveFormSection form={form} />
+            <DocumentationsFormSection
+              mode="create"
+              form={form}
+              storageBasePath="documentations/biofloc-thematic"
+            />
           </CardContent>
         </Card>
+      )}
 
-        {!isEdit && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Dokumentasi</CardTitle>
-              <CardDescription>
-                Unggah dokumentasi pengerjaan program
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <DocumentationsFormSection
-                mode="create"
-                form={form}
-                storageBasePath="documentations/biofloc-thematic"
-              />
-            </CardContent>
-          </Card>
-        )}
-
-        <Button type="submit" disabled={isPending} className="w-full">
-          {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-          {isEdit ? "Simpan Perubahan" : "Simpan"}
-        </Button>
-      </form>
-    </div>
+      <Button type="submit" disabled={isPending} className="w-full">
+        {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+        {isEdit ? "Simpan Perubahan" : "Simpan"}
+      </Button>
+    </form>
   );
 }

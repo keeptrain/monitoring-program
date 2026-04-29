@@ -1,65 +1,37 @@
-"use client";
-
 import Link from "next/link";
-import {
-  LayoutDashboard,
-  ArrowLeft,
-  LeafIcon,
-  WavesIcon,
-  Grid3x3Icon,
-} from "lucide-react";
-
-const dashboardLinks = [
-  {
-    href: "/dashboard/available-location",
-    label: "Revitalisasi Tambak Panturan",
-    icon: WavesIcon,
-    description: "Kelola data Revitalisasi Tambak Panturan",
-  },
-  {
-    href: "/dashboard/thematic/biofloc",
-    label: "Bioflok",
-    icon: Grid3x3Icon,
-    description: "Kelola program tematik bioflok",
-  },
-  {
-    href: "/dashboard/thematic/minapadi",
-    label: "Minapadi",
-    icon: LeafIcon,
-    description: "Kelola program tematik minapadi",
-  },
-  {
-    href: "/dashboard/isf",
-    label: "Integrated Shrimp Farming (ISF)",
-    icon: WavesIcon,
-    description: "Kelola program Integrated Shrimp Farming",
-  },
-];
+import { Suspense } from "react";
+import Image from "next/image";
+import { UserDropdown } from "./UserDropdown";
 
 export default function DashboardNavbar() {
   return (
-    <header className="border-border text-background sticky top-0 z-50 border-b bg-cyan-800">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <header className="text-background sticky top-0 z-20 bg-[#006ebf] shadow-xs">
+      <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-background/60 hover:text-background flex items-center gap-1.5 text-xs transition-colors"
-          >
-            <ArrowLeft className="size-3" />
-            <span className="hidden sm:block">Beranda</span>
-          </Link>
-          <div className="bg-background/20 h-4 w-px" />
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="text-background size-4" />
-            <span className="text-sm font-semibold tracking-tight">
-              Dashboard Admin
-            </span>
+        <Link
+          href="/"
+          className="text-foreground flex items-center gap-2 text-sm font-semibold"
+        >
+          <div className="relative size-10 sm:size-12">
+            <Image
+              src="/favicon.webp"
+              alt="Logo KKP"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
           </div>
-        </div>
+          <span className="hidden text-xs leading-tight font-bold text-white/90 sm:inline">
+            Kementerian Kelautan <br /> dan Perikanan Republik Indonesia
+          </span>
+        </Link>
+
+        {/* User Navigation (Client Part) */}
+        <Suspense fallback={<div className="size-10 rounded-full bg-white/10 animate-pulse" />}>
+          <UserDropdown />
+        </Suspense>
       </nav>
     </header>
   );
 }
-
-export { dashboardLinks };

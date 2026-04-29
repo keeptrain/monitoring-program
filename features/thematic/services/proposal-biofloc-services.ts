@@ -3,19 +3,29 @@ import { createClient } from "@/utils/supabase";
 import { ProposalBioflocFormValues } from "../forms/proposal-biofloc-schema";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { ProposalBioflocStatus } from "../types/thematic";
+import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
+import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
+import { saveDocumentationsAction } from "@/features/documentation/actions";
 
 export type ProposalBioflocThematicProgram = {
   id: number;
   status: ProposalBioflocStatus;
   name: string;
-  province: string;
-  regency: string;
+  province_id: string;
+  regency_id: string;
   district: string;
   village: string;
   location_id: number | null;
   proposal_path: string;
   created_at: string;
   updated_at: string;
+};
+
+export type ProposalBioflocDetail = ProposalBioflocThematicProgram & {
+  available_locations: {
+    latitude: number;
+    longitude: number;
+  } | null;
 };
 
 export type ProposalBioflocPaginationParams = {
@@ -34,7 +44,7 @@ export type PaginatedProposalBioflocResult = {
 };
 
 type ProposalProvinceRow = {
-  province: string | null;
+  province_id: string | null;
 };
 
 export type ProposalBioflocProvinceSummary = {
@@ -50,10 +60,12 @@ export async function createAvailableLocationForBioflocProposalService(
   supabase: SupabaseClient,
   payload: ProposalBioflocFormValues,
 ) {
-  const { data: locationId, error } = await supabase
+  const { data, error } = await supabase
     .from(TABLES.AVAILABLE_LOCATIONS)
     .insert({
       type: "biofloc_thematic",
+      province_id: payload.province_id,
+      regency_id: payload.regency_id,
       name: payload.name,
       latitude: payload.latitude,
       longitude: payload.longitude,
@@ -65,7 +77,8 @@ export async function createAvailableLocationForBioflocProposalService(
     throw new Error(`Gagal menyimpan lokasi: ${error.message}`);
   }
 
-  return locationId;
+  console.log(data.id);
+  return data.id;
 }
 
 export async function createProposalBioflocThematicProgramService(
@@ -77,21 +90,42 @@ export async function createProposalBioflocThematicProgramService(
     payload,
   );
 
-  const { error } = await supabase
+  const { data: proposal, error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
     .insert({
-      location_id: locationId.id,
+      location_id: locationId,
       status: "pending",
       name: payload.name,
-      province: payload.province,
-      regency: payload.regency,
+      province_id: payload.province_id,
+      regency_id: payload.regency_id,
       district: payload.district,
       village: payload.village,
       proposal_path: payload.proposal_path,
-    });
+    })
+    .select("id")
+    .single();
 
   if (error) {
     throw new Error(`Gagal menyimpan proposal: ${error.message}`);
+  }
+
+  if (!proposal?.id) {
+    throw new Error(
+      "Proposal berhasil dibuat tetapi ID proposal tidak ditemukan.",
+    );
+  }
+
+  const docsResult = await saveDocumentationsAction(
+    supabase,
+    proposal.id,
+    "proposal_biofloc_thematic",
+    payload.documentations,
+  );
+
+  if (!docsResult.success) {
+    throw new Error(
+      docsResult.error ?? "Gagal menyimpan dokumentasi proposal.",
+    );
   }
 
   return { message: "Proposal berhasil diajukan." };
@@ -113,7 +147,7 @@ export async function getProposalBioflocPaginatedService(
   let query = supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
     .select(
-      "id, name, province, regency, district, village, status, created_at",
+      "id, name, province_id, regency_id, district, village, status, created_at",
       { count: "exact" },
     );
 
@@ -124,7 +158,7 @@ export async function getProposalBioflocPaginatedService(
 
   // Province filter
   if (province && province.trim().length > 0) {
-    query = query.eq("province", province);
+    query = query.eq("province_id", province);
   }
 
   const { data, error, count } = await query
@@ -173,7 +207,7 @@ export async function getProposalBioflocProvinceSummary(
 ): Promise<ProposalBioflocProvinceSummary> {
   const { data, error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("province");
+    .select("province_id");
 
   if (error) {
     throw error;
@@ -182,10 +216,13 @@ export async function getProposalBioflocProvinceSummary(
   const rows = (data ?? []) as ProposalProvinceRow[];
   const proposal_count_by_province = rows.reduce<Record<string, number>>(
     (acc, row) => {
-      if (!row.province) {
+      if (!row.province_id) {
         return acc;
       }
-      const key = normalizeProvinceName(row.province);
+      const province =
+        INDONESIA_PROVINCES.find((p) => p.province_id === row.province_id)
+          ?.name ?? row.province_id;
+      const key = normalizeProvinceName(province);
       acc[key] = (acc[key] ?? 0) + 1;
       return acc;
     },
@@ -248,4 +285,120 @@ export async function createSignedUrl(id: number) {
   }
 
   return { blob, originalPath: proposalBiofloc.proposal_path };
+}
+
+/**
+ * Get single proposal detail with location info (lat/lng)
+ */
+export async function getProposalBioflocDetailService(
+  id: number,
+): Promise<ProposalBioflocDetail> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .select(
+      `
+      id,
+      status,
+      name,
+      province_id,
+      regency_id,
+      district,
+      village,
+      location_id,
+      proposal_path,
+      created_at,
+      updated_at,
+      available_locations (
+        name,
+        latitude,
+        longitude
+      )
+    `,
+    )
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error("Proposal tidak ditemukan.");
+  }
+
+  return data as unknown as ProposalBioflocDetail;
+}
+
+/**
+ * Convert an approved proposal into a thematic program (KDMP)
+ * This creates a new thematic program using the proposal data
+ */
+export async function convertProposalToThematicProgramService(
+  proposalId: number,
+  value: BioflocProgramFormValues,
+): Promise<{ success: boolean; message: string }> {
+  const supabase = await createClient();
+
+  // Get the approved proposal with location details
+  const { data: proposal, error: proposalError } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .select("id, location_id, status, name, district, village")
+    .eq("id", proposalId)
+    .single();
+
+  if (proposalError || !proposal) {
+    throw new Error(
+      "Proposal tidak ditemukan atau belum disetujui untuk dikonversi.",
+    );
+  }
+
+  if (proposal.status !== "approved") {
+    throw new Error("Proposal belum di setujui.");
+  }
+
+  // Create new thematic program with proposal data
+  const { error: bioflocInsertError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .insert({
+      proposal_id: proposalId,
+      location_id: proposal.location_id,
+      name: proposal.name,
+      status: "potential",
+      progress_percent: value.progress_percent,
+      kusuka_number: "", // null
+      commodity_aid: value.commodity_aid,
+      commodity_potential: value.commodity_potential,
+      land_area: value.land_area,
+      production_value: value.production_value,
+      total_management: value.total_management,
+      total_members: value.total_members,
+      distribution_amount: value.distribution_amount,
+      sppg_partner: value.sppg_partner,
+      address: `${proposal.village}, ${proposal.district}`,
+      s_curve_path: value.s_curve_path,
+    });
+
+  if (bioflocInsertError) {
+    throw new Error(
+      `Gagal membuat program tematik: ${bioflocInsertError.message}`,
+    );
+  }
+
+  const { error: updateProposalError } = await supabase
+    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .update({ status: "converted" })
+    .eq("id", proposalId);
+
+  if (updateProposalError) {
+    throw new Error(
+      `Gagal memperbarui status proposal: ${updateProposalError.message}`,
+    );
+  }
+
+  return {
+    success: true,
+    message: `Program tematik berhasil dibuat dari proposal.`,
+  };
 }

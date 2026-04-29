@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
+import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
+import { LocationStatus } from "@/features/monitoring/api/getPublicLocationsByType";
 
 export interface AvailableLocation {
   id: number;
@@ -34,6 +36,7 @@ export async function getAvailableLocations() {
 
 export async function getAvailableLocationsByType(
   type: LocationType,
+  status: LocationStatus,
 ): Promise<PublicAvailableLocation[]> {
   const supabase = await createClient();
 
@@ -42,23 +45,29 @@ export async function getAvailableLocationsByType(
       ? TABLES.BIOFLOC_THEMATIC_PROGRAMS
       : "isf_programs";
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("available_locations")
     .select(
       `
       id,
+      province_id,
       name,
       latitude,
       longitude,
       ${programTable}!inner (
         id,
-        name,
+        status,
         progress_percent
       )
     `,
     )
-    .eq("type", type)
-    .limit(10);
+    .eq("type", type);
+
+  if (type === "biofloc_thematic") {
+    query = query.eq(`${programTable}.status`, status);
+  }
+
+  const { data, error } = await query.limit(100);
 
   if (error) {
     console.error("getAvailableLocationsByType error:", error);
@@ -67,6 +76,7 @@ export async function getAvailableLocationsByType(
 
   type LocationWithProgramRow = {
     id: number;
+    province_id: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -79,10 +89,14 @@ export async function getAvailableLocationsByType(
         : item[programTable]
     ) as { id: number; name: string; progress_percent: number } | null;
 
+    const provinceName =
+      INDONESIA_PROVINCES.find((p) => p.province_id === item.province_id)
+        ?.name ?? "Provinsi Tidak Diketahui";
+
     return {
       id: program?.id ?? item.id,
-      program_name: program?.name ?? "Unknown Program",
       location_name: item.name,
+      province_name: provinceName,
       progress_percent: program?.progress_percent ?? 0,
       position: {
         latitude: item.latitude ?? 0,
@@ -119,6 +133,8 @@ export async function createLocationFromProgram(
     name: string;
     latitude: number;
     longitude: number;
+    province_id?: string;
+    regency_id?: string;
   },
 ) {
   const { data: locationData, error } = await supabase

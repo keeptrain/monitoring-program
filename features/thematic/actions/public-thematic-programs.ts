@@ -8,13 +8,18 @@ export type PublicThematicProgram = {
   location_id: number;
   name: string;
   progress_percent: number;
-  commodity: string;
+  commodity_aid: string;
+  commodity_potential: string | null;
   land_area: string;
-  production: string;
-  total_admin: number;
+  production_value: string;
+  total_management: number;
+  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations: {
     name: string | null;
     latitude: number | null;
@@ -27,13 +32,18 @@ type PublicThematicProgramRow = {
   location_id: number;
   name: string;
   progress_percent: number;
-  commodity: string;
+  commodity_aid: string;
+  commodity_potential: string | null;
   land_area: string;
-  production: string;
-  total_admin: number;
+  production_value: string;
+  total_management: number;
+  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations:
     | {
         name: string | null;
@@ -58,13 +68,18 @@ export async function getPublicThematicProgram(id: number) {
       location_id,
       name,
       progress_percent,
-      commodity,
+      commodity_aid,
+      commodity_potential,
       land_area,
-      production,
-      total_admin,
+      production_value,
+      total_management,
+      total_members,
       distribution_amount,
       sppg_partner,
       s_curve_path,
+      kusuka_number,
+      nib,
+      legal_entity_number,
       available_locations (
         name,
         latitude,
@@ -94,13 +109,18 @@ export async function getPublicThematicProgram(id: number) {
     location_id: data.location_id,
     name: data.name,
     progress_percent: data.progress_percent,
-    commodity: data.commodity,
+    commodity_aid: data.commodity_aid,
+    commodity_potential: data.commodity_potential,
     land_area: data.land_area,
-    production: data.production,
-    total_admin: data.total_admin,
+    production_value: data.production_value,
+    total_management: data.total_management,
+    total_members: data.total_members,
     distribution_amount: data.distribution_amount,
     sppg_partner: data.sppg_partner,
     s_curve_path: data.s_curve_path,
+    kusuka_number: data.kusuka_number,
+    nib: data.nib,
+    legal_entity_number: data.legal_entity_number,
     available_locations: location ?? null,
   } satisfies PublicThematicProgram;
 }

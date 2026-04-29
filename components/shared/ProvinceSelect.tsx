@@ -6,7 +6,7 @@ import {
 import { PROVINCES_BY_ISLAND } from "@/features/thematic/constants/indonesia-provinces";
 
 interface ProvinceSelectProps {
-  /** Current selected province name (or "" for all) */
+  /** Current selected province ID (or "" for all) */
   value: string;
   onChange: (value: string) => void;
   /** Label for the "all" option, defaults to "Semua Provinsi" */
@@ -39,7 +39,7 @@ export default function ProvinceSelect({
       {PROVINCES_BY_ISLAND.map(({ island, provinces }) => (
         <NativeSelectOptGroup key={island} label={island}>
           {provinces.map((p) => (
-            <NativeSelectOption key={p.region_id} value={p.name}>
+            <NativeSelectOption key={p.province_id} value={p.province_id}>
               {p.name}
             </NativeSelectOption>
           ))}

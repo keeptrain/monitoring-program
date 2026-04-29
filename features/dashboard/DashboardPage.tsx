@@ -1,7 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { dashboardLinks } from "@/components/DashboardNavbar";
+import { DASHBOARD_LINKS } from "@/lib/constants/navigation";
 import { ArrowRight } from "lucide-react";
 
 export default function DashboardPage() {
@@ -16,13 +14,13 @@ export default function DashboardPage() {
           Dashboard
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Kelola data program prioritas dan lokasi pelaksanaan.
+          Kelola data untuk masing-masing program prioritas.
         </p>
       </div>
 
       {/* Quick-access cards */}
       <div className="border-border bg-border grid gap-px border sm:grid-cols-2">
-        {dashboardLinks.map(({ href, label, icon: Icon, description }) => (
+        {DASHBOARD_LINKS.map(({ href, label, icon: Icon, description }) => (
           <Link
             key={href}
             href={href}

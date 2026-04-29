@@ -20,13 +20,9 @@ import { getDocumentationsUploadMutationKey } from "@/features/documentation/hoo
 export default function IsfReportForm({
   zone,
   initialData,
-  initialMinDate,
-  initialMaxDate,
 }: {
   zone: string;
   initialData?: IsfProgramLog;
-  initialMinDate?: string;
-  initialMaxDate?: string;
 }) {
   const isEdit = !!initialData;
 
@@ -35,7 +31,7 @@ export default function IsfReportForm({
     onSubmit,
     isPending: isFormPending,
     documentationError,
-  } = useIsfReportForm(zone, initialData, initialMinDate, initialMaxDate);
+  } = useIsfReportForm(zone, initialData);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -63,11 +59,7 @@ export default function IsfReportForm({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <IsfInformationBasicFormSection
-              form={form}
-              minDate={initialMinDate}
-              maxDate={initialMaxDate}
-            />
+            <IsfInformationBasicFormSection form={form} isEdit={isEdit} />
           </CardContent>
         </Card>
 

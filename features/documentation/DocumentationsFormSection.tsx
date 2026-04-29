@@ -27,6 +27,7 @@ type DocumentationsFormSectionProps = {
   storageBasePath?: string;
   /** "create" = thumbnail grid (default), "edit" = compact file-name list */
   mode: "create" | "edit";
+  documentationType?: "default" | "proposal_before";
 };
 
 export default function DocumentationsFormSection({
@@ -35,6 +36,7 @@ export default function DocumentationsFormSection({
   externalErrorMessage,
   storageBasePath = "documentations",
   mode = "create",
+  documentationType = "default",
 }: DocumentationsFormSectionProps) {
   const typedForm = form as UseFormReturn<
     DocumentationFormInput,
@@ -60,6 +62,7 @@ export default function DocumentationsFormSection({
   });
 
   const errors = typedForm.formState.errors;
+  const showAfterField = documentationType !== "proposal_before";
 
   return (
     <div className="space-y-6">
@@ -78,14 +81,20 @@ export default function DocumentationsFormSection({
                 <p className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
                   Grup Dokumentasi #{index + 1}
                 </p>
-                <RemoveGroupButton onRemove={() => remove(index)} />
+                {!(index === 0 && documentationType === "proposal_before") && (
+                  <RemoveGroupButton onRemove={() => remove(index)} />
+                )}
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* Foto Sebelum */}
                 <DocumentationImageField
                   mode={mode}
-                  label="Foto Sebelum"
+                  label={
+                    documentationType === "proposal_before"
+                      ? "Dokumentasi Proposal"
+                      : "Foto Sebelum"
+                  }
                   images={beforeImages}
                   localPreviews={localPreviews}
                   altPrefix={`Dokumentasi sebelum ${index + 1}`}
@@ -106,29 +115,30 @@ export default function DocumentationsFormSection({
                   }
                 />
 
-                {/* Foto Sesudah */}
-                <DocumentationImageField
-                  mode={mode}
-                  label="Foto Sesudah"
-                  images={afterImages}
-                  localPreviews={localPreviews}
-                  altPrefix={`Dokumentasi sesudah ${index + 1}`}
-                  errorMessage={
-                    (
-                      errors as {
-                        documentations?: Array<{
-                          image_after_paths?: { message?: string };
-                        }>;
-                      }
-                    ).documentations?.[index]?.image_after_paths?.message
-                  }
-                  onFilesSelected={(files) =>
-                    handleUpload(index, "image_after_paths", files)
-                  }
-                  onRemoveImage={(pathIndex) =>
-                    removeImagePath(index, "image_after_paths", pathIndex)
-                  }
-                />
+                {showAfterField && (
+                  <DocumentationImageField
+                    mode={mode}
+                    label="Foto Sesudah"
+                    images={afterImages}
+                    localPreviews={localPreviews}
+                    altPrefix={`Dokumentasi sesudah ${index + 1}`}
+                    errorMessage={
+                      (
+                        errors as {
+                          documentations?: Array<{
+                            image_after_paths?: { message?: string };
+                          }>;
+                        }
+                      ).documentations?.[index]?.image_after_paths?.message
+                    }
+                    onFilesSelected={(files) =>
+                      handleUpload(index, "image_after_paths", files)
+                    }
+                    onRemoveImage={(pathIndex) =>
+                      removeImagePath(index, "image_after_paths", pathIndex)
+                    }
+                  />
+                )}
               </div>
             </div>
           );

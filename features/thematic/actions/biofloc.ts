@@ -3,9 +3,7 @@
 import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createLocationFromProgram } from "@/features/dashboard/actions/available-locations";
 import * as db from "../services/biofloc-services";
-import { createClient } from "@/utils/supabase";
 import { UpdateProgressFormValues } from "../forms/update-progress-schema";
 import {
   BioflocProgramsPaginatedInput,
@@ -27,40 +25,16 @@ export async function getThematicProgramById(id: number) {
   return db.getBioflocThematicProgramByIdService(id);
 }
 
-export async function createThematicPrograms(data: BioflocProgramFormValues) {
-  const documentations = db.normalizeDocumentations(data.documentations);
-
-  const supabase = await createClient();
-
-  const locationId = await createLocationFromProgram(supabase, {
-    type: "biofloc_thematic",
-    name: data.location_name,
-    latitude: data.latitude,
-    longitude: data.longitude,
-  });
-
-  if (locationId === undefined) {
-    console.error("Error creating location");
-    return;
-  }
-
-  // Remove location fields from data before inserting into thematic_programs
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { location_name, latitude, longitude, ...programData } = data;
-
+export async function createThematicProgram(
+  data: BioflocProgramFormValues,
+): Promise<{ success: boolean; message?: string }> {
   try {
-    await db.createBioflocThematicProgramService({
-      ...programData,
-      location_id: locationId,
-      documentations,
-    });
+    await db.createBioflocThematicService(data);
+    return { success: true, message: "Program berhasil dibuat" };
   } catch (error) {
     console.error("Error creating thematic program:", error);
-    return;
+    return { success: false, message: "Gagal membuat program" };
   }
-
-  revalidatePath("/dashboard/thematic");
-  redirect("/dashboard/thematic");
 }
 
 export async function updateThematicPrograms(
@@ -101,4 +75,21 @@ export async function updateThematicProgramProgress(
 
   revalidatePath("/dashboard/thematic");
   revalidatePath(`/dashboard/thematic/${id}`);
+}
+
+export async function deleteThematicProgram(
+  id: number,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    await db.deleteBioflocThematicProgramService(id);
+    // revalidatePath("/dashboard/thematic/biofloc");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting thematic program:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Gagal menghapus program",
+    };
+  }
 }

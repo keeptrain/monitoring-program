@@ -4,8 +4,8 @@ import { createClient } from "@/utils/supabase";
 
 export interface PublicAvailableLocation {
   id: number;
-  program_name: string;
   location_name: string;
+  province_name: string;
   progress_percent: number;
   position: {
     latitude: number;
@@ -68,8 +68,8 @@ export async function getPublicAvailableLocations(): Promise<
     return [
       {
         id: item.id,
-        program_name: item.name,
         location_name: location.name ?? "Unknown",
+        province_name: "Unknown",
         progress_percent: item.progress_percent,
         position: {
           latitude: location.latitude,

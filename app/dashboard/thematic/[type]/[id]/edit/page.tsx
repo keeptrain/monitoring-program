@@ -1,4 +1,5 @@
 import BioflocProgramForm from "@/features/thematic/forms/BioflocProgramForm";
+import { ThematicFormHeader } from "@/features/thematic/components/ThematicFormHeader";
 import { getThematicProgramById } from "@/features/thematic/actions/biofloc";
 import { ThematicProgramDetail } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
@@ -23,5 +24,10 @@ export default async function ThematicProgramEditPage({
     return notFound();
   }
 
-  return <BioflocProgramForm initialData={program as ThematicProgramDetail} />;
+  return (
+    <div className="mx-auto max-w-4xl">
+      <ThematicFormHeader isEdit />
+      <BioflocProgramForm initialData={program as ThematicProgramDetail} />
+    </div>
+  );
 }
