@@ -20,7 +20,8 @@ const DEFAULT_VALUES: ProposalBioflocFormInput = {
   village: "",
   latitude: "",
   longitude: "",
-  proposal_path: "proposal-biofloc-thematic/1777253909964-doi9.pdf",
+  // proposal_path: "proposal-biofloc-thematic/1777253909964-doi9.pdf",
+  proposal_path: "",
   documentations: [{ image_before_paths: [] }],
 };
 

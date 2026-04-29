@@ -76,8 +76,6 @@ export default function PublicMonitoringMap({
     }
   };
 
-  console.log("rerender");
-
   return (
     <>
       <MapTopContent
