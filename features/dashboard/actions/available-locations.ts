@@ -1,14 +1,17 @@
 "use server";
 
 import { createClient } from "@/utils/supabase";
-import { TABLES } from "@/lib/constants/tables";
 import { AvailableLocationFormValues } from "../forms/available-location-schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
-import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
 import { LocationStatus } from "@/features/monitoring/api/getPublicLocationsByType";
+import { cookies } from "next/headers";
+import {
+  getActiveLocationsService,
+  getPotentialLocationsService,
+} from "@/features/thematic/services/biofloc-locations-services";
 
 export interface AvailableLocation {
   id: number;
@@ -34,76 +37,47 @@ export async function getAvailableLocations() {
   return (data ?? []) as AvailableLocation[];
 }
 
+export type ActionResult<T> = {
+  success: boolean;
+  message?: string;
+  data: T;
+};
+
 export async function getAvailableLocationsByType(
   type: LocationType,
   status: LocationStatus,
-): Promise<PublicAvailableLocation[]> {
-  const supabase = await createClient();
+): Promise<ActionResult<PublicAvailableLocation[]>> {
+  // Check session for potential status
+  if (status === "potential") {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session_id")?.value === "true";
 
-  const programTable =
-    type === "biofloc_thematic"
-      ? TABLES.BIOFLOC_THEMATIC_PROGRAMS
-      : "isf_programs";
+    if (!session) {
+      return {
+        success: false,
+        message: "Silakan masuk terlebih dahulu untuk melihat data potensi",
+        data: [],
+      };
+    }
+  }
 
-  let query = supabase
-    .from("available_locations")
-    .select(
-      `
-      id,
-      province_id,
-      name,
-      latitude,
-      longitude,
-      ${programTable}!inner (
-        id,
-        status,
-        progress_percent
-      )
-    `,
-    )
-    .eq("type", type);
-
+  // Only handle biofloc_thematic for now
   if (type === "biofloc_thematic") {
-    query = query.eq(`${programTable}.status`, status);
-  }
-
-  const { data, error } = await query.limit(100);
-
-  if (error) {
-    console.error("getAvailableLocationsByType error:", error);
-    return [];
-  }
-
-  type LocationWithProgramRow = {
-    id: number;
-    province_id: string;
-    name: string;
-    latitude: number;
-    longitude: number;
-  } & Record<string, unknown>;
-
-  return ((data as unknown as LocationWithProgramRow[]) ?? []).map((item) => {
-    const program = (
-      Array.isArray(item[programTable])
-        ? item[programTable][0]
-        : item[programTable]
-    ) as { id: number; name: string; progress_percent: number } | null;
-
-    const provinceName =
-      INDONESIA_PROVINCES.find((p) => p.province_id === item.province_id)
-        ?.name ?? "Provinsi Tidak Diketahui";
+    const results =
+      status === "active"
+        ? await getActiveLocationsService()
+        : await getPotentialLocationsService();
 
     return {
-      id: program?.id ?? item.id,
-      location_name: item.name,
-      province_name: provinceName,
-      progress_percent: program?.progress_percent ?? 0,
-      position: {
-        latitude: item.latitude ?? 0,
-        longitude: item.longitude ?? 0,
-      },
+      success: true,
+      data: results,
     };
-  });
+  }
+
+  return {
+    success: true,
+    data: [],
+  };
 }
 
 export async function createAvailableLocation(
