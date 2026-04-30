@@ -7,6 +7,7 @@ import ProposalSubmissionTable from "./ProposalSubmissionTable";
 import Link from "next/link";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import { useGetBioflocProgramQuotas } from "@/features/monitoring/api/getBioflocProgramQuotas";
+import { Session } from "@/features/auth/session";
 
 const IN_VIEW_OPTIONS = {
   root: null,
@@ -14,7 +15,13 @@ const IN_VIEW_OPTIONS = {
   threshold: 0.5,
 } as const;
 
-export default function PublicBioflocProposalSection() {
+export default function PublicBioflocProposalSection({
+  session,
+}: {
+  session: Session;
+}) {
+  const { isAuthenticated, userRole, programScope } = session;
+
   const { ref: provinceTableRef, isInView: isProvinceTableInView } =
     useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
 
@@ -30,12 +37,16 @@ export default function PublicBioflocProposalSection() {
   return (
     <section className="space-y-8">
       {/* 1. Upload Banner */}
-      <Button className="h-10 w-full text-base" asChild>
-        <Link href="/monitoring/biofloc/proposal">
-          <UploadIcon />
-          Upload Pengajuan Proposal Bioflok Tematik 2026
-        </Link>
-      </Button>
+      {isAuthenticated &&
+        userRole === "officer" &&
+        programScope === "biofloc" && (
+          <Button className="h-10 w-full text-base" asChild>
+            <Link href="/biofloc-thematic/proposal">
+              <UploadIcon />
+              Upload Pengajuan Proposal Bioflok Tematik 2026
+            </Link>
+          </Button>
+        )}
 
       <div className="flex items-center gap-2">
         <h2 className="text-lg font-semibold text-zinc-900">

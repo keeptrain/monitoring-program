@@ -5,7 +5,8 @@ import {
 import { PublicAvailableLocation } from "@/features/dashboard/actions/public-available-locations";
 import { getPublicMonitoringIsf } from "@/features/monitoring/actions/public-location";
 import { PublicMonitoringIsf } from "../types/monitoring-types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries, queryOptions } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export type LocationStatus = "potential" | "active";
 
@@ -14,17 +15,63 @@ export const getLocationsQueryKey = (
   status: LocationStatus,
 ) => ["locations", type, status];
 
-export const useGetPublicLocationsByType = (
-  type: LocationType,
-  status: LocationStatus,
-) =>
-  useQuery({
+const getLocationsQueryOptions = (type: LocationType, status: LocationStatus) =>
+  queryOptions({
     queryKey: getLocationsQueryKey(type, status),
-    queryFn: async (): Promise<PublicAvailableLocation[]> =>
-      getAvailableLocationsByType(type, status),
+    queryFn: async (): Promise<PublicAvailableLocation[]> => {
+      const result = await getAvailableLocationsByType(type, status);
+      if (!result.success && result.message) {
+        toast.error(result.message);
+      }
+      return result.data;
+    },
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });
+
+export const useGetPublicLocationsByType = (
+  type: LocationType,
+  status: LocationStatus,
+  enabled: boolean = true,
+) =>
+  useQuery({
+    ...getLocationsQueryOptions(type, status),
+    enabled,
+  });
+
+export const useGetPublicLocationsCombined = (
+  type: LocationType,
+  statuses: LocationStatus[],
+) => {
+  const results = useQueries({
+    queries: statuses.map((status) => getLocationsQueryOptions(type, status)),
+  });
+
+  const isLoading = results.some((r) => r.isLoading);
+  const isError = results.some((r) => r.isError);
+
+  const combinedData = results.flatMap((result, index) => {
+    const status = statuses[index];
+    const data = result.data ?? [];
+    return data.map((l) => ({
+      ...l,
+      isPotential: status === "potential",
+    }));
+  });
+
+  return {
+    data: combinedData,
+    isLoading,
+    isError,
+    results: statuses.reduce(
+      (acc, status, index) => {
+        acc[status] = results[index];
+        return acc;
+      },
+      {} as Record<LocationStatus, (typeof results)[0]>,
+    ),
+  };
+};
 
 export const getPublicMonitoringIsfQueryKey = () => [
   "public-monitoring",

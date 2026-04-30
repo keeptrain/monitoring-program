@@ -1,175 +1,41 @@
 "use client";
 
-import {
-  ArrowUpIcon,
-  Grid3X3Icon,
-  LeafIcon,
-  LucideIcon,
-  MenuIcon,
-  ShrimpIcon,
-  WavesIcon,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
-import { LocationType } from "@/features/dashboard/actions/available-locations";
-import type { PublicMonitoringMapProps } from "@/features/monitoring/PublicMonitoringMap";
+import { ArrowUpIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { PublicMonitoringMapProps } from "./MonitoringMapPage";
 
 const LazyMap = dynamic<PublicMonitoringMapProps>(
-  () => import("./PublicMonitoringMap"),
+  () => import("./MonitoringMapPage"),
   {
     ssr: false,
     loading: () => <LoadingLazyMap />,
   },
 );
-
-const LazyIsf = dynamic(() => import("./PublicMonitoringIsf"), {
-  ssr: false,
-  loading: () => <LoadingLazyMap />,
-});
-
-const LazyPublicBioflocProposalSection = dynamic(
-  () => import("./components/biofloc/PublicBioflocProposalSection"),
-  {
-    ssr: false,
-    loading: () => <LoadingLazyMap />,
-  },
-);
-
-const FILTER_STATE: Record<
-  LocationType,
-  { label: string; sub: string; icon: LucideIcon }
-> = {
-  biofloc_thematic: {
-    label: "Tematik Bioflok",
-    sub: "Budidaya Ikan Sistem Bioflok",
-    icon: Grid3X3Icon,
-  },
-  minapadi_thematic: {
-    label: "Tematik Minapadi",
-    sub: "Budidaya Padi dan Ikan Terintegrasi",
-    icon: LeafIcon,
-  },
-  isf: {
-    label: "Integrated Shrimp Farming",
-    sub: "Kawasan Budidaya Udang Terintegrasi",
-    icon: ShrimpIcon,
-  },
-  revitalization: {
-    label: "Revitalisasi",
-    sub: "Revitalisasi tambak pantura",
-    icon: WavesIcon,
-  },
-};
 
 export default function PublicMonitoringPage({
   isAuthenticated = false,
+  children,
 }: {
   isAuthenticated?: boolean;
+  children?: React.ReactNode;
 }) {
-  const [activeTab, setActiveTab] = useState<LocationType | null>(
-    "biofloc_thematic",
-  );
-
   return (
     <>
-      <Header
-        activeTab={activeTab}
-        onTabChange={(tab: LocationType) => setActiveTab(tab)}
-      />
-      <div className="flex flex-1 flex-col">
-        <div className="mx-auto w-full max-w-6xl space-y-8 pb-8">
-          {/* Map Container - Top Section */}
-          <section className="relative h-[65vh] min-h-[400px] w-full">
-            {activeTab && (
-              <div className="flex h-full w-full">
-                {activeTab === "isf" ? (
-                  <LazyIsf />
-                ) : (
-                  <LazyMap type={activeTab} isAuthenticated={isAuthenticated} />
-                )}
-              </div>
-            )}
-          </section>
+      <div className="mx-auto w-full max-w-6xl space-y-8 pb-8">
+        {/* Map Container - Top Section */}
+        <section className="relative h-[65vh] min-h-[400px] w-full">
+          <div className="flex h-full w-full">
+            <LazyMap isAuthenticated={isAuthenticated} />
+          </div>
+        </section>
 
-          {/* Table Container - Bottom Section */}
-          {activeTab === "biofloc_thematic" && (
-            <LazyPublicBioflocProposalSection />
-          )}
-        </div>
+        {/* Dynamic Content Container - Bottom Section */}
+        <div className="space-y-8">{children}</div>
       </div>
       <ScrollToTopButton />
     </>
-  );
-}
-
-export function Header({
-  activeTab,
-  onTabChange,
-}: {
-  activeTab: LocationType | null;
-  onTabChange: (tab: LocationType) => void;
-}) {
-  const activeLabel = activeTab
-    ? FILTER_STATE[activeTab].label
-    : "Select Dashboard";
-
-  return (
-    <div className="bg-backdrop-blur-sm z-5 bg-white/80">
-      <div className="mx-auto flex max-w-6xl items-center justify-between p-4 sm:px-0">
-        <div>
-          <h2 className="text-xs font-semibold text-zinc-400 uppercase">
-            Monitoring
-          </h2>
-          <h1 className="font-bold text-zinc-900">
-            Dashboard Program Prioritas
-          </h1>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              <MenuIcon className="size-4" />
-              <p className="ml-2 hidden sm:block">Dashboard: {activeLabel}</p>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-64 rounded-none" align="end">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>Pilih Dashboard Program</DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={activeTab || ""}
-                onValueChange={(value) => onTabChange(value as LocationType)}
-              >
-                {Object.entries(FILTER_STATE).map(([key, value]) => (
-                  <DropdownMenuRadioItem
-                    key={key}
-                    value={key}
-                    className="flex items-center gap-2 rounded-none px-2"
-                  >
-                    <value.icon className="size-4 text-zinc-400" />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{value.label}</span>
-                      <span className="text-[10px] leading-none text-zinc-400">
-                        {value.sub}
-                      </span>
-                    </div>
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
   );
 }
 
