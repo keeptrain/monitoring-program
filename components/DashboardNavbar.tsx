@@ -28,7 +28,11 @@ export default function DashboardNavbar() {
         </Link>
 
         {/* User Navigation (Client Part) */}
-        <Suspense fallback={<div className="size-10 rounded-full bg-white/10 animate-pulse" />}>
+        <Suspense
+          fallback={
+            <div className="size-10 animate-pulse rounded-full bg-white/10" />
+          }
+        >
           <UserDropdown />
         </Suspense>
       </nav>

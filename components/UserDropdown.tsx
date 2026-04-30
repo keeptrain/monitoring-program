@@ -26,6 +26,8 @@ export function UserDropdown() {
       await logout();
       if (pathname !== "/") {
         router.push("/");
+      } else {
+        router.refresh();
       }
     });
   };
