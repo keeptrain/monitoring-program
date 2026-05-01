@@ -6,6 +6,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
+import { LocationStatus } from "@/features/monitoring/api/getPublicLocationsByType";
+import { cookies } from "next/headers";
+import {
+  getActiveLocationsService,
+  getPotentialLocationsService,
+} from "@/features/thematic/services/biofloc-locations-services";
 
 export interface AvailableLocation {
   id: number;
@@ -31,59 +37,47 @@ export async function getAvailableLocations() {
   return (data ?? []) as AvailableLocation[];
 }
 
+export type ActionResult<T> = {
+  success: boolean;
+  message?: string;
+  data: T;
+};
+
 export async function getAvailableLocationsByType(
   type: LocationType,
-): Promise<PublicAvailableLocation[]> {
-  const supabase = await createClient();
+  status: LocationStatus,
+): Promise<ActionResult<PublicAvailableLocation[]>> {
+  // Check session for potential status
+  if (status === "potential") {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session_id")?.value === "true";
 
-  const programTable =
-    type === "biofloc_thematic" ? "thematic_programs" : "isf_programs";
-
-  const { data, error } = await supabase
-    .from("available_locations")
-    .select(
-      `
-      id,
-      name,
-      latitude,
-      longitude,
-      ${programTable}!inner (
-        id,
-        name,
-        percentage_of_work
-      )
-    `,
-    )
-    .eq("type", type);
-
-  if (error) {
-    console.error("getAvailableLocationsByType error:", error);
-    return [];
+    if (!session) {
+      return {
+        success: false,
+        message: "Silakan masuk terlebih dahulu untuk melihat data potensi",
+        data: [],
+      };
+    }
   }
 
-  type LocationWithProgramRow = {
-    id: number;
-    name: string;
-    latitude: number;
-    longitude: number;
-  } & Record<string, unknown>;
-
-  return ((data as unknown as LocationWithProgramRow[]) ?? []).map((item) => {
-    const program = Array.isArray(item[programTable])
-      ? item[programTable][0]
-      : item[programTable];
+  // Only handle biofloc_thematic for now
+  if (type === "biofloc_thematic") {
+    const results =
+      status === "active"
+        ? await getActiveLocationsService()
+        : await getPotentialLocationsService();
 
     return {
-      id: program?.id ?? item.id,
-      program_name: program?.name ?? "Unknown Program",
-      location_name: item.name,
-      percentage_of_work: program?.percentage_of_work ?? 0,
-      position: {
-        latitude: item.latitude ?? 0,
-        longitude: item.longitude ?? 0,
-      },
+      success: true,
+      data: results,
     };
-  });
+  }
+
+  return {
+    success: true,
+    data: [],
+  };
 }
 
 export async function createAvailableLocation(
@@ -100,7 +94,11 @@ export async function createAvailableLocation(
   revalidatePath("/dashboard/available-location");
   redirect("/dashboard/available-location");
 }
-export type LocationType = "biofloc_thematic" | "isf";
+export type LocationType =
+  | "biofloc_thematic"
+  | "minapadi_thematic"
+  | "isf"
+  | "revitalization";
 
 export async function createLocationFromProgram(
   supabase: SupabaseClient,
@@ -109,6 +107,8 @@ export async function createLocationFromProgram(
     name: string;
     latitude: number;
     longitude: number;
+    province_id?: string;
+    regency_id?: string;
   },
 ) {
   const { data: locationData, error } = await supabase

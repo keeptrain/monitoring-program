@@ -6,79 +6,176 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  ColumnDef,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  ColumnFiltersState,
+  Table as TanstackTable,
+} from "@tanstack/react-table";
+import React, { useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { Loader2Icon } from "lucide-react";
+import DataTablePagination from "./data-table-pagination";
+import { PaginationState, Updater } from "@tanstack/react-table";
 
-import { ReactNode } from "react";
+interface TableOptions {
+  defaultPageSize?: number;
+  showRowsText?: boolean;
+  showPagination?: boolean;
+}
 
-export type Column<T> =
-  | {
-      header: string;
-      accessorKey: keyof T;
-      cell?: (row: T) => ReactNode;
-    }
-  | {
-      header: string;
-      accessorKey?: never;
-      cell: (row: T) => ReactNode;
-    };
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  isPending?: boolean;
+  options?: TableOptions;
+  topContent?: (table: TanstackTable<TData>) => React.ReactNode;
+  onRowClick?: (row: TData) => void;
+  // Manual server-side pagination support
+  manualPagination?: boolean;
+  pageCount?: number;
+  rowCount?: number;
+  pagination?: PaginationState;
+  onPaginationChange?: (updater: Updater<PaginationState>) => void;
+}
 
-type DatatableProps<T> = {
-  columns: Column<T>[];
-  data: T[];
-  onRowClick?: (e: React.MouseEvent<HTMLTableRowElement>, row: T) => void;
-};
-
-export default function Datatable<T>({
+export default function DataTable<TData, TValue>({
+  topContent,
   columns,
   data,
+  isPending = false,
   onRowClick,
-}: DatatableProps<T>) {
+  options: userOptions,
+  manualPagination,
+  pageCount,
+  rowCount,
+  pagination,
+  onPaginationChange,
+}: DataTableProps<TData, TValue>) {
+  const options = {
+    defaultPageSize: 10,
+    showRowsText: true,
+    showPagination: true,
+    ...userOptions,
+  };
+
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  // Local fallback pagination state if controlled is not provided
+  const [localPagination, setLocalPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: options.defaultPageSize,
+  });
+
+  const currentPagination = pagination ?? localPagination;
+  const setPagination = onPaginationChange ?? setLocalPagination;
+
+  const table = useReactTable({
+    data,
+    columns,
+    pageCount,
+    rowCount,
+    manualPagination,
+    state: {
+      sorting,
+      columnFilters,
+      pagination: currentPagination,
+    },
+    meta: {
+      isLoading: isPending,
+    },
+    getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onPaginationChange: setPagination,
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
-    <Table className="border-collapse border border-border">
-      <TableHeader className="bg-muted/50">
-        <TableRow>
-          {columns.map((column, index) => (
-            <TableHead
-              key={index}
-              className="h-10 border-b border-border text-xs font-bold uppercase tracking-wider text-muted-foreground"
-            >
-              {column.header}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.length > 0 ? (
-          data.map((row, rowIndex) => (
-            <TableRow
-              key={rowIndex}
-              onClick={(e) => onRowClick?.(e, row) ?? undefined}
-              className="hover:bg-muted/30"
-            >
-              {columns.map((column, colIndex) => (
-                <TableCell
-                  key={colIndex}
-                  className="border-b border-border py-4"
-                >
-                  {column.cell
-                    ? column.cell(row)
-                    : column.accessorKey !== undefined
-                    ? String(row[column.accessorKey] ?? "-")
-                    : "-"}
-                </TableCell>
-              ))}
+    <div className="flex flex-col gap-4">
+      {!!topContent && (
+        <div className="flex items-center">{topContent(table)}</div>
+      )}
+      <Table className="border-border border-collapse border">
+        <TableHeader className="bg-muted/50">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                );
+              })}
             </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell
-              colSpan={columns.length}
-              className="h-24 text-center text-muted-foreground"
-            >
-              Tidak ada data.
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {isPending ? (
+            <LoadingTableBody columns={columns.length} />
+          ) : table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onRowClick?.(row.original);
+                }}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                Tidak ditemukan atau data tidak tersedia
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <DataTablePagination table={table} options={options} />
+    </div>
+  );
+}
+
+function LoadingTableBody({ columns }: { columns: number }) {
+  return (
+    <>
+      <TableRow>
+        <TableCell colSpan={columns}>
+          <div className="my-2 flex items-center justify-center gap-2">
+            <Loader2Icon className="animate-spin" />
+            <p>Loading...</p>
+          </div>
+          <Skeleton className="h-6 w-full" />
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={columns}>
+          <Skeleton className="h-6 w-full" />
+        </TableCell>
+      </TableRow>
+    </>
   );
 }

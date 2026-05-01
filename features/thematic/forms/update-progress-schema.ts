@@ -1,13 +1,18 @@
+import { documentationFormSchema } from "@/features/documentation/forms/documentation-schema";
 import { z } from "zod";
-import { documentationSchema } from "./thematic-program-schema";
 
-export const updateProgressSchema = z.object({
-  percentage_of_work: z.coerce
+export const updateBaseProgressSchema = z.object({
+  progress_percent: z.coerce
     .number({ error: "Persentase harus berupa angka" })
     .int()
     .min(0, "Minimum 0%")
     .max(100, "Maximum 100%"),
-  documentations: z.array(documentationSchema).optional(),
+});
+
+export const updateProgressSchema = updateBaseProgressSchema.extend({
+  documentations: documentationFormSchema.shape.documentations
+    .optional()
+    .default([]),
 });
 
 export type UpdateProgressFormInput = z.input<typeof updateProgressSchema>;

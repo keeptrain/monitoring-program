@@ -1,85 +1,179 @@
-import z from "zod";
+"use client";
+
 import { Field, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { UseFormReturn, FieldValues, Path } from "react-hook-form";
+import {
+  UseFormReturn,
+  FieldValues,
+  Path,
+  useWatch,
+  Control,
+  Controller,
+} from "react-hook-form";
 import { handleGeoCoordinateValueChange } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
+import { useCallback, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import dynamic from "next/dynamic";
+import type { MapPinPickerValue } from "./MapPinPicker";
+import ProvinceSelect from "./ProvinceSelect";
 
-export const locationFormSchemaPattern = {
-  location_name: z.string().min(1, "Nama lokasi harus diisi"),
-  latitude: z.preprocess(
-    (v) => (v === "" ? undefined : v),
-    z.coerce
-      .number({ error: "Latitude harus diisi" })
-      .min(-90, "Latitude minimal -90")
-      .max(90, "Latitude maksimal 90"),
-  ),
-  longitude: z.preprocess(
-    (v) => (v === "" ? undefined : v),
-    z.coerce
-      .number({ error: "Longitude harus diisi" })
-      .min(-180, "Longitude minimal -180")
-      .max(180, "Longitude maksimal 180"),
-  ),
-};
+const MapPinPicker = dynamic(() => import("./MapPinPicker"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[320px] w-full rounded-md" />,
+});
 
-export const locationFormSchema = z.object(locationFormSchemaPattern);
+// Isolated coordinate watcher (prevents parent re-render)
+function CoordinateMapSync<T extends FieldValues>({
+  control,
+  setValue,
+  isManualInput,
+}: {
+  control: Control<T>;
+  setValue: UseFormReturn<T>["setValue"];
+  isManualInput: boolean;
+}) {
+  const latitude = useWatch({ control, name: "latitude" as Path<T> });
+  const longitude = useWatch({ control, name: "longitude" as Path<T> });
 
+  const mapValue: MapPinPickerValue = {
+    latitude: Number(latitude) || 0,
+    longitude: Number(longitude) || 0,
+  };
+
+  const handleMapChange = useCallback(
+    (value: MapPinPickerValue) => {
+      setValue("latitude" as Path<T>, String(value.latitude) as never, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      setValue("longitude" as Path<T>, String(value.longitude) as never, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    },
+    [setValue],
+  );
+
+  return (
+    <MapPinPicker
+      value={mapValue}
+      onChange={handleMapChange}
+      disabled={isManualInput}
+    />
+  );
+}
+
+// Main Component
 export default function LocationFormSection<T extends FieldValues>({
   form,
+  isReadOnly = false,
+  showAdministrativeFields = false,
 }: {
   form: UseFormReturn<T>;
+  isReadOnly?: boolean;
+  showAdministrativeFields?: boolean;
 }) {
+  const [isManualInput, setIsManualInput] = useState(false);
+
   const {
     register,
+    control,
+    setValue,
     formState: { errors },
   } = form;
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <Field className="col-span-2">
-        <FieldLabel>Nama Lokasi</FieldLabel>
-        <Input
-          {...register("location_name" as Path<T>)}
-          aria-invalid={!!errors["location_name"]}
-          placeholder="Masukkan Nama Lokasi"
-        />
-        <FieldError>
-          {errors["location_name"]?.message as string | undefined}
-        </FieldError>
-      </Field>
+    <div className="space-y-4">
+      {showAdministrativeFields && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Field>
+            <FieldLabel>Provinsi</FieldLabel>
+            <Controller
+              control={control}
+              name={"province_id" as Path<T>}
+              render={({ field }) => (
+                <ProvinceSelect
+                  value={(field.value as string) ?? ""}
+                  onChange={field.onChange}
+                  allLabel="Pilih Provinsi"
+                  showAll
+                  className="w-full"
+                  aria-invalid={!!errors["province_id"]}
+                />
+              )}
+            />
+            <FieldError>
+              {errors["province_id"]?.message as string | undefined}
+            </FieldError>
+          </Field>
 
-      <Field>
-        <FieldLabel>Latitude</FieldLabel>
-        <Input
-          {...register("latitude" as Path<T>, {
-            onChange: handleGeoCoordinateValueChange,
-          })}
-          defaultValue={"12"}
-          pattern="^-?[0-9]*\.?[0-9]*$"
-          inputMode="decimal"
-          aria-invalid={!!errors["latitude"]}
-          placeholder="-1.2345"
-        />
-        <FieldError>
-          {errors["latitude"]?.message as string | undefined}
-        </FieldError>
-      </Field>
+          <Field>
+            <FieldLabel>Kabupaten/Kota</FieldLabel>
+            <Input
+              {...register("regency_id" as Path<T>)}
+              aria-invalid={!!errors["regency_id"]}
+              placeholder="Contoh: Sidoarjo"
+              disabled={isReadOnly}
+            />
+            <FieldError>
+              {errors["regency_id"]?.message as string | undefined}
+            </FieldError>
+          </Field>
+        </div>
+      )}
 
-      <Field>
-        <FieldLabel>Longitude</FieldLabel>
-        <Input
-          {...register("longitude" as Path<T>, {
-            onChange: handleGeoCoordinateValueChange,
-          })}
-          pattern="^-?[0-9]*\.?[0-9]*$"
-          inputMode="decimal"
-          aria-invalid={!!errors["longitude"]}
-          placeholder="6.7890"
-        />
-        <FieldError>
-          {errors["longitude"]?.message as string | undefined}
-        </FieldError>
-      </Field>
+      <CoordinateMapSync
+        control={control}
+        setValue={setValue}
+        isManualInput={isManualInput || isReadOnly}
+      />
+
+      {!isReadOnly && (
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={isManualInput}
+            onCheckedChange={setIsManualInput}
+            label="Input manual koordinat"
+          />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Field>
+          <FieldLabel>Latitude</FieldLabel>
+          <Input
+            {...register("latitude" as Path<T>, {
+              onChange: handleGeoCoordinateValueChange,
+            })}
+            pattern="^-?[0-9]*\.?[0-9]*$"
+            inputMode="decimal"
+            aria-invalid={!!errors["latitude"]}
+            placeholder="-6.93095"
+            disabled={!isManualInput || isReadOnly}
+          />
+          <FieldError>
+            {errors["latitude"]?.message as string | undefined}
+          </FieldError>
+        </Field>
+
+        <Field>
+          <FieldLabel>Longitude</FieldLabel>
+          <Input
+            {...register("longitude" as Path<T>, {
+              onChange: handleGeoCoordinateValueChange,
+            })}
+            pattern="^-?[0-9]*\.?[0-9]*$"
+            inputMode="decimal"
+            aria-invalid={!!errors["longitude"]}
+            placeholder="107.46755"
+            disabled={!isManualInput || isReadOnly}
+          />
+          <FieldError>
+            {errors["longitude"]?.message as string | undefined}
+          </FieldError>
+        </Field>
+      </div>
     </div>
   );
 }

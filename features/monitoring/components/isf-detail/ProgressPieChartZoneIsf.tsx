@@ -1,0 +1,50 @@
+"use client";
+
+import { PieChart, Pie, Label, ResponsiveContainer } from "recharts";
+
+export function ProgressPieChartZoneIsf({ progress }: { progress: number }) {
+  const chartData = [
+    { name: "Progress", value: progress, fill: "var(--primary)" },
+    { name: "Sisa", value: 100 - progress, fill: "#f1f5f9" },
+  ];
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={chartData}
+          innerRadius={65}
+          outerRadius={85}
+          startAngle={90}
+          endAngle={450}
+          dataKey="value"
+          stroke="none"
+          isAnimationActive={true}
+          animationDuration={800}
+        >
+          <Label
+            content={({ viewBox }) => {
+              const { cx, cy } = viewBox as { cx: number; cy: number };
+              return (
+                <text
+                  x={cx}
+                  y={cy}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                >
+                  <tspan
+                    x={cx}
+                    y={cy}
+                    className="fill-primary text-3xl font-black tracking-tighter italic"
+                  >
+                    {progress}%
+                  </tspan>
+                </text>
+              );
+            }}
+          />
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+  );
+}

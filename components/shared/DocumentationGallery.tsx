@@ -11,13 +11,11 @@ export interface DocumentationItem {
   image_after_path: string | null;
 }
 
-interface DocumentationGalleryProps {
-  documentations: DocumentationItem[];
-}
-
 export function DocumentationGallery({
   documentations,
-}: DocumentationGalleryProps) {
+}: {
+  documentations: DocumentationItem[];
+}) {
   return (
     <div className="space-y-8">
       {documentations?.map((doc, index) => (

@@ -1,59 +1,54 @@
-"use client";
-
+import { session } from "@/features/auth/session";
+import Image from "next/image";
 import Link from "next/link";
-import {
-  LayoutDashboard,
-  MapPin,
-  ArrowLeft,
-  LeafIcon,
-  WavesIcon,
-} from "lucide-react";
+import { Suspense } from "react";
+import { UserDropdown } from "./UserDropdown";
 
-const dashboardLinks = [
-  {
-    href: "/dashboard/available-location",
-    label: "Lokasi Tersedia",
-    icon: MapPin,
-    description: "Kelola data lokasi yang tersedia untuk program",
-  },
-  {
-    href: "/dashboard/thematic",
-    label: "Program Tematik",
-    icon: LeafIcon,
-    description: "Kelola program tematik DJPB",
-  },
-  {
-    href: "/dashboard/isf",
-    label: "Program Isf",
-    icon: WavesIcon,
-    description: "Kelola program isf DJPB",
-  },
-];
+const SCOPE_TO_PATH: Record<string, string> = {
+  biofloc: "/biofloc-thematic",
+  minapadi: "/minapadi-thematic",
+  isf: "/isf",
+  revitalization: "/revitalisasi",
+};
 
-export default function DashboardNavbar() {
+export default async function DashboardNavbar() {
+  const { programScope } = await session();
+
+  const homeHref =
+    programScope === "all" ? "/" : SCOPE_TO_PATH[programScope] || "/";
+
   return (
-    <header className="border-border text-background sticky top-0 z-50 border-b bg-cyan-800">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <header className="text-background sticky top-0 z-20 bg-[#006ebf] shadow-xs">
+      <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-background/60 hover:text-background flex items-center gap-1.5 text-xs transition-colors"
-          >
-            <ArrowLeft className="size-3" />
-            <span className="hidden sm:block">Beranda</span>
-          </Link>
-          <div className="bg-background/20 h-4 w-px" />
-          <div className="flex items-center gap-2">
-            <LayoutDashboard className="text-background size-4" />
-            <span className="text-sm font-semibold tracking-tight">
-              Dashboard Admin
-            </span>
+        <Link
+          href={homeHref}
+          className="text-foreground flex items-center gap-2 text-sm font-semibold"
+        >
+          <div className="relative size-10 sm:size-12">
+            <Image
+              src="/favicon.webp"
+              alt="Logo KKP"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
           </div>
-        </div>
+          <span className="hidden text-xs leading-tight font-bold text-white/90 sm:inline">
+            Kementerian Kelautan <br /> dan Perikanan Republik Indonesia
+          </span>
+        </Link>
+
+        {/* User Navigation (Client Part) */}
+        <Suspense
+          fallback={
+            <div className="size-10 animate-pulse rounded-full bg-white/10" />
+          }
+        >
+          <UserDropdown />
+        </Suspense>
       </nav>
     </header>
   );
 }
-
-export { dashboardLinks };

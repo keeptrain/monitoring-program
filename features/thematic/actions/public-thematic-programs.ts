@@ -1,26 +1,25 @@
 "use server";
 
 import { createClient } from "@/utils/supabase";
-
-export type PublicThematicDocumentation = {
-  id: string;
-  image_before_path: string | null;
-  image_after_path: string | null;
-};
+import { TABLES } from "@/lib/constants/tables";
 
 export type PublicThematicProgram = {
   id: number;
   location_id: number;
   name: string;
-  percentage_of_work: number;
-  commodity: string;
+  progress_percent: number;
+  commodity_aid: string;
+  commodity_potential: string | null;
   land_area: string;
-  production: string;
-  total_admin: number;
+  production_value: string;
+  total_management: number;
+  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
-  documentations: PublicThematicDocumentation[];
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations: {
     name: string | null;
     latitude: number | null;
@@ -32,15 +31,19 @@ type PublicThematicProgramRow = {
   id: number;
   location_id: number;
   name: string;
-  percentage_of_work: number;
-  commodity: string;
+  progress_percent: number;
+  commodity_aid: string;
+  commodity_potential: string | null;
   land_area: string;
-  production: string;
-  total_admin: number;
+  production_value: string;
+  total_management: number;
+  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
-  documentations: unknown;
+  kusuka_number: string;
+  nib: string | null;
+  legal_entity_number: string | null;
   available_locations:
     | {
         name: string | null;
@@ -58,21 +61,25 @@ type PublicThematicProgramRow = {
 export async function getPublicThematicProgram(id: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("thematic_programs")
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .select(
       `
       id,
       location_id,
       name,
-      percentage_of_work,
-      commodity,
+      progress_percent,
+      commodity_aid,
+      commodity_potential,
       land_area,
-      production,
-      total_admin,
+      production_value,
+      total_management,
+      total_members,
       distribution_amount,
       sppg_partner,
       s_curve_path,
-      documentations,
+      kusuka_number,
+      nib,
+      legal_entity_number,
       available_locations (
         name,
         latitude,
@@ -93,21 +100,6 @@ export async function getPublicThematicProgram(id: number) {
     return null;
   }
 
-  const rawDocumentations = Array.isArray(data.documentations)
-    ? data.documentations
-    : [];
-
-  const documentations: PublicThematicDocumentation[] = rawDocumentations
-    .slice(0, 5)
-    .map((doc, index) => {
-      const item = doc as Partial<PublicThematicDocumentation>;
-      return {
-        id: item.id ?? String(index),
-        image_before_path: item.image_before_path ?? null,
-        image_after_path: item.image_after_path ?? null,
-      };
-    });
-
   const location = Array.isArray(data.available_locations)
     ? (data.available_locations[0] ?? null)
     : data.available_locations;
@@ -116,15 +108,19 @@ export async function getPublicThematicProgram(id: number) {
     id: data.id,
     location_id: data.location_id,
     name: data.name,
-    percentage_of_work: data.percentage_of_work,
-    commodity: data.commodity,
+    progress_percent: data.progress_percent,
+    commodity_aid: data.commodity_aid,
+    commodity_potential: data.commodity_potential,
     land_area: data.land_area,
-    production: data.production,
-    total_admin: data.total_admin,
+    production_value: data.production_value,
+    total_management: data.total_management,
+    total_members: data.total_members,
     distribution_amount: data.distribution_amount,
     sppg_partner: data.sppg_partner,
     s_curve_path: data.s_curve_path,
-    documentations,
+    kusuka_number: data.kusuka_number,
+    nib: data.nib,
+    legal_entity_number: data.legal_entity_number,
     available_locations: location ?? null,
   } satisfies PublicThematicProgram;
 }

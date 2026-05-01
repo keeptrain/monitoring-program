@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Providers from "@/app/providers";
+import { Toaster } from "sonner";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -15,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Program Prioritas DJPB",
   description: "Platform monitoring program prioritas KKP",
+  icons: {
+    icon: "/favicon.webp",
+  },
 };
 
 export default function RootLayout({
@@ -28,11 +33,14 @@ export default function RootLayout({
         inter.variable,
         geistSans.variable,
         geistMono.variable,
-        geistHeading.variable
+        geistHeading.variable,
       )}
     >
-      <body className="min-h-full bg-background text-foreground">
-        <Providers>{children}</Providers>
+      <body className="bg-background text-foreground min-h-full">
+        <Providers>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </Providers>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

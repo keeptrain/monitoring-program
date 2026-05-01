@@ -1,68 +1,49 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { FishIcon, LayoutDashboard, Map } from "lucide-react";
+import Image from "next/image";
+import { UserDropdown } from "./UserDropdown";
+import { cookies } from "next/headers";
+import { Button } from "./ui/button";
+import { LogInIcon } from "lucide-react";
 
-const navLinks = [
-  { href: "/#programs", label: "Program" },
-  { href: "/#features", label: "Fitur" },
-];
-
-export default function Navbar() {
-  const pathname = usePathname();
+export default async function Navbar() {
+  const cookieStore = await cookies();
+  const userRole = cookieStore.get("session_id")?.value;
+  const isAuthenticated = !!userRole;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm">
-      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+    <header className="border-border bg-background/90 sticky top-0 z-10 border-b backdrop-blur-sm">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground"
+          className="text-foreground flex items-center gap-2 text-sm font-semibold"
         >
-          <span className="flex size-8 items-center justify-center bg-primary text-background text-[10px] font-bold rounded-full">
-            <FishIcon className="size-4" />
-          </span>
-          <span className="hidden sm:inline text-xs">
-            Kementerian Kelautan <br /> dan Perikanan
+          <div className="relative size-10 sm:size-12">
+            <Image
+              src="/favicon.webp"
+              alt="Logo KKP"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          </div>
+          <span className="hidden text-xs leading-tight font-bold sm:inline">
+            Kementerian Kelautan <br /> dan Perikanan Republik Indonesia
           </span>
         </Link>
 
-        {/* Center nav */}
-        <div className="hidden items-center gap-1 md:flex">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "px-3 py-1.5 text-sm font-medium transition-colors",
-                pathname === href
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
-
         {/* Right actions */}
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href="/monitoring">
-              <Map className="mr-1.5 size-3.5" />
-              Monitoring
+        {isAuthenticated ? (
+          <UserDropdown />
+        ) : (
+          <Button size="sm" asChild>
+            <Link href="/login">
+              <LogInIcon className="mr-1 size-4" />
+              Masuk
             </Link>
           </Button>
-          <Button asChild size="sm">
-            <Link href="/dashboard">
-              <LayoutDashboard className="mr-1.5 size-3.5" />
-              Dashboard
-            </Link>
-          </Button>
-        </div>
+        )}
       </nav>
     </header>
   );
