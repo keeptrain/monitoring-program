@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT UNIQUE NOT NULL,
-    full_name TEXT,
+    name TEXT,
     role TEXT NOT NULL DEFAULT 'viewer',
     program_scope TEXT NOT NULL DEFAULT 'none',
     created_at TIMESTAMPTZ DEFAULT NOW(),
