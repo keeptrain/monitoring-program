@@ -13,6 +13,10 @@ export default function proxy(request: NextRequest) {
   // Inject the current pathname into a custom header
   requestHeaders.set("x-pathname", request.nextUrl.pathname);
 
+  const pathname = requestHeaders.get("x-pathname");
+
+  console.log("Pathname dari Header:", pathname);
+
   return NextResponse.next({
     request: {
       headers: requestHeaders,
@@ -37,3 +41,10 @@ export async function checkRoleGuard(currentType: string) {
     redirect(`/${allowedPath}`);
   }
 }
+
+export const config = {
+  matcher: [
+    // Exclude API routes, static files, image optimizations, and .png files
+    "/((?!api|_next/static|_next/image|.*\\.png$).*)",
+  ],
+};

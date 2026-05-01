@@ -2,7 +2,21 @@ import Link from "next/link";
 import { DASHBOARD_LINKS } from "@/lib/constants/navigation";
 import { ArrowRight } from "lucide-react";
 
-export default function DashboardPage() {
+import { session } from "@/features/auth/session";
+
+export default async function DashboardPage() {
+  const { userRole, programScope } = await session();
+
+  const filteredLinks = DASHBOARD_LINKS.filter((link) => {
+    if (link.href === "/dashboard/users") {
+      return userRole === "admin";
+    }
+
+    if (programScope === "all") return true;
+
+    return link.href.includes(programScope);
+  });
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Header */}
@@ -20,7 +34,7 @@ export default function DashboardPage() {
 
       {/* Quick-access cards */}
       <div className="border-border bg-border grid gap-px border sm:grid-cols-2">
-        {DASHBOARD_LINKS.map(({ href, label, icon: Icon, description }) => (
+        {filteredLinks.map(({ href, label, icon: Icon, description }) => (
           <Link
             key={href}
             href={href}

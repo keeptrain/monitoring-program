@@ -1,8 +1,14 @@
-import { LeafIcon, WavesIcon, Grid3x3Icon } from "lucide-react";
+import { LeafIcon, WavesIcon, Grid3x3Icon, UserIcon } from "lucide-react";
 
 export const DASHBOARD_LINKS = [
   {
-    href: "/dashboard/available-location",
+    href: "/dashboard/users",
+    label: "User Management",
+    icon: UserIcon,
+    description: "Kelola user",
+  },
+  {
+    href: "/dashboard/revitalization",
     label: "Revitalisasi Tambak Panturan",
     icon: WavesIcon,
     description: "Kelola data Revitalisasi Tambak Panturan",
