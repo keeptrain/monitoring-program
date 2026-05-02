@@ -2,7 +2,7 @@ import { MenuDashboardTriggerClient } from "@/components/MenuDashboardTriggerCli
 import Navbar from "@/components/Navbar";
 import PublicPageHeader from "@/components/PublicPageHeader";
 import { Button } from "@/components/ui/button";
-import { session } from "@/features/auth/session";
+import { getSessionCached } from "@/features/auth/session";
 import { FolderLockIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -11,16 +11,17 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const sessionData = await session();
-  const { isAuthenticated, userRole } = sessionData;
+  const session = await getSessionCached();
+  const isLoggedIn = session.isLoggedIn;
+  const userRole = session.role;
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr]">
       <Navbar />
       <PublicPageHeader label="Monitoring" title="Dashboard Program Prioritas">
-        {!isAuthenticated ? (
+        {!isLoggedIn ? (
           <MenuDashboardTriggerClient
-            isAuthenticated={isAuthenticated}
+            isAuthenticated={isLoggedIn}
             userRole={userRole}
           />
         ) : (
@@ -34,7 +35,7 @@ export default async function PublicLayout({
           )
         )}
       </PublicPageHeader>
-      <main className="bg-background">{children}</main>
+      <main className="bg-background px-4 sm:px-2">{children}</main>
     </div>
   );
 }

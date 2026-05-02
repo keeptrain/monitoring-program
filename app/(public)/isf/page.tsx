@@ -1,5 +1,5 @@
 import MonitoringIsfPage from "@/features/monitoring/MonitoringIsfPage";
-import { checkRoleGuard } from "@/proxy";
+import { checkRoleGuard } from "@/features/auth/utils";
 
 export default async function IsfMonitoringPage() {
   await checkRoleGuard("isf");

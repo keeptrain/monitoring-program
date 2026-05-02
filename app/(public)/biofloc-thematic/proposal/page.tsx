@@ -1,4 +1,4 @@
-import { checkRoleGuard } from "@/proxy";
+import { checkRoleGuard } from "@/features/auth/utils";
 import ProposalBioflocForm from "@/features/thematic/forms/ProposalBioflocForm";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

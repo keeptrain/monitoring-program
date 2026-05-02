@@ -1,13 +1,37 @@
-import { checkRoleGuard } from "@/proxy";
-import { session } from "@/features/auth/session";
+import ProposalProvinceTable from "@/features/monitoring/components/biofloc/ProposalProvinceTable";
+import TotalIncomingProposals from "@/features/monitoring/components/thematic/TotalIncomingProposals";
+import MonitoringThematicHeader from "@/features/monitoring/components/thematic/MonitoringThematicHeader";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { getThematicProgramQuotasQueryOptions } from "@/features/monitoring/api/getBioflocProgramQuotas";
+import LazyThematicProposalTable from "@/features/monitoring/components/thematic/LazyThematicProposalTable";
+import { ThematicType } from "@/features/thematic/constants/filter-state";
 
-export default async function MinapadiMonitoringPage() {
-  await checkRoleGuard("minapadi-thematic");
-  const { isAuthenticated } = await session();
+export default async function MonitoringMinapadiThematicPage() {
+  const type: ThematicType = "minapadi_thematic";
+  const queryClient = new QueryClient();
+
+  const { data, proposal_total } = await queryClient.fetchQuery(
+    getThematicProgramQuotasQueryOptions("biofloc_thematic"),
+  );
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Content for Minapadi will be added here */}
-    </div>
+    <>
+      <MonitoringThematicHeader thematicType={type} />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
+          <TotalIncomingProposals value={proposal_total} />
+          <div className="lg:col-span-4">
+            <ProposalProvinceTable data={data} />
+          </div>
+          <div className="lg:col-span-6">
+            <LazyThematicProposalTable />
+          </div>
+        </div>
+      </HydrationBoundary>
+    </>
   );
 }
