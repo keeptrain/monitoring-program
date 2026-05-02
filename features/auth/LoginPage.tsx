@@ -1,14 +1,11 @@
 import { LoginForm } from "./components/login-form";
-import { DevQuickLogin } from "./components/dev-quick-login";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
-import { getSession } from "./auth-actions";
+import Image from "next/image";
 
 export default async function LoginPage() {
-  const isDevelopment = process.env.NODE_ENV !== "development";
-
   return (
     <div className="bg-muted flex min-h-svh items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-4xl">
@@ -38,14 +35,16 @@ export default async function LoginPage() {
                 </div>
 
                 <div className="mt-8 grid gap-6">
-                  {isDevelopment ? <DevQuickLogin /> : <LoginForm />}
+                  <LoginForm />
                 </div>
               </div>
               <div className="bg-muted hidden items-center justify-center p-10 md:flex">
-                <img
+                <Image
+                  width={256}
+                  height={256}
                   src="/favicon.webp"
                   alt="Logo"
-                  className="size-64 object-contain transition-all hover:scale-105 dark:brightness-[0.8]"
+                  className="object-contain transition-all hover:scale-105 dark:brightness-[0.8]"
                 />
               </div>
             </CardContent>
