@@ -1,5 +1,7 @@
 import { Grid3X3Icon, LeafIcon, ShrimpIcon, WavesIcon } from "lucide-react";
 
+export type ThematicType = "biofloc_thematic" | "minapadi_thematic";
+
 export const FILTER_STATE = {
   biofloc_thematic: {
     label: "Tematik Bioflok",
