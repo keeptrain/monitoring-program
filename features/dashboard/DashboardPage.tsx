@@ -2,6 +2,7 @@ import { DASHBOARD_LINKS } from "@/lib/constants/navigation";
 import { getSessionCached } from "../auth/session";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const session = await getSessionCached();
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       {/* Header */}
       <div className="mb-10">
-        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
+        <p className="text-muted-foreground mb-2 text-xs font-medium tracking-widest uppercase">
           Admin Panel
         </p>
         <h1 className="text-foreground text-2xl font-semibold tracking-tight">
@@ -35,7 +36,12 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick-access cards */}
-      <div className="border-border bg-border grid gap-px border sm:grid-cols-2">
+      <div
+        className={cn(
+          "border-border bg-border grid gap-px border",
+          filteredLinks.length > 1 && "sm:grid-cols-2",
+        )}
+      >
         {filteredLinks.map(({ href, label, icon: Icon, description }) => (
           <Link
             key={href}
