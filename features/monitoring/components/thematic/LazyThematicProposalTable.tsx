@@ -1,0 +1,28 @@
+"use client";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { useInViewOnce } from "@/hooks/useInViewOnce";
+import dynamic from "next/dynamic";
+
+const IN_VIEW_OPTIONS = {
+  root: null,
+  rootMargin: "120px 0px",
+  threshold: 0.5,
+} as const;
+
+const LazyTableComponent = dynamic(
+  () => import("../biofloc/ProposalSubmissionTable"),
+  {
+    loading: () => <Skeleton className="h-[500px] w-full" />,
+  },
+);
+
+export default function LazyThematicProposalTable() {
+  const { ref, isInView } = useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
+
+  return (
+    <div ref={ref} className="min-h-[550px]">
+      {isInView && <LazyTableComponent enabled={isInView} />}
+    </div>
+  );
+}

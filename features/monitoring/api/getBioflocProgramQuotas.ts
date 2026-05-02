@@ -1,14 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { getBioflocProgramQuotasPublic } from "@/features/thematic/actions/program-quotas";
 
-export const getBioflocProgramQuotasQueryKey = () =>
-  ["biofloc-program-quotas"] as const;
+export const getThematicProgramQuotasQueryKey = (
+  thematicType: "biofloc_thematic" | "minapadi_thematic",
+) => ["thematic-program-quotas", thematicType] as const;
 
-export const useGetBioflocProgramQuotas = (enabled: boolean) =>
-  useQuery({
-    queryKey: getBioflocProgramQuotasQueryKey(),
+export const getThematicProgramQuotasQueryOptions = (
+  thematicType: "biofloc_thematic" | "minapadi_thematic",
+) =>
+  queryOptions({
+    queryKey: getThematicProgramQuotasQueryKey(thematicType),
     queryFn: getBioflocProgramQuotasPublic,
-    enabled,
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

@@ -9,13 +9,11 @@ import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
-type ProposalSubmissionTableProps = {
-  enabled?: boolean;
-};
-
 export default function ProposalSubmissionTable({
   enabled = true,
-}: ProposalSubmissionTableProps) {
+}: {
+  enabled?: boolean;
+}) {
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -38,39 +36,37 @@ export default function ProposalSubmissionTable({
   const columns = useMemo(() => ProposalSubmissionTableColumns(), []);
 
   return (
-    <>
-      <Datatable
-        columns={columns}
-        data={data?.data ?? []}
-        isPending={isPending}
-        manualPagination={true}
-        pageCount={data?.totalPages ?? -1}
-        rowCount={data?.total ?? 0}
-        pagination={pagination}
-        onPaginationChange={setPagination}
-        topContent={() => (
-          <>
-            <ProvinceSelect
-              value={selectedProvince}
-              onChange={(val) => {
-                setSelectedProvince(val);
+    <Datatable
+      columns={columns}
+      data={data?.data ?? []}
+      isPending={isPending}
+      manualPagination={true}
+      pageCount={data?.totalPages ?? -1}
+      rowCount={data?.total ?? 0}
+      pagination={pagination}
+      onPaginationChange={setPagination}
+      topContent={() => (
+        <>
+          <ProvinceSelect
+            value={selectedProvince}
+            onChange={(val) => {
+              setSelectedProvince(val);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
+            }}
+            className="w-[200px]"
+          />
+          <div className="ml-auto w-1/4">
+            <Input
+              placeholder="Cari kelompok kdmp..."
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
                 setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
               }}
-              className="w-[200px]"
             />
-            <div className="ml-auto w-1/4">
-              <Input
-                placeholder="Cari kelompok kdmp..."
-                value={searchQuery}
-                onChange={(event) => {
-                  setSearchQuery(event.target.value);
-                  setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
-                }}
-              />
-            </div>
-          </>
-        )}
-      />
-    </>
+          </div>
+        </>
+      )}
+    />
   );
 }
