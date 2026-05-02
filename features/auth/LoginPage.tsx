@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeftIcon } from "lucide-react";
+import { getSession } from "./auth-actions";
 
 export default async function LoginPage() {
   const isDevelopment = process.env.NODE_ENV !== "development";
@@ -18,9 +19,9 @@ export default async function LoginPage() {
                 <div className="flex flex-col gap-6">
                   <div className="relative flex items-center justify-center">
                     <Button
-                      variant="link"
+                      variant="ghost"
                       size="icon-sm"
-                      className="absolute left-0 size-8 p-0"
+                      className="absolute left-0"
                       asChild
                     >
                       <Link href="/">

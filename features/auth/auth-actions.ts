@@ -2,104 +2,46 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { UserRole, ProgramScope } from "./types/user";
-
-export async function login(
-  role: UserRole = "viewer",
-  scope: ProgramScope = "none",
-) {
-  const cookieStore = await cookies();
-  const sessionData = JSON.stringify({ role, scope });
-
-  cookieStore.set("session_id", sessionData, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-  });
-}
-
 import { loginFormSchema } from "./form/login-schema";
 import z from "zod";
+import { getIronSession } from "iron-session";
+import { SessionData, sessionOptions } from "@/lib/session";
+import * as db from "@/features/auth/services/login-services";
+import { buildSession } from "./session";
+import { getRedirectPath } from "./utils";
 
 export type ActionState = {
   success: boolean;
-  errors?: Record<string, string[]>;
+  errors?: {
+    [key: string]: string[] | undefined;
+  };
   message?: string;
 };
 
-const MOCK_USERS: {
-  email: string;
-  role: UserRole;
-  scope: ProgramScope;
-}[] = [
-  // PMO
-  {
-    email: "pmobioflok@test.com",
-    role: "pmo",
-    scope: "biofloc",
-  },
-  {
-    email: "pmominapadi@test.com",
-    role: "pmo",
-    scope: "minapadi",
-  },
-  { email: "pmoisf@test.com", role: "pmo", scope: "isf" },
-  {
-    email: "pmorevitalisasi@test.com",
-    role: "pmo",
-    scope: "revitalization",
-  },
-  // Petugas (Officer)
-  {
-    email: "petugasbioflok@test.com",
-    role: "officer",
-    scope: "biofloc",
-  },
-  {
-    email: "petugasminapadi@test.com",
-    role: "officer",
-    scope: "minapadi",
-  },
-  {
-    email: "petugasisf@test.com",
-    role: "officer",
-    scope: "isf",
-  },
-  {
-    email: "petugasrevitalisasi@test.com",
-    role: "officer",
-    scope: "revitalization",
-  },
-  // Admin
-  {
-    email: "adminbioflok@test.com",
-    role: "admin",
-    scope: "biofloc",
-  },
-  {
-    email: "adminminapadi@test.com",
-    role: "admin",
-    scope: "minapadi",
-  },
-  {
-    email: "adminisf@test.com",
-    role: "admin",
-    scope: "isf",
-  },
-  {
-    email: "adminrevitalisasi@test.com",
-    role: "admin",
-    scope: "revitalization",
-  },
-] as const;
+export async function getSession() {
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
 
-export async function loginWithCredentials(
+  if (!session.isLoggedIn) {
+    return {
+      success: false,
+      message: "Anda harus login terlebih dahulu.",
+    };
+  }
+
+  return session;
+}
+
+export async function login(
   prevState: ActionState | null,
   formData: FormData,
 ): Promise<ActionState> {
-  const rawData = Object.fromEntries(formData.entries());
-  const validatedFields = loginFormSchema.safeParse(rawData);
+  const validatedFields = loginFormSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
 
   if (!validatedFields.success) {
     return {
@@ -110,10 +52,15 @@ export async function loginWithCredentials(
 
   const { email, password } = validatedFields.data;
 
+  let isSuccesful = false;
+  let redirectPath = "/";
   // Check mock users
-  const user = MOCK_USERS.find((u) => u.email === email);
-
-  if (!user) {
+  try {
+    const user = await db.login(email, password);
+    await buildSession(user.id, user.role, user.programScope);
+    isSuccesful = true;
+    redirectPath = getRedirectPath(user.role, user.programScope);
+  } catch (error) {
     return {
       success: false,
       errors: {
@@ -122,16 +69,22 @@ export async function loginWithCredentials(
     };
   }
 
-  await login(user.role, user.scope);
-
-  if (user.role === "admin" || user.role === "pmo") {
-    redirect("/dashboard");
-  } else {
-    redirect("/");
+  if (isSuccesful) {
+    redirect(redirectPath);
   }
+
+  return {
+    success: false,
+    message: "Terjadi kesalahan saat mencoba untuk masuk.",
+  };
 }
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete("session_id");
+  const session = await getIronSession<SessionData>(
+    cookieStore,
+    sessionOptions,
+  );
+
+  session.destroy();
 }

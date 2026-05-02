@@ -12,8 +12,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  created_at: string;
+  updated_at: string;
   role: UserRole;
   program_scope: ProgramScope;
-  createdAt: string;
-  updatedAt: string;
 }

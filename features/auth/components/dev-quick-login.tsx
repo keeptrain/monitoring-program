@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { login } from "@/features/auth/auth-actions";
+import { ActionState, login } from "@/features/auth/auth-actions";
 import { useRouter } from "next/navigation";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
 import {
@@ -67,14 +67,7 @@ export function DevQuickLogin() {
   );
 
   const handleLogin = (scope: ProgramScope) => {
-    startTransition(async () => {
-      await login(role, scope);
-      if (role === "pmo") {
-        router.push("/dashboard");
-      } else {
-        router.push("/");
-      }
-    });
+    startTransition(async () => {});
   };
 
   return (

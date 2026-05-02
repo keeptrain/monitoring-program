@@ -1,34 +1,40 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
-import { UserRole, ProgramScope } from "./types/user";
+import { SessionData, sessionOptions } from "@/lib/session";
+import { getIronSession } from "iron-session";
+import { ProgramScope, UserRole } from "./types/user";
 
-export interface Session {
-  isAuthenticated: boolean;
-  userRole: UserRole;
-  programScope: ProgramScope;
+export async function getSession(): Promise<SessionData> {
+  const cookieStore = await cookies();
+  const ironSession = await getIronSession<SessionData>(
+    cookieStore,
+    sessionOptions,
+  );
+  return {
+    sub: ironSession.sub,
+    role: ironSession.role,
+    programScope: ironSession.programScope,
+    isLoggedIn: !!ironSession.isLoggedIn,
+  };
 }
 
-export const session = cache(async (): Promise<Session> => {
-  const cookieStore = await cookies();
-  const sessionValue = cookieStore.get("session_id")?.value;
-  const isAuthenticated = !!sessionValue;
-
-  let userRole: UserRole = "viewer";
-  let programScope: ProgramScope = "none";
-
-  if (sessionValue) {
-    try {
-      const data = JSON.parse(sessionValue);
-      userRole = data.role;
-      programScope = data.scope;
-    } catch (e) {
-      console.error("Failed to parse session cookie", e);
-    }
-  }
-
-  return {
-    isAuthenticated,
-    userRole,
-    programScope,
-  };
+export const getSessionCached = cache(async (): Promise<SessionData> => {
+  return await getSession();
 });
+
+export async function buildSession(
+  sub: string, // user id
+  role: UserRole,
+  programScope: ProgramScope,
+) {
+  const cookieStore = await cookies();
+  const ironSession = await getIronSession<SessionData>(
+    cookieStore,
+    sessionOptions,
+  );
+  ironSession.sub = sub;
+  ironSession.role = role;
+  ironSession.programScope = programScope;
+  ironSession.isLoggedIn = true;
+  await ironSession.save();
+}

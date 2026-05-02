@@ -4,11 +4,14 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { loginWithCredentials } from "@/features/auth/auth-actions";
+import { ActionState, login } from "@/features/auth/auth-actions";
 import { Loader2Icon } from "lucide-react";
 
 export function LoginForm() {
-  const [state, action, isPending] = useActionState(loginWithCredentials, null);
+  const [state, action, isPending] = useActionState<
+    ActionState | null,
+    FormData
+  >(login, null);
 
   const { errors } = state ?? {};
   const errorsEmail = errors?.email;
@@ -43,6 +46,7 @@ export function LoginForm() {
           id="password"
           name="password"
           type="password"
+          defaultValue={"password123"}
           required
           aria-invalid={!!errorsPassword}
         />
