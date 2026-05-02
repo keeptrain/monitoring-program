@@ -7,6 +7,8 @@ export const getUsersQueryOptions = () =>
   queryOptions({
     queryKey: getUsersQueryKey(),
     queryFn: async () => getUsers(),
+    staleTime: 2 * 60 * 1000,
+    gcTime: 4 * 60 * 1000,
   });
 
 export const useGetUsers = () => useQuery(getUsersQueryOptions());

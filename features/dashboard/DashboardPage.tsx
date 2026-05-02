@@ -1,15 +1,17 @@
-import Link from "next/link";
 import { DASHBOARD_LINKS } from "@/lib/constants/navigation";
-import { ArrowRight } from "lucide-react";
-
-import { session } from "@/features/auth/session";
+import { getSessionCached } from "../auth/session";
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 
 export default async function DashboardPage() {
-  const { userRole, programScope } = await session();
+  const session = await getSessionCached();
+
+  const role = session.role;
+  const programScope = session.programScope;
 
   const filteredLinks = DASHBOARD_LINKS.filter((link) => {
     if (link.href === "/dashboard/users") {
-      return userRole === "admin";
+      return role === "admin";
     }
 
     if (programScope === "all") return true;
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
               <div className="border-border group-hover:border-foreground flex size-10 items-center justify-center border transition-colors">
                 <Icon className="text-foreground size-5" />
               </div>
-              <ArrowRight className="text-muted-foreground group-hover:text-foreground size-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRightIcon className="text-muted-foreground group-hover:text-foreground size-4 transition-transform group-hover:translate-x-1" />
             </div>
             <div>
               <h2 className="text-foreground text-sm font-semibold">{label}</h2>

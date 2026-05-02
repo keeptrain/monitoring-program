@@ -8,16 +8,14 @@ import { PencilIcon, TrashIcon } from "lucide-react";
 import { formatDateWithTime } from "@/lib/utils";
 
 export const UsersTableColumns = ({
-  onEdit,
+  onAction,
 }: {
-  onEdit?: (user: User) => void;
+  onAction: (action: "edit" | "delete", user: User) => void;
 }): ColumnDef<User>[] => [
   {
     accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.email}</span>
-    ),
+    cell: ({ row: { original } }) => original.email,
   },
   {
     accessorKey: "role",
@@ -29,20 +27,20 @@ export const UsersTableColumns = ({
           variant={role === "admin" ? "default" : "secondary"}
           className="capitalize"
         >
-          {role}
+          {role === "officer" ? "Petugas" : role}
         </Badge>
       );
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created_at",
     header: "Dibuat",
-    cell: ({ row: { original } }) => formatDateWithTime(original.createdAt),
+    cell: ({ row: { original } }) => formatDateWithTime(original.created_at),
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "updated_at",
     header: "Diperbarui",
-    cell: ({ row: { original } }) => formatDateWithTime(original.updatedAt),
+    cell: ({ row: { original } }) => formatDateWithTime(original.updated_at),
   },
   {
     header: "Aksi",
@@ -54,14 +52,14 @@ export const UsersTableColumns = ({
           type: "action",
           key: "edit",
           label: "Ubah",
-          onClick: () => onEdit?.(item),
+          onClick: () => onAction("edit", item),
           icon: PencilIcon,
         },
         {
           type: "action",
           key: "delete",
           label: "Hapus",
-          onClick: () => console.log("delete"),
+          onClick: () => onAction("delete", item),
           icon: TrashIcon,
           className: "text-red-600 hover:text-red-700 hover:bg-red-50",
         },

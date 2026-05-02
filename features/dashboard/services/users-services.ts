@@ -1,40 +1,46 @@
+import { uuidv7 } from "uuidv7";
+import bcrypt from "bcryptjs";
 import { User, UserRole, ProgramScope } from "@/features/auth/types/user";
+import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
-
-const MOCK_USERS: User[] = [
-  {
-    id: "1",
-    email: "admin@test.com",
-    name: "Admin",
-    role: "admin",
-    program_scope: "all",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    email: "petugas-bioflok@test.com",
-    name: "Petugas Bioflok",
-    role: "officer",
-    program_scope: "biofloc",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    email: "petugas-isf@test.com",
-    name: "Petugas ISF",
-    role: "officer",
-    program_scope: "isf",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
 
 export async function getUsersService(
   programScope: ProgramScope,
+  currentUserId: string,
 ): Promise<User[]> {
-  return MOCK_USERS.filter((user) => user.program_scope === programScope);
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("users")
+    .select(
+      `
+      id, 
+      email, 
+      name, 
+      created_at, 
+      updated_at,
+      user_assignments!inner(program_scope, role)
+    `,
+    )
+    .is("deleted_at", null)
+    .neq("id", currentUserId);
+
+  if (programScope !== "all") {
+    query = query.eq("user_assignments.program_scope", programScope);
+  }
+
+  const { data, error } = await query.limit(50);
+
+  if (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+
+  return data.map(({ user_assignments, ...user }) => ({
+    ...user,
+    role: user_assignments?.[0]?.role,
+    program_scope: user_assignments?.[0]?.program_scope,
+  })) as User[];
 }
 
 export async function getUserByIdService(id: string) {
@@ -51,71 +57,136 @@ export async function getUserByIdService(id: string) {
 
 export async function createUserService(userData: {
   email: string;
-  fullName?: string;
+  name: string;
   role: UserRole;
   programScope: ProgramScope;
+  password: string;
 }) {
-  const adminClient = await createClient();
+  const supabase = await createClient();
 
-  // 1. Create user in Auth
-  const { data: authData, error: authError } =
-    await adminClient.auth.admin.createUser({
-      email: userData.email,
-      password: "password123", // Default password, user should change it
-      email_confirm: true,
-    });
-
-  if (authError) throw authError;
-
-  // 2. Create user in Public table
-  const { data, error } = await adminClient.from("users").insert({
-    id: authData.user.id,
+  const uuid = uuidv7();
+  const { error: insertUserError } = await supabase.from(TABLES.USERS).insert({
+    id: uuid,
     email: userData.email,
-    full_name: userData.fullName,
-    role: userData.role,
-    program_scope: userData.programScope,
+    name: userData.name,
+    password: bcrypt.hashSync(userData.password, 10),
   });
 
-  if (error) {
-    // Cleanup Auth user if public table insert fails
-    await adminClient.auth.admin.deleteUser(authData.user.id);
-    throw error;
+  if (insertUserError) {
+    // 23505 is the PostgreSQL error code for unique violation
+    if (insertUserError.code === "23505") {
+      throw new Error("EMAIL_ALREADY_EXISTS");
+    }
+    throw insertUserError;
   }
 
-  return data;
+  const { error: assignmentError } = await supabase
+    .from(TABLES.USER_ASSIGNMENTS)
+    .insert({
+      user_id: uuid,
+      role: userData.role,
+      program_scope: userData.programScope,
+    });
+
+  if (assignmentError) throw assignmentError;
+
+  return {
+    email: userData.email,
+    role: userData.role,
+  };
 }
 
 export async function updateUserService(
   id: string,
   userData: Partial<{
-    fullName: string;
+    email: string;
+    name: string;
     role: UserRole;
-    programScope: ProgramScope;
+    password?: string;
   }>,
 ) {
-  const adminClient = await createClient();
+  const supabase = await createClient();
 
-  const { data, error } = await adminClient
-    .from("users")
-    .update({
-      full_name: userData.fullName,
-      role: userData.role,
-      program_scope: userData.programScope,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
+  // 1. Ambil data saat ini (Strict Type)
+  const { data: currentUser, error: fetchError } = await supabase
+    .from(TABLES.USERS)
+    .select(
+      `
+      email, 
+      name, 
+      user_assignments!inner(role)
+    `,
+    )
+    .eq("id", id)
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (fetchError || !currentUser) throw new Error("USER_NOT_FOUND");
+
+  // Cast type untuk mempermudah akses (karena join Supabase return array)
+  // eslint-disable-next-line
+  const currentAssignment = (currentUser.user_assignments as any)?.[0];
+
+  // eslint-disable-next-line
+  const userUpdates: Record<string, any> = {};
+  // eslint-disable-next-line
+  const assignmentUpdates: Record<string, any> = {};
+
+  // 2. Cek Perubahan Email & Validasi Keunikan
+  if (userData.email && userData.email !== currentUser.email) {
+    const { data: existingUser } = await supabase
+      .from(TABLES.USERS)
+      .select("id")
+      .eq("email", userData.email)
+      .neq("id", id)
+      .maybeSingle();
+
+    if (existingUser) throw new Error("EMAIL_ALREADY_EXISTS");
+    userUpdates.email = userData.email;
+  }
+
+  // 3. Cek Perubahan Nama
+  if (userData.name && userData.name !== currentUser.name) {
+    userUpdates.name = userData.name;
+  }
+
+  // 3.1 Cek Perubahan Password
+  if (userData.password && userData.password.trim() !== "") {
+    userUpdates.password = bcrypt.hashSync(userData.password, 10);
+  }
+
+  // 4. Cek Perubahan Role (Program Scope sengaja tidak dimasukkan sesuai permintaan)
+  if (userData.role && userData.role !== currentAssignment?.role) {
+    assignmentUpdates.role = userData.role;
+  }
+
+  // 5. Eksekusi Update Tabel Users
+  if (Object.keys(userUpdates).length > 0) {
+    userUpdates.updated_at = new Date().toISOString();
+    const { error: userError } = await supabase
+      .from(TABLES.USERS)
+      .update(userUpdates)
+      .eq("id", id);
+    if (userError) throw userError;
+  }
+
+  // 6. Eksekusi Update Tabel User Assignments
+  if (Object.keys(assignmentUpdates).length > 0) {
+    assignmentUpdates.updated_at = new Date().toISOString();
+    const { error: assignmentError } = await supabase
+      .from(TABLES.USER_ASSIGNMENTS)
+      .update(assignmentUpdates)
+      .eq("user_id", id);
+    if (assignmentError) throw assignmentError;
+  }
+
+  return true;
 }
 
 export async function deleteUserService(id: string) {
-  const adminClient = await createClient();
-
-  // Auth delete will cascade to public.users if configured correctly,
-  // but we'll do it explicitly or rely on the FK cascade.
-  const { error } = await adminClient.auth.admin.deleteUser(id);
-
-  if (error) throw error;
-  return true;
+  const supabase = await createClient();
+  await supabase
+    .from(TABLES.USERS)
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id)
+    .throwOnError();
 }
