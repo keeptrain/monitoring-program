@@ -1,22 +1,13 @@
-import { session } from "@/features/auth/session";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { UserDropdown } from "./UserDropdown";
 
-const SCOPE_TO_PATH: Record<string, string> = {
-  biofloc: "/biofloc-thematic",
-  minapadi: "/minapadi-thematic",
-  isf: "/isf",
-  revitalization: "/revitalisasi",
-};
-
-export default async function DashboardNavbar() {
-  const { programScope } = await session();
-
-  const homeHref =
-    programScope === "all" ? "/" : SCOPE_TO_PATH[programScope] || "/";
-
+export default async function DashboardNavbar({
+  homeHref,
+}: {
+  homeHref: string;
+}) {
   return (
     <header className="text-background sticky top-0 z-20 bg-[#006ebf] shadow-xs">
       <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-0">

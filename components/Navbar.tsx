@@ -7,8 +7,7 @@ import { LogInIcon } from "lucide-react";
 
 export default async function Navbar() {
   const cookieStore = await cookies();
-  const userRole = cookieStore.get("session_id")?.value;
-  const isAuthenticated = !!userRole;
+  const isAuthenticated = !!cookieStore.get("session")?.value;
 
   return (
     <header className="border-border bg-background/90 sticky top-0 z-10 border-b backdrop-blur-sm">
