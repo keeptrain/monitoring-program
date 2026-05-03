@@ -7,4 +7,5 @@ export const TABLES = {
   PROGRAM_QUOTAS: "program_quotas",
   LOGS: "monitoring_logs",
   UPT: "technical_units",
+  KDMP_ENTITIES: "kdmp_entities",
 } as const;

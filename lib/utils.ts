@@ -41,6 +41,27 @@ export const handleInputNumberValueChange = (
   e.target.value = sanitized;
 };
 
+export const handleNumberKeyDown = (
+  e: React.KeyboardEvent<HTMLInputElement>,
+) => {
+  // Allow: Backspace, Delete, Tab, Escape, Enter
+  if (
+    ["Backspace", "Delete", "Tab", "Escape", "Enter"].includes(e.key) ||
+    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Cmd+A, Cmd+C, Cmd+V, Cmd+X
+    ((e.ctrlKey || e.metaKey) &&
+      ["a", "c", "v", "x"].includes(e.key.toLowerCase())) ||
+    // Allow: Home, End, Left, Right
+    ["Home", "End", "ArrowLeft", "ArrowRight"].includes(e.key)
+  ) {
+    return;
+  }
+
+  // Block: anything that is not a number
+  if (!/^\d$/.test(e.key)) {
+    e.preventDefault();
+  }
+};
+
 export const handleGeoCoordinateValueChange = (
   e: React.ChangeEvent<HTMLInputElement>,
 ) => {
@@ -84,11 +105,11 @@ export function mergeUnique(existing: string[], incoming: string[]) {
 
 // Create a Map for O(1) lookup performance
 const provinceIdMap = new Map(
-  INDONESIA_PROVINCES.map((p) => [p.province_id, p.name])
+  INDONESIA_PROVINCES.map((p) => [p.province_id, p.name]),
 );
 
 export function getProvinceNameById(
-  provinceId?: string | number
+  provinceId?: string | number,
 ): string | undefined {
   const id = String(provinceId);
   return id ? provinceIdMap.get(id) : undefined;
@@ -96,7 +117,7 @@ export function getProvinceNameById(
 
 export function getProvinceNameByIdOrFallback(
   provinceId?: string | number,
-  fallback: string = "Provinsi Tidak Diketahui"
+  fallback: string = "Provinsi Tidak Diketahui",
 ): string {
   return getProvinceNameById(provinceId) ?? fallback;
 }

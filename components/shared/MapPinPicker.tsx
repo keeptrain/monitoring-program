@@ -158,16 +158,11 @@ export default function MapPinPicker({
           type="button"
           onClick={handleLocateMe}
           disabled={locating || disabled}
-          className="absolute right-2 bottom-2 z-5 rounded-md border bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-zinc-50 disabled:opacity-50"
+          className="absolute right-0.5 bottom-5 z-5 bg-white/90 px-2 py-1 text-xs font-medium shadow-sm transition-colors hover:bg-zinc-50 disabled:opacity-50"
         >
           {locating ? "Mencari..." : "📍 Lokasi Saya"}
         </button>
       </div>
-      {!disabled && (
-        <p className="text-muted-foreground mt-1 text-[11px]">
-          Klik pada peta atau seret pin untuk memilih lokasi.
-        </p>
-      )}
     </div>
   );
 }

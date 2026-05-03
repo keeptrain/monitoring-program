@@ -132,10 +132,16 @@ export default function LocationFormSection<T extends FieldValues>({
       {!isReadOnly && (
         <div className="flex items-center gap-2">
           <Checkbox
+            id="manual-input"
             checked={isManualInput}
-            onCheckedChange={setIsManualInput}
-            label="Input manual koordinat"
+            onCheckedChange={(checked) => setIsManualInput(checked === true)}
           />
+          <label
+            htmlFor="manual-input"
+            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Input manual koordinat
+          </label>
         </div>
       )}
 

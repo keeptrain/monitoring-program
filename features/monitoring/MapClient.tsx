@@ -122,7 +122,6 @@ function MapTopContent({
   type: LocationType;
   resetMap: () => void;
 }) {
-  console.log(type);
   const [statuses, setStatuses] = useQueryState(
     "status",
     parseAsArrayOf(parseAsString).withDefault(["active"]),
@@ -262,7 +261,7 @@ function MapDetailSheet({
   type,
   isAuthenticated,
 }: {
-  type: Exclude<LocationType, "isf">;
+  type: "biofloc_thematic" | "minapadi_thematic";
   isAuthenticated: boolean;
 }) {
   const queryClient = useQueryClient();
@@ -333,7 +332,7 @@ function MapDetailSheet({
           <LoadingPublicMonitoringDetail />
         ) : selectedLocation || detailData ? (
           <DetailSheetContent
-            data={detailData}
+            data={detailData!}
             isAuthenticated={isAuthenticated}
           />
         ) : (
@@ -349,7 +348,7 @@ function MapDetailSheet({
   );
 }
 
-function MapMarker({ type }: { type: Exclude<LocationType, "isf"> }) {
+function MapMarker({ type }: { type: "biofloc_thematic" | "minapadi_thematic" }) {
   const [, setDetailIdUrl] = useQueryState("detailId", parseAsInteger);
   const [statuses] = useQueryState(
     "status",
@@ -445,7 +444,7 @@ const DUMMY_KALIMANTAN_GEOJSON = {
       },
     },
   ],
-};
+} as any;
 
 function MapIslands() {
   const onEachFeature = (feature: any, layer: any) => {

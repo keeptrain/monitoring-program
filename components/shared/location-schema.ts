@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const locationCoordinateSchema = z.object({
+  latitude: z.coerce.number().min(-90).max(90, "Latitude tidak valid"),
+  longitude: z.coerce.number().min(-180).max(180, "Longitude tidak valid"),
+});
+
 export const locationCoordinateSchemaPattern = {
   latitude: z.coerce.number().min(-90).max(90, "Latitude tidak valid"),
   longitude: z.coerce.number().min(-180).max(180, "Longitude tidak valid"),
@@ -19,3 +24,5 @@ export const locationFormSchemaPattern = {
   ...locationAdministrativeSchemaPattern,
   ...locationCoordinateSchemaPattern,
 };
+
+export type LocationFields = z.infer<typeof locationCoordinateSchemaPattern>;
