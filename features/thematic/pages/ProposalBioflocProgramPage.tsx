@@ -6,18 +6,36 @@ import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
 import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
-import { ProposalAdminTableColumns } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
-import { useUpdateProposalBioflocStatus } from "@/features/thematic/api/useUpdateProposalBioflocStatus";
+import {
+  ProposalAdminTableColumns,
+  ProposalVerificationFormValues,
+} from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { ProposalBioflocStatus } from "../types/thematic";
 import {
   NativeSelect,
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { useRouter } from "next/navigation";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ProposalBioflocStatus } from "@/features/proposal/types/proposal-biofloc";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { toast } from "sonner";
 
 export default function ProposalBioflocProgramPage() {
   const router = useRouter();
+  const [id, setId] = useState<string | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -26,9 +44,6 @@ export default function ProposalBioflocProgramPage() {
   });
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
 
-  // Simulated static admin check for this demo component
-  const isAdmin = true;
-
   const { data, isPending } = useGetProposalBioflocPaginated({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
@@ -36,14 +51,14 @@ export default function ProposalBioflocProgramPage() {
     search: debouncedSearchQuery,
   });
 
-  const { mutate: updateStatus } = useUpdateProposalBioflocStatus();
-
   // Action Handlers
   const handleAction = useCallback(
-    (id: number, status: ProposalBioflocStatus) => {
-      updateStatus({ id, status });
+    (id: string, action: "verify" | "convert") => {
+      if (action === "verify") {
+        setId(id);
+      }
     },
-    [updateStatus],
+    [setId],
   );
 
   const columns = useMemo(
@@ -51,69 +66,134 @@ export default function ProposalBioflocProgramPage() {
     [handleAction],
   );
 
-  const handleRowClick = (id: number) =>
+  const handleRowClick = (id: string) =>
     router.push(`/dashboard/thematic/biofloc/proposals/${id}`);
 
-  if (!isAdmin) {
-    return (
-      <div className="rounded border border-red-200 bg-red-50 p-4 text-red-800">
-        <h3
-          className="font-semibold"
-          style={{ display: "flex", alignItems: "center", gap: "8px" }}
-        >
-          Akses Ditolak
-        </h3>
-        <p className="mt-1 text-sm">
-          Hanya admin yang memiliki izin untuk memverifikasi proposal.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <Datatable
-      columns={columns}
-      data={data?.data ?? []}
-      isPending={isPending}
-      manualPagination={true}
-      pageCount={data?.totalPages ?? -1}
-      rowCount={data?.total ?? 0}
-      pagination={pagination}
-      onPaginationChange={setPagination}
-      onRowClick={({ id }) => handleRowClick(id)}
-      topContent={(table) => (
-        <>
-          <ProvinceSelect
-            value={selectedProvince}
-            onChange={(val) => {
-              setSelectedProvince(val);
-              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-            }}
-            className="mr-2 w-[200px]"
-          />
-          <NativeSelect
-            value={table.getColumn("status")?.getFilterValue() as string}
-            onChange={(event) => {
-              table.getColumn("status")?.setFilterValue(event.target.value);
-            }}
-          >
-            <NativeSelectOption value="">Semua Status</NativeSelectOption>
-            <NativeSelectOption value="pending">Menunggu</NativeSelectOption>
-            <NativeSelectOption value="approved">Disetujui</NativeSelectOption>
-            <NativeSelectOption value="rejected">Ditolak</NativeSelectOption>
-          </NativeSelect>
-          <div className="ml-auto w-1/4">
-            <Input
-              placeholder="Cari kelompok kdmp..."
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value);
+    <>
+      <Datatable
+        columns={columns}
+        data={data?.data ?? []}
+        isPending={isPending}
+        manualPagination={true}
+        pageCount={data?.totalPages ?? -1}
+        rowCount={data?.total ?? 0}
+        pagination={pagination}
+        onPaginationChange={setPagination}
+        onRowClick={({ id }) => handleRowClick(id)}
+        topContent={(table) => (
+          <>
+            <ProvinceSelect
+              value={selectedProvince}
+              onChange={(val) => {
+                setSelectedProvince(val);
                 setPagination((prev) => ({ ...prev, pageIndex: 0 }));
               }}
+              className="mr-2 w-[200px]"
             />
-          </div>
-        </>
-      )}
-    />
+            <NativeSelect
+              value={table.getColumn("status")?.getFilterValue() as string}
+              onChange={(event) => {
+                table.getColumn("status")?.setFilterValue(event.target.value);
+              }}
+            >
+              <NativeSelectOption value="">Semua Status</NativeSelectOption>
+              <NativeSelectOption value="pending">Menunggu</NativeSelectOption>
+              <NativeSelectOption value="approved">
+                Disetujui
+              </NativeSelectOption>
+              <NativeSelectOption value="rejected">Ditolak</NativeSelectOption>
+            </NativeSelect>
+            <div className="ml-auto w-1/4">
+              <Input
+                placeholder="Cari kelompok kdmp..."
+                value={searchQuery}
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                }}
+              />
+            </div>
+          </>
+        )}
+      />
+
+      <Sheet open={id !== null} onOpenChange={() => setId(null)}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Verifikasi Proposal</SheetTitle>
+            <SheetDescription>
+              Lengkapi form di bawah untuk melakukan verifikasi proposal
+            </SheetDescription>
+          </SheetHeader>
+          <VerificationForm id={id} />
+          <SheetFooter>
+            <Button type="submit" form="proposal-verification">
+              Save changes
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+}
+
+function VerificationForm({ id }: { id: string | null }) {
+  const [status, setStatus] = useState<ProposalBioflocStatus | null>(null);
+  const { mutate } = useVerificationProposalBiofloc();
+
+  const handleSubmit = async (formData: FormData) => {
+    if (!id) return;
+    const values: ProposalVerificationFormValues = {
+      status: formData.get("status") as "approved" | "rejected",
+      rejectionReason: formData.get("rejection_reason") as string,
+    };
+    mutate(
+      { id, data: values },
+      { onError: (error) => toast.error(error.message) },
+    );
+  };
+
+  return (
+    <form id="proposal-verification" action={handleSubmit} className="mx-4">
+      <FieldGroup className="space-y-3">
+        <Field>
+          <FieldLabel>Hasil Verifikasi</FieldLabel>
+          <RadioGroup
+            name="status"
+            className="w-fit"
+            defaultValue="approved"
+            required
+          >
+            <div className="flex items-center gap-3">
+              <RadioGroupItem
+                id="approved"
+                value="approved"
+                onClick={() => setStatus("approved")}
+              />
+              <Label htmlFor="approved">Setujui</Label>
+            </div>
+            <div className="flex items-center gap-3">
+              <RadioGroupItem
+                id="rejected"
+                value="rejected"
+                onClick={() => setStatus("rejected")}
+              />
+              <Label htmlFor="rejected">Tolak</Label>
+            </div>
+          </RadioGroup>
+        </Field>
+
+        <Field>
+          <FieldLabel>Alasan Penolakan</FieldLabel>
+          <Textarea
+            disabled={status !== "rejected"}
+            name="rejection_reason"
+            placeholder="Masukkan alasan..."
+            required={status === "rejected"}
+          />
+        </Field>
+      </FieldGroup>
+    </form>
   );
 }

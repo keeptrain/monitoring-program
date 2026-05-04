@@ -22,10 +22,10 @@ export default function BioflocProgramForm({
   isConvertingFromProposal = false,
 }: {
   initialData?: ThematicProgramDetail | null;
-  proposalId?: number;
+  proposalId?: string;
   isConvertingFromProposal?: boolean;
 }) {
-  const isEdit = !!initialData && initialData.id !== 0;
+  const isEdit = !!initialData;
   const { form, onSubmit, isPending } = useThematicProgramForm(
     initialData,
     proposalId,

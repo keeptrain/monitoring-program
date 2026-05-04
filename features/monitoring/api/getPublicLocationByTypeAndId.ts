@@ -5,12 +5,12 @@ import { MonitoringDetailTypeMap } from "../types/monitoring-types";
 
 export const getPublicLocationByTypeAndIdQueryKey = (
   type: LocationType,
-  id: number,
+  id: number | string,
 ) => ["public-location", type, id];
 
 export const useGetPublicLocationByTypeAndId = <T extends LocationType>(
   type: T,
-  id: number,
+  id: number | string,
 ) =>
   useQuery({
     queryKey: getPublicLocationByTypeAndIdQueryKey(type, id),
@@ -20,5 +20,5 @@ export const useGetPublicLocationByTypeAndId = <T extends LocationType>(
       >,
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
-    enabled: !!type && id !== 0,
+    enabled: !!type && id !== 0 && id !== "",
   });

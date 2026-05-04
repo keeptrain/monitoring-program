@@ -8,9 +8,9 @@ import { ConstructionIcon, PencilIcon, TrashIcon } from "lucide-react";
 const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   {
     header: "Nama KDMP",
-    accessorKey: "name",
+    accessorKey: "entity_name",
     cell: ({ row }) => (
-      <span className="font-semibold">{row.original.name}</span>
+      <span className="font-semibold">{row.original.entity_name}</span>
     ),
   },
   {
@@ -42,7 +42,7 @@ export const BioflocProgramsPublicTableColumns =
 
 export const BioflocProgramsInternalTableColumns = (opts: {
   onOpenProgress?: (row: BioflocProgramListItem) => void;
-  onDelete?: (id: number) => Promise<unknown>;
+  onDelete?: (id: string) => Promise<unknown>;
 }): ColumnDef<BioflocProgramListItem>[] => {
   const handleDelete = async (item: BioflocProgramListItem) => {
     if (!opts.onDelete) {
@@ -51,7 +51,7 @@ export const BioflocProgramsInternalTableColumns = (opts: {
     }
 
     const confirmed = confirm(
-      `Apakah Anda yakin ingin menghapus program KDMP "${item.name}"? Tindakan ini tidak dapat dibatalkan.`,
+      `Apakah Anda yakin ingin menghapus program KDMP "${item.entity_name}"? Tindakan ini tidak dapat dibatalkan.`,
     );
     if (confirmed) {
       try {

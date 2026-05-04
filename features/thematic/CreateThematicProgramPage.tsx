@@ -18,40 +18,39 @@ export default async function CreateThematicProgramPage({
     return notFound();
   }
 
-  const proposalIdNum = proposalId ? parseInt(proposalId) : undefined;
-  if (proposalId && isNaN(proposalIdNum!)) {
+  if (!proposalId) {
     return notFound();
   }
 
-  let initialData: any = null;
-  if (proposalIdNum) {
+  const initialData: any = null;
+  if (proposalId) {
     try {
-      const proposal = await getProposalBioflocDetail(proposalIdNum);
+      const proposal = await getProposalBioflocDetail(proposalId);
       if (proposal.status !== "approved") {
         return notFound();
       }
       // Prepare initial data from proposal with default values for required fields
-      initialData = {
-        id: 0,
-        name: proposal.name,
-        location_id: proposal.location_id || 0,
-        commodity_aid: "",
-        commodity_potential: "",
-        land_area: "",
-        production_value: "",
-        progress_percent: 0,
-        total_management: 0,
-        total_members: 0,
-        distribution_amount: 0,
-        sppg_partner: "",
-        kusuka_number: "",
-        s_curve_path: "",
-        available_locations: proposal.available_locations || {
-          name: "",
-          latitude: 0,
-          longitude: 0,
-        },
-      };
+      // initialData = {
+      //   id: 0,
+      //   name: proposal.na,
+      //   location_id: proposal.location_id || 0,
+      //   commodity_aid: "",
+      //   commodity_potential: "",
+      //   land_area: "",
+      //   production_value: "",
+      //   progress_percent: 0,
+      //   total_management: 0,
+      //   total_members: 0,
+      //   distribution_amount: 0,
+      //   sppg_partner: "",
+      //   kusuka_number: "",
+      //   s_curve_path: "",
+      //   available_locations: proposal.available_locations || {
+      //     name: "",
+      //     latitude: 0,
+      //     longitude: 0,
+      //   },
+      // };
     } catch {
       return notFound();
     }
@@ -60,11 +59,11 @@ export default async function CreateThematicProgramPage({
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <ThematicFormHeader />
-      {proposalIdNum && <ProposalSourceCard proposalId={proposalIdNum} />}
+      {proposalId && <ProposalSourceCard proposalId={proposalId} />}
       <BioflocProgramForm
         initialData={initialData}
-        proposalId={proposalIdNum}
-        isConvertingFromProposal={!!proposalIdNum}
+        proposalId={proposalId}
+        isConvertingFromProposal={!!proposalId}
       />
     </div>
   );

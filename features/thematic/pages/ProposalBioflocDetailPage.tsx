@@ -6,14 +6,14 @@ import {
 import { MapPinIcon } from "lucide-react";
 import { getProposalBioflocDetail } from "../actions/proposal-biofloc";
 import { proposalBioflocDetailQueryKey } from "../api/getProposalBioflocDetail";
-import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 import { formatDateWithTime } from "@/lib/utils";
-import { LinkBackButton } from "@/components/shared/LinkBackButton";
 import { StatusBadge } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailItem } from "@/components/shared/DetailItem";
 import ProposalDetailClient from "../components/biofloc/ProposalDetailClient";
 import { notFound } from "next/navigation";
+
+import { ProposalBioflocDetail } from "@/features/proposal/types/proposal-biofloc";
 
 export default async function ProposalBioflocDetailPage({
   params,
@@ -27,11 +27,10 @@ export default async function ProposalBioflocDetailPage({
   }
 
   const queryClient = new QueryClient();
-
-  const data = await queryClient.fetchQuery({
-    queryKey: proposalBioflocDetailQueryKey(Number(id)),
-    queryFn: () => getProposalBioflocDetail(Number(id)),
-  });
+  const data = (await queryClient.fetchQuery({
+    queryKey: proposalBioflocDetailQueryKey(id),
+    queryFn: () => getProposalBioflocDetail(id),
+  })) as ProposalBioflocDetail | null;
 
   if (!data) {
     notFound();
@@ -39,63 +38,83 @@ export default async function ProposalBioflocDetailPage({
 
   const {
     id: proposalId,
-    province_id,
-    name,
     status,
-    district,
-    village,
     created_at,
     updated_at,
     available_locations,
+    kdmp_entities,
   } = data;
 
-  const provinceName =
-    INDONESIA_PROVINCES.find((p) => p.province_id === province_id)?.name ??
-    province_id;
-
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="mx-auto max-w-4xl space-y-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-              Dashboard / Tematik / {type} / Proposal / Detail
-            </p>
-            <div className="flex items-center gap-1">
-              <LinkBackButton href={`/dashboard/thematic/${type}/proposals`} />
-              <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
-                {name}
-              </h1>
-            </div>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
-              <span className="flex items-center gap-2">
-                <MapPinIcon className="size-4" />
-                <p className="text-muted-foreground">{provinceName}</p>
-              </span>
-            </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
+            Dashboard / Tematik / {type} / Proposal / Detail
+          </p>
+          <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
+            {kdmp_entities?.name ?? "-"}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+            <span className="flex items-center gap-2">
+              <MapPinIcon className="size-4" />
+              <p className="text-muted-foreground">
+                {available_locations?.province_name || "-"}
+              </p>
+            </span>
           </div>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Informasi</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <DetailItem
-              label="Status"
-              value={<StatusBadge status={status} />}
-            />
-            <DetailItem label="Dibuat" value={formatDateWithTime(created_at)} />
-            <DetailItem
-              label="Diperbarui"
-              value={formatDateWithTime(updated_at)}
-            />
-
-            <DetailItem label="Kelurahan" value={district} />
-            <DetailItem label="Desa" value={village} />
-          </CardContent>
-        </Card>
-
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Informasi Proposal</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <DetailItem label="Status" value={<StatusBadge status={status} />} />
+          <DetailItem label="Dibuat" value={formatDateWithTime(created_at)} />
+          <DetailItem
+            label="Diperbarui"
+            value={formatDateWithTime(updated_at)}
+          />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Identitas KDMP</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <DetailItem
+            label="Nama Kelompok"
+            value={kdmp_entities?.name ?? "-"}
+          />
+          <DetailItem
+            label="Nomor KUSUKA"
+            value={kdmp_entities?.kusuka_number ?? "-"}
+          />
+          <DetailItem label="NIB" value={kdmp_entities?.nib ?? "-"} />
+          <DetailItem
+            label="Badan Hukum"
+            value={kdmp_entities?.legal_entity_number ?? "-"}
+          />
+          <DetailItem
+            label="Ketua"
+            value={kdmp_entities?.chairman_name ?? "-"}
+          />
+          <DetailItem
+            label="No. Telp Ketua"
+            value={kdmp_entities?.chairman_phone ?? "-"}
+          />
+          <DetailItem
+            label="Jumlah Pengurus"
+            value={kdmp_entities?.board_member_count?.toString() ?? "-"}
+          />
+          <DetailItem
+            label="Jumlah Anggota"
+            value={kdmp_entities?.member_count?.toString() ?? "-"}
+          />
+        </CardContent>
+      </Card>
+      <HydrationBoundary state={dehydrate(queryClient)}>
         <ProposalDetailClient
           id={proposalId}
           locations={{
@@ -103,7 +122,7 @@ export default async function ProposalBioflocDetailPage({
             longitude: available_locations?.longitude || 0,
           }}
         />
-      </div>
-    </HydrationBoundary>
+      </HydrationBoundary>
+    </div>
   );
 }

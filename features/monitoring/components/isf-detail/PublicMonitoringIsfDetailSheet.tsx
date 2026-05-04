@@ -25,7 +25,7 @@ export default function PublicMonitoringIsfDetailSheet({
 
   const { id, step_id, progress_percent, progress_date, total_worker } = data;
 
-  const handleReportSelect = async (reportId: number) => {
+  const handleReportSelect = async (reportId: string) => {
     try {
       const res = await getIsfProgramLogById(reportId);
       setData(res.data as unknown as IsfDetailSheet);
@@ -109,7 +109,7 @@ function LastUpdateStatus({
 }: {
   progressDate?: string | null;
   stepId: number;
-  onReportSelect: (id: number) => void;
+  onReportSelect: (id: string) => void;
 }) {
   const parsedDate = progressDate ? new Date(progressDate) : undefined;
 

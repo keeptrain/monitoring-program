@@ -15,8 +15,8 @@ export function BioflocProgramQuotaTableColumns(opts?: {
     },
     {
       header: "Kode Provinsi",
-      accessorKey: "province_id",
-      cell: ({ row }) => row.original.province_id,
+      accessorKey: "province_code",
+      cell: ({ row }) => row.original.province_code,
     },
     {
       header: "Tahun",

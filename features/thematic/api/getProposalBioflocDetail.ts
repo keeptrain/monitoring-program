@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProposalBioflocDetail } from "@/features/thematic/actions/proposal-biofloc";
 
-export const proposalBioflocDetailQueryKey = (id: number) => [
-  "proposal-biofloc-detail",
+export const proposalBioflocDetailQueryKey = (id: string) => [
+  "proposal-biofloc",
   id,
 ];
 
-export function useGetProposalBioflocDetail(id: number, enabled = true) {
+export function useGetProposalBioflocDetail(id: string, enabled = true) {
   return useQuery({
     queryKey: proposalBioflocDetailQueryKey(id),
     queryFn: () => getProposalBioflocDetail(id),

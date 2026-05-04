@@ -63,7 +63,7 @@ export default function PublicBioflocTable() {
 
   const columns = useMemo(() => BioflocProgramsPublicTableColumns(), []);
 
-  const handleRowClick = (id: number) =>
+  const handleRowClick = (id: string) =>
     router.push(`/monitoring/biofloc-thematic/${id}`);
 
   return (

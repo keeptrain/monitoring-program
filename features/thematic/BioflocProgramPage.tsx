@@ -99,7 +99,7 @@ export default function BioflocProgramPage({
   );
 
   const handleRowClick = useCallback(
-    (row: { id: number }) => {
+    (row: { id: string }) => {
       router.push(`/dashboard/thematic/${programType}/${row.id}`);
     },
     [programType, router],

@@ -37,12 +37,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Map as LeafletMap } from "leaflet";
 import { useRef, startTransition, useState } from "react";
-import {
-  useQueryState,
-  parseAsInteger,
-  parseAsArrayOf,
-  parseAsString,
-} from "nuqs";
+import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePathname } from "next/navigation";
 
@@ -106,7 +101,7 @@ export default function MapClient({
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapMarker type={type} />
-        {isAuthenticated && type === "biofloc_thematic" && <MapIslands />}
+        {/* {isAuthenticated && type === "biofloc_thematic" && <MapIslands />} */}
       </MapContainer>
       <MapDetailSheet type={type} isAuthenticated={isAuthenticated} />
     </>
@@ -265,13 +260,12 @@ function MapDetailSheet({
   isAuthenticated: boolean;
 }) {
   const queryClient = useQueryClient();
-
   const [detailIdUrl, setDetailIdUrl] = useQueryState(
     "detailId",
-    parseAsInteger,
+    parseAsString,
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   if (detailIdUrl && (!isOpen || detailIdUrl !== activeId)) {
     setActiveId(detailIdUrl);
@@ -282,7 +276,7 @@ function MapDetailSheet({
 
   const { data: detailData, isLoading } = useGetPublicLocationByTypeAndId(
     type,
-    activeId ?? 0,
+    activeId ?? "",
   );
 
   const activeLocations =
@@ -298,7 +292,7 @@ function MapDetailSheet({
   const locations = [...activeLocations, ...potentialLocations];
 
   const selectedLocation = activeId
-    ? locations.find((l) => l.id === activeId)
+    ? locations.find((l) => l.id.toString() === activeId)
     : null;
 
   const handleOpenChange = (open: boolean) => {
@@ -348,8 +342,12 @@ function MapDetailSheet({
   );
 }
 
-function MapMarker({ type }: { type: "biofloc_thematic" | "minapadi_thematic" }) {
-  const [, setDetailIdUrl] = useQueryState("detailId", parseAsInteger);
+function MapMarker({
+  type,
+}: {
+  type: "biofloc_thematic" | "minapadi_thematic";
+}) {
+  const [, setDetailIdUrl] = useQueryState("detailId", parseAsString);
   const [statuses] = useQueryState(
     "status",
     parseAsArrayOf(parseAsString).withDefault(["active"]),
@@ -361,7 +359,7 @@ function MapMarker({ type }: { type: "biofloc_thematic" | "minapadi_thematic" })
   );
 
   const handleLocationDetailClick = (location: PublicAvailableLocation) => {
-    setDetailIdUrl(location.id, { scroll: false });
+    setDetailIdUrl(location.id.toString(), { scroll: false });
   };
 
   return (
@@ -408,72 +406,72 @@ function MapPopUpContent({
   );
 }
 
-const DUMMY_KALIMANTAN_GEOJSON = {
-  type: "FeatureCollection",
-  features: [
-    {
-      type: "Feature",
-      properties: { name: "Kalimantan Barat", total: 5, status: "Aktif" },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [108.8, 2.0],
-            [112.0, 2.0],
-            [112.0, -3.0],
-            [108.8, -3.0],
-            [108.8, 2.0],
-          ],
-        ],
-      },
-    },
-    {
-      type: "Feature",
-      properties: { name: "Kalimantan Timur", total: 7, status: "Aktif" },
-      geometry: {
-        type: "Polygon",
-        coordinates: [
-          [
-            [114.0, 3.0],
-            [119.0, 3.0],
-            [119.0, -2.0],
-            [114.0, -2.0],
-            [114.0, 3.0],
-          ],
-        ],
-      },
-    },
-  ],
-} as any;
+// const DUMMY_KALIMANTAN_GEOJSON = {
+//   type: "FeatureCollection",
+//   features: [
+//     {
+//       type: "Feature",
+//       properties: { name: "Kalimantan Barat", total: 5, status: "Aktif" },
+//       geometry: {
+//         type: "Polygon",
+//         coordinates: [
+//           [
+//             [108.8, 2.0],
+//             [112.0, 2.0],
+//             [112.0, -3.0],
+//             [108.8, -3.0],
+//             [108.8, 2.0],
+//           ],
+//         ],
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: { name: "Kalimantan Timur", total: 7, status: "Aktif" },
+//       geometry: {
+//         type: "Polygon",
+//         coordinates: [
+//           [
+//             [114.0, 3.0],
+//             [119.0, 3.0],
+//             [119.0, -2.0],
+//             [114.0, -2.0],
+//             [114.0, 3.0],
+//           ],
+//         ],
+//       },
+//     },
+//   ],
+// } as any;
 
-function MapIslands() {
-  const onEachFeature = (feature: any, layer: any) => {
-    if (feature.properties && feature.properties.name) {
-      layer.bindTooltip(
-        `
-        <div class="p-1 space-y-1">
-          <p class="text-xs font-bold">${feature.properties.name}</p>
-          <div class="grid grid-cols-2 gap-x-2 text-[10px]">
-            <span class="text-zinc-500">Total:</span>
-            <span class="font-semibold">${feature.properties.total} Lokasi</span>
-            <span class="text-zinc-500">Status:</span>
-            <span class="font-semibold text-emerald-600">${feature.properties.status}</span>
-          </div>
-        </div>
-      `,
-        { sticky: true, direction: "top", opacity: 1 },
-      );
-    }
-  };
+// function MapIslands() {
+//   const onEachFeature = (feature: any, layer: any) => {
+//     if (feature.properties && feature.properties.name) {
+//       layer.bindTooltip(
+//         `
+//         <div class="p-1 space-y-1">
+//           <p class="text-xs font-bold">${feature.properties.name}</p>
+//           <div class="grid grid-cols-2 gap-x-2 text-[10px]">
+//             <span class="text-zinc-500">Total:</span>
+//             <span class="font-semibold">${feature.properties.total} Lokasi</span>
+//             <span class="text-zinc-500">Status:</span>
+//             <span class="font-semibold text-emerald-600">${feature.properties.status}</span>
+//           </div>
+//         </div>
+//       `,
+//         { sticky: true, direction: "top", opacity: 1 },
+//       );
+//     }
+//   };
 
-  return (
-    <GeoJSON
-      data={DUMMY_KALIMANTAN_GEOJSON}
-      onEachFeature={onEachFeature}
-      style={{
-        stroke: false,
-        fillColor: "#00000000",
-      }}
-    />
-  );
-}
+//   return (
+//     <GeoJSON
+//       data={DUMMY_KALIMANTAN_GEOJSON}
+//       onEachFeature={onEachFeature}
+//       style={{
+//         stroke: false,
+//         fillColor: "#00000000",
+//       }}
+//     />
+//   );
+// }

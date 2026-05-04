@@ -3,7 +3,8 @@ import { upsertBioflocProgramQuota } from "../actions/program-quotas";
 import { getBioflocProgramQuotasQueryKey } from "./getBioflocProgramQuotas";
 
 type UpdateQuotaPayload = {
-  province_id: string;
+  province_code: string;
+  province_name: string;
   quota_limit: number;
 };
 

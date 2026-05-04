@@ -88,14 +88,14 @@ function getDefaultValues(
 
 export function useThematicProgramForm(
   initialData?: ThematicProgramDetail | null,
-  proposalId?: number,
+  proposalId?: string,
   isConvertingFromProposal?: boolean,
 ) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
-  const isEdit = !!initialData && initialData.id !== 0;
+  const isEdit = !!initialData && !!initialData.id;
   const shouldRequireAdministrativeLocation =
     !isEdit && !isConvertingFromProposal;
 
@@ -115,7 +115,7 @@ export function useThematicProgramForm(
   const onSubmit = (values: BioflocProgramFormValues) => {
     startTransition(async () => {
       try {
-        if (initialData && initialData.id !== 0) {
+        if (initialData && initialData.id) {
           await updateThematicPrograms(initialData.id, values);
         } else if (isConvertingFromProposal && proposalId) {
           const { success } = await convertProposalToProgram(

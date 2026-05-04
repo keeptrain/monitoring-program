@@ -2,7 +2,6 @@ import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
-import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 
 async function getBioflocLocationsByStatus(
   status: "active" | "potential",
@@ -15,7 +14,8 @@ async function getBioflocLocationsByStatus(
     .select(
       `
       id,
-      province_id,
+      province_code,
+      province_name,
       name,
       latitude,
       longitude,
@@ -28,7 +28,7 @@ async function getBioflocLocationsByStatus(
     )
     .eq("type", "biofloc_thematic")
     .eq(`${TABLES.BIOFLOC_THEMATIC_PROGRAMS}.status`, status)
-    .limit(10); // Increased limit as requested/needed
+    .limit(process.env.NODE_ENV === "development" ? 10 : 100); // Increased limit as requested/needed
 
   if (error) {
     console.error(`Error fetching ${status} biofloc locations:`, error);
@@ -37,7 +37,8 @@ async function getBioflocLocationsByStatus(
 
   type LocationRow = {
     id: number;
-    province_id: string;
+    province_code: string;
+    province_name: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -48,14 +49,10 @@ async function getBioflocLocationsByStatus(
       ? item[TABLES.BIOFLOC_THEMATIC_PROGRAMS][0]
       : item[TABLES.BIOFLOC_THEMATIC_PROGRAMS];
 
-    const provinceName =
-      INDONESIA_PROVINCES.find((p) => p.province_id === item.province_id)
-        ?.name ?? "Provinsi Tidak Diketahui";
-
     return {
       id: program?.id ?? item.id,
       location_name: item.name,
-      province_name: provinceName,
+      province_name: item.province_name,
       progress_percent: program?.progress_percent ?? 0,
       position: {
         latitude: item.latitude ?? 0,

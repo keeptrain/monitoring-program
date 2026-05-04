@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
 
 export type PublicThematicProgram = {
-  id: number;
+  id: string;
   location_id: number;
   name: string;
   progress_percent: number;
@@ -28,22 +28,24 @@ export type PublicThematicProgram = {
 };
 
 type PublicThematicProgramRow = {
-  id: number;
+  id: string;
   location_id: number;
-  name: string;
   progress_percent: number;
   commodity_aid: string;
   commodity_potential: string | null;
   land_area: string;
   production_value: string;
-  total_management: number;
-  total_members: number;
   distribution_amount: number;
   sppg_partner: string;
   s_curve_path: string;
-  kusuka_number: string;
-  nib: string | null;
-  legal_entity_number: string | null;
+  kdmp_entities: {
+    name: string;
+    kusuka_number: string | null;
+    nib: string | null;
+    legal_entity_number: string | null;
+    board_member_count: number | null;
+    member_count: number | null;
+  } | null;
   available_locations:
     | {
         name: string | null;
@@ -58,7 +60,7 @@ type PublicThematicProgramRow = {
     | null;
 };
 
-export async function getPublicThematicProgram(id: number) {
+export async function getPublicThematicProgram(id: string | number) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
@@ -66,20 +68,22 @@ export async function getPublicThematicProgram(id: number) {
       `
       id,
       location_id,
-      name,
       progress_percent,
       commodity_aid,
       commodity_potential,
       land_area,
       production_value,
-      total_management,
-      total_members,
       distribution_amount,
       sppg_partner,
       s_curve_path,
-      kusuka_number,
-      nib,
-      legal_entity_number,
+      kdmp_entities (
+        name,
+        kusuka_number,
+        nib,
+        legal_entity_number,
+        board_member_count,
+        member_count
+      ),
       available_locations (
         name,
         latitude,
@@ -104,23 +108,25 @@ export async function getPublicThematicProgram(id: number) {
     ? (data.available_locations[0] ?? null)
     : data.available_locations;
 
+  const entity = data.kdmp_entities;
+
   return {
     id: data.id,
     location_id: data.location_id,
-    name: data.name,
+    name: entity?.name ?? "Tidak Diketahui",
     progress_percent: data.progress_percent,
     commodity_aid: data.commodity_aid,
     commodity_potential: data.commodity_potential,
     land_area: data.land_area,
     production_value: data.production_value,
-    total_management: data.total_management,
-    total_members: data.total_members,
+    total_management: entity?.board_member_count ?? 0,
+    total_members: entity?.member_count ?? 0,
     distribution_amount: data.distribution_amount,
     sppg_partner: data.sppg_partner,
     s_curve_path: data.s_curve_path,
-    kusuka_number: data.kusuka_number,
-    nib: data.nib,
-    legal_entity_number: data.legal_entity_number,
+    kusuka_number: entity?.kusuka_number ?? "",
+    nib: entity?.nib ?? null,
+    legal_entity_number: entity?.legal_entity_number ?? null,
     available_locations: location ?? null,
   } satisfies PublicThematicProgram;
 }

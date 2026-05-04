@@ -12,9 +12,9 @@ import {
 
 export async function getPublicLocationDetail<T extends LocationType>(
   type: T,
-  id: number,
+  id: number | string,
 ): Promise<MonitoringDetailTypeMap[T] | null> {
-  if (!Number.isFinite(id) || id === 0) {
+  if (!id || id === 0 || id === "") {
     return null;
   }
 

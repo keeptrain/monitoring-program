@@ -14,7 +14,7 @@ const LazyMap = dynamic(() => import("@/components/shared/MapPinPicker"), {
 });
 
 interface ProposalDetailClientProps {
-  id: number;
+  id: string;
   locations: { latitude: number; longitude: number };
 }
 

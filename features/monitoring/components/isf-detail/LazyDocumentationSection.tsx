@@ -11,7 +11,7 @@ export function LazyDocumentationSection({
   programId,
 }: {
   type: string;
-  programId: number;
+  programId: string;
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);

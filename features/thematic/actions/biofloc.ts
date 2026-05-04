@@ -21,7 +21,7 @@ export async function getBioflocProgramsPaginated(
   return db.getBioflocProgramsPaginatedService(parsed.data);
 }
 
-export async function getThematicProgramById(id: number) {
+export async function getThematicProgramById(id: string) {
   return db.getBioflocThematicProgramByIdService(id);
 }
 
@@ -38,7 +38,7 @@ export async function createThematicProgram(
 }
 
 export async function updateThematicPrograms(
-  id: number,
+  id: string,
   data: BioflocProgramFormValues,
 ) {
   const documentations = db.normalizeDocumentations(data.documentations);
@@ -60,7 +60,7 @@ export async function updateThematicPrograms(
 }
 
 export async function updateThematicProgramProgress(
-  id: number,
+  id: string,
   data: UpdateProgressFormValues,
 ) {
   try {
@@ -78,7 +78,7 @@ export async function updateThematicProgramProgress(
 }
 
 export async function deleteThematicProgram(
-  id: number,
+  id: string,
 ): Promise<{ success: boolean; message?: string }> {
   try {
     await db.deleteBioflocThematicProgramService(id);

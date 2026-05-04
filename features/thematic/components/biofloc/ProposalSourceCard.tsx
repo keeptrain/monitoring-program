@@ -8,7 +8,7 @@ import { getProvinceNameByIdOrFallback } from "@/lib/utils";
 export default async function ProposalSourceCard({
   proposalId,
 }: {
-  proposalId: number;
+  proposalId: string;
 }) {
   let proposal;
   try {
@@ -43,12 +43,12 @@ export default async function ProposalSourceCard({
           <CardTitle>Informasi Sumber Proposal</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-muted-foreground text-sm font-medium">
                 Nama KDMP
               </p>
-              <p className="text-sm font-semibold">{proposal.name}</p>
+              <p className="text-sm font-semibold"></p>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
@@ -80,7 +80,7 @@ export default async function ProposalSourceCard({
               <p className="text-muted-foreground text-sm font-medium">Desa</p>
               <p className="text-sm">{proposal.village}</p>
             </div>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </>

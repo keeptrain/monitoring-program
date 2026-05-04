@@ -29,10 +29,20 @@ const LIST_SELECT = `
 
 const DETAIL_SELECT = `
       *,
+      kdmp_entities (
+        name,
+        kusuka_number,
+        nib,
+        legal_entity_number,
+        board_member_count,
+        member_count
+      ),
       available_locations (
         name,
         latitude,
-        longitude
+        longitude,
+        province_code,
+        province_name
       )
     ` as const;
 
@@ -63,48 +73,60 @@ export async function getBioflocThematicProgramsService() {
 
 const INTERNAL_PAGINATED_SELECT = `
   id,
-  name,
-  kusuka_number,
   commodity_aid,
   progress_percent,
   distribution_amount,
-  total_management,
   created_at,
   updated_at,
+  kdmp_entities!inner (
+    name,
+    kusuka_number,
+    board_member_count,
+    member_count
+  ),
   available_locations!inner (
     name,
-    province_id
+    province_code,
+    province_name
   )
 ` as const;
 
 const PUBLIC_PAGINATED_SELECT = `
   id,
-  name,
   commodity_aid,
   progress_percent,
   distribution_amount,
-  total_management,
   created_at,
   updated_at,
+  kdmp_entities!inner (
+    name,
+    board_member_count,
+    member_count
+  ),
   available_locations!inner (
     name,
-    province_id
+    province_code,
+    province_name
   )
 ` as const;
 
 type BioflocProgramListRow = {
-  id: number;
-  name: string;
-  kusuka_number?: string;
+  id: string;
   commodity_aid: string;
   progress_percent: number;
   distribution_amount: number;
-  total_management: number;
   created_at: string;
   updated_at: string;
-  available_locations: {
+  kdmp_entities: {
     name: string;
-    province_id: string;
+    kusuka_number?: string | null;
+    board_member_count: number | null;
+    member_count: number | null;
+  } | null;
+  available_locations: {
+    name: string | null;
+    province_code: string;
+    province_name: string;
   } | null;
 };
 
@@ -124,11 +146,11 @@ export async function getBioflocProgramsPaginatedService(
     .select(selectColumns, { count: "exact" });
 
   if (search.length > 0) {
-    query = query.ilike("name", `%${search}%`);
+    query = query.ilike("kdmp_entities.name", `%${search}%`);
   }
 
   if (province.length > 0) {
-    query = query.eq("available_locations.province_id", province);
+    query = query.eq("available_locations.province_code", province);
   }
 
   if (year && year > 0) {
@@ -146,16 +168,18 @@ export async function getBioflocProgramsPaginatedService(
   const rows = (data ?? []) as unknown as BioflocProgramListRow[];
   const mappedRows: BioflocProgramListItem[] = rows.map((row) => ({
     id: row.id,
-    name: row.name,
+    entity_name: row.kdmp_entities?.name ?? "Tidak Diketahui",
     location_name: row.available_locations?.name ?? "-",
     commodity_aid: row.commodity_aid,
     progress_percent: row.progress_percent,
     distribution_amount: row.distribution_amount,
-    total_management: row.total_management,
+    total_management: row.kdmp_entities?.board_member_count ?? 0,
     created_at: row.created_at,
     updated_at: row.updated_at,
     year: new Date(row.created_at).getUTCFullYear(),
-    ...(scope === "internal" ? { kusuka_number: row.kusuka_number ?? "" } : {}),
+    ...(scope === "internal"
+      ? { kusuka_number: row.kdmp_entities?.kusuka_number ?? "" }
+      : {}),
   }));
 
   const total = count ?? 0;
@@ -169,7 +193,7 @@ export async function getBioflocProgramsPaginatedService(
 }
 
 export async function getBioflocThematicProgramByIdService(
-  id: number,
+  id: string | number,
 ): Promise<ThematicProgramDetail> {
   const supabase = await createClient();
 
@@ -222,8 +246,17 @@ export async function getBioflocThematicProgramByIdService(
     }
   });
 
+  const entity = program.kdmp_entities;
+  const location = program.available_locations;
+
   return {
     ...program,
+    name: entity?.name ?? "Tidak Diketahui",
+    kusuka_number: entity?.kusuka_number ?? "",
+    nib: entity?.nib ?? "",
+    legal_entity_number: entity?.legal_entity_number ?? "",
+    total_management: entity?.board_member_count ?? 0,
+    total_members: entity?.member_count ?? 0,
     documentations: Object.values(docGroups),
   } as unknown as ThematicProgramDetail;
 }
@@ -320,7 +353,7 @@ export async function createBioflocThematicProgramService(
 }
 
 export async function updateBioflocThematicProgramService(
-  id: number,
+  id: string,
   data: Omit<BioflocProgramFormValues, "documentations"> & {
     documentations: NormalizedDocumentation[];
   },
@@ -340,7 +373,7 @@ export async function updateBioflocThematicProgramService(
 }
 
 export async function updateBioflocThematicProgramProgressService(
-  id: number,
+  id: string,
   progress_percent: number,
 ) {
   const supabase = await createClient();
@@ -357,7 +390,7 @@ export async function updateBioflocThematicProgramProgressService(
   }
 }
 
-export async function deleteBioflocThematicProgramService(id: number) {
+export async function deleteBioflocThematicProgramService(id: string) {
   const supabase = await createClient();
 
   // Ambil data program untuk mengecek keberadaan proposal_id dan tahun pengajuan

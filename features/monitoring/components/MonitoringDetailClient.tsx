@@ -18,7 +18,7 @@ export default function MonitoringDetailClient({
   const latestReport = data?.data?.[0];
   const [currentReport, setCurrentReport] = useState<any>(latestReport);
 
-  const handleReportSelect = async (reportId: number) => {
+  const handleReportSelect = async (reportId: string) => {
     try {
       const res = await getIsfProgramLogById(reportId);
       setCurrentReport(res.data);

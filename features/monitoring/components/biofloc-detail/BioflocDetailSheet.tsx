@@ -47,7 +47,7 @@ export default function BioflocDetailSheet({
       </div>
 
       <Button className="w-full" asChild>
-        <Link href={`/monitoring/biofloc-thematic/${data.id}`}>
+        <Link href={`/biofloc-thematic/${data.id}`}>
           Data Detail
           <ArrowRightIcon />
         </Link>

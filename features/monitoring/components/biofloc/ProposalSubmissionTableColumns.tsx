@@ -1,13 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { ProposalBioflocThematicProgram } from "@/features/thematic/services/proposal-biofloc-services";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Check, X, Loader2 } from "lucide-react";
-import { ProposalBioflocStatus } from "@/features/thematic/types/thematic";
-import { INDONESIA_PROVINCES } from "@/features/thematic/constants/indonesia-provinces";
+import { Download, Check, Loader2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
 import { ConvertProposalButton } from "@/features/thematic/components/biofloc/ConvertProposalButton";
+import {
+  ProposalBioflocStatus,
+  ProposalBioflocThematicProgram,
+} from "@/features/proposal/types/proposal-biofloc";
+import z from "zod";
 
 const STATUS_CONFIG: Record<
   ProposalBioflocStatus,
@@ -20,6 +22,7 @@ const STATUS_CONFIG: Record<
   approved: { variant: "default", label: "Disetujui" },
   converted: { variant: "default", label: "Masuk KDMP" },
   rejected: { variant: "destructive", label: "Ditolak" },
+  revision: { variant: "outline", label: "Revisi" },
 };
 
 export const StatusBadge = ({ status }: { status: ProposalBioflocStatus }) => {
@@ -31,35 +34,13 @@ export const ProposalSubmissionTableColumns =
   (): ColumnDef<ProposalBioflocThematicProgram>[] => [
     {
       header: "Nama KDMP",
-      accessorKey: "name",
-      cell: ({ row: { original } }) => (
-        <span className="font-semibold">{original.name}</span>
-      ),
+      accessorKey: "kdmp_entities.name",
+      cell: ({ row: { original } }) => original.kdmp_entities.name,
     },
     {
-      header: "Provinsi",
-      accessorKey: "province_id",
-      cell: ({ row: { original } }) => {
-        const name = INDONESIA_PROVINCES.find(
-          (p) => p.province_id === original.province_id,
-        )?.name;
-        return <span>{name || original.province_id}</span>;
-      },
-    },
-    {
-      header: "Kab / Kota",
-      accessorKey: "regency_id",
-      cell: ({ row: { original } }) => <span>{original.regency_id}</span>,
-    },
-    {
-      header: "Kelurahan",
-      accessorKey: "district",
-      cell: ({ row: { original } }) => <span>{original.district}</span>,
-    },
-    {
-      header: "Desa",
-      accessorKey: "village",
-      cell: ({ row: { original } }) => <span>{original.village}</span>,
+      header: "No. KUSUKA",
+      accessorKey: "kdmp_entities.kusuka_number",
+      cell: ({ row: { original } }) => original.kdmp_entities.kusuka_number,
     },
     {
       header: "Status Proposal",
@@ -68,64 +49,68 @@ export const ProposalSubmissionTableColumns =
     },
   ];
 
-// Admin Actions component extracted to handle loading states
-function AdminActions({
+export const proposalVerificationSchema = z
+  .object({
+    status: z.enum(["approved", "rejected"]),
+    rejectionReason: z.string().nullable(),
+  })
+  .refine((data) => {
+    if (data.status === "rejected" && !data.rejectionReason) {
+      return false;
+    }
+    return true;
+  });
+
+export type ProposalVerificationFormValues = z.infer<
+  typeof proposalVerificationSchema
+>;
+
+function ActionButtons({
   row,
   onAction,
 }: {
   row: ProposalBioflocThematicProgram;
-  onAction: (id: number, status: ProposalBioflocStatus) => void;
+  onAction: (id: string, action: "verify" | "convert") => void;
 }) {
   return (
     <div className="flex items-center gap-2">
-      <ProposalDownloadButton id={row.id} />
       {row.status === "pending" && (
-        <>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAction(row.id, "approved");
-            }}
-            className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
-            title="Setujui"
-          >
-            <Check className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAction(row.id, "rejected");
-            }}
-            className="text-red-600 hover:bg-red-50 hover:text-red-700"
-            title="Tolak"
-          >
-            <X className="size-4" />
-          </Button>
-        </>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction(row.id, "verify");
+          }}
+          title="Verifikasi"
+        >
+          <Check className="size-4" />
+          Verifikasi
+        </Button>
       )}
+      <ProposalDownloadButton id={row.id} />
       {row.status === "approved" && (
-        <ConvertProposalButton proposalId={row.id} proposalName={row.name} />
+        <ConvertProposalButton
+          proposalId={row.id}
+          proposalName={row.kdmp_entities.name}
+        />
       )}
     </div>
   );
 }
 
 export const ProposalAdminTableColumns = (
-  onAction: (id: number, status: ProposalBioflocStatus) => void,
+  onAction: (id: string, action: "verify" | "convert") => void,
 ): ColumnDef<ProposalBioflocThematicProgram>[] => [
   ...ProposalSubmissionTableColumns(),
   {
-    header: "Aksi",
     id: "actions",
-    cell: ({ row }) => <AdminActions row={row.original} onAction={onAction} />,
+    header: "Aksi",
+    cell: ({ row }) => <ActionButtons row={row.original} onAction={onAction} />,
   },
 ];
 
-export function ProposalDownloadButton({ id }: { id: number }) {
+export function ProposalDownloadButton({ id }: { id: string }) {
   const { mutate, isPending } = useMutation({
     mutationFn: () => createSignedUrlForProposalBiofloc(id),
     onSuccess: (data) => {

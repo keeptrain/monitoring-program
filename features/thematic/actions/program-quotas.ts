@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 import {
   PROGRAM_QUOTA_YEAR,
   programQuotaUpdateSchema,
@@ -38,22 +37,17 @@ export async function getBioflocProgramQuotasPublic(): Promise<{
 }
 
 export async function upsertBioflocProgramQuota(input: {
-  province_id: string;
+  province_code: string;
+  province_name: string;
   quota_limit: number;
 }) {
   const parsed = programQuotaUpdateSchema.parse({
     quota_limit: input.quota_limit,
   });
 
-  const province = INDONESIA_PROVINCES.find(
-    (item) => item.province_id === input.province_id,
-  );
-  if (!province) {
-    throw new Error("Provinsi tidak valid.");
-  }
-
   const row = await db.upsertProgramQuotaByProvince({
-    province_id: input.province_id,
+    province_code: input.province_code,
+    province_name: input.province_name,
     year: PROGRAM_QUOTA_YEAR,
     quota_limit: parsed.quota_limit,
   });
@@ -62,8 +56,8 @@ export async function upsertBioflocProgramQuota(input: {
 
   return {
     id: row.id,
-    province_id: row.province_id,
-    region_name: province.name,
+    province_code: row.province_code,
+    region_name: row.province_name,
     program_type: "biofloc_thematic" as const,
     year: row.year,
     quota_limit: row.quota_limit,

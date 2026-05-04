@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface ConvertProposalButtonProps {
-  proposalId: number;
+  proposalId: string;
   proposalName: string;
 }
 

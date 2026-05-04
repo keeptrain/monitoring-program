@@ -6,7 +6,7 @@ export function useDeleteThematicProgram() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number): Promise<void> => {
+    mutationFn: async (id: string): Promise<void> => {
       const result = await deleteThematicProgram(id);
       if (!result.success) {
         throw new Error(result.message || "Gagal menghapus program");

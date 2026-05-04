@@ -1,12 +1,12 @@
 import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
-import { INDONESIA_PROVINCES } from "../constants/indonesia-provinces";
 import { PROGRAM_QUOTA_TYPE } from "../forms/program-quota-schema";
 import { getProposalBioflocProvinceSummary } from "./proposal-biofloc-services";
 
 export type ProgramQuotaRow = {
   id: number;
-  province_id: string;
+  province_code: string;
+  province_name: string;
   program_type: string;
   year: number;
   quota_limit: number;
@@ -16,7 +16,7 @@ export type ProgramQuotaRow = {
 
 export type ProgramQuotaViewRow = {
   id: number | null;
-  province_id: string;
+  province_code: string;
   region_name: string;
   program_type: "biofloc_thematic";
   year: number;
@@ -35,10 +35,10 @@ export async function getProgramQuotasByTypeAndYear(year: number) {
   const [quotaResult, proposalSummary] = await Promise.all([
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
-      .select("id, province_id, quota_limit")
+      .select("id, province_code, province_name, quota_limit")
       .eq("program_type", PROGRAM_QUOTA_TYPE)
       .eq("year", year)
-      .order("province_id", { ascending: true }),
+      .order("province_code", { ascending: true }),
     getProposalBioflocProvinceSummary(supabase),
   ]);
   const { data, error } = quotaResult;
@@ -52,7 +52,6 @@ export async function getProgramQuotasByTypeAndYear(year: number) {
       year,
       rows: (data ?? []) as ProgramQuotaRow[],
       proposalCountByProvince: proposalSummary.proposal_count_by_province,
-      onlyPositiveQuota: false,
     }),
     proposal_total: proposalSummary.proposal_total,
   } satisfies ProgramQuotaResult;
@@ -66,11 +65,11 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
   const [quotaResult, proposalSummary] = await Promise.all([
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
-      .select("id, province_id, quota_limit")
+      .select("id, province_code, province_name, quota_limit")
       .eq("program_type", PROGRAM_QUOTA_TYPE)
       .eq("year", year)
       .gt("quota_limit", minQuota)
-      .order("province_id", { ascending: true }),
+      .order("province_code", { ascending: true }),
     getProposalBioflocProvinceSummary(supabase),
   ]);
   const { data, error } = quotaResult;
@@ -84,14 +83,14 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
       year,
       rows: (data ?? []) as ProgramQuotaRow[],
       proposalCountByProvince: proposalSummary.proposal_count_by_province,
-      onlyPositiveQuota: minQuota >= 0,
     }),
     proposal_total: proposalSummary.proposal_total,
   } satisfies ProgramQuotaResult;
 }
 
 export async function upsertProgramQuotaByProvince(input: {
-  province_id: string;
+  province_code: string;
+  province_name: string;
   year: number;
   quota_limit: number;
 }) {
@@ -100,14 +99,15 @@ export async function upsertProgramQuotaByProvince(input: {
     .from(TABLES.PROGRAM_QUOTAS)
     .upsert(
       {
-        province_id: input.province_id,
+        province_code: input.province_code,
+        province_name: input.province_name,
         program_type: PROGRAM_QUOTA_TYPE,
         year: input.year,
         quota_limit: input.quota_limit,
         updated_at: new Date().toISOString(),
       },
       {
-        onConflict: "province_id,program_type,year",
+        onConflict: "province_code,program_type,year",
       },
     )
     .select("*")
@@ -124,45 +124,19 @@ function mapProgramQuotaRows(input: {
   year: number;
   rows: ProgramQuotaRow[];
   proposalCountByProvince: Record<string, number>;
-  onlyPositiveQuota: boolean;
 }): ProgramQuotaViewRow[] {
-  if (input.onlyPositiveQuota) {
-    const provinceByProvinceId = new Map(
-      INDONESIA_PROVINCES.map((province) => [province.province_id, province]),
-    );
-
-    return input.rows.map((row) => {
-      const province = provinceByProvinceId.get(row.province_id);
-      const region_name = province?.name ?? row.province_id;
-      const normalizedProvinceName = region_name.trim().toLowerCase();
-      return {
-        id: row.id ?? null,
-        province_id: row.province_id,
-        region_name,
-        program_type: "biofloc_thematic",
-        year: input.year,
-        quota_limit: row.quota_limit,
-        proposal_count:
-          input.proposalCountByProvince[normalizedProvinceName] ?? 0,
-        updated_at: row.updated_at ?? null,
-      };
-    });
-  }
-
-  const byProvince = new Map(input.rows.map((row) => [row.province_id, row]));
-  return INDONESIA_PROVINCES.map((province) => {
-    const row = byProvince.get(province.province_id);
-    const normalizedProvinceName = province.name.trim().toLowerCase();
+  return input.rows.map((row) => {
+    const normalizedProvinceName = row.province_name.trim().toLowerCase();
     return {
-      id: row?.id ?? null,
-      province_id: province.province_id,
-      region_name: province.name,
+      id: row.id ?? null,
+      province_code: row.province_code,
+      region_name: row.province_name,
       program_type: "biofloc_thematic",
       year: input.year,
-      quota_limit: row?.quota_limit ?? 0,
+      quota_limit: row.quota_limit,
       proposal_count:
         input.proposalCountByProvince[normalizedProvinceName] ?? 0,
-      updated_at: row?.updated_at ?? null,
+      updated_at: row.updated_at ?? null,
     };
   });
 }

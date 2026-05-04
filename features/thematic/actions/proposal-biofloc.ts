@@ -1,82 +1,62 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import {
-  ProposalBioflocFormValues,
-  proposalBioflocSchema,
-} from "../forms/proposal-biofloc-schema";
 import * as db from "../services/proposal-biofloc-services";
-import { ProposalBioflocStatus } from "../types/thematic";
-import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
-export type {
-  ProposalBioflocThematicProgram,
-  ProposalBioflocDetail,
+import {
+  ProposalBioflocStatus,
   ProposalBioflocPaginationParams,
-  PaginatedProposalBioflocResult,
-} from "../services/proposal-biofloc-services";
-
-export async function createProposalBioflocThematicProgram(
-  payload: ProposalBioflocFormValues,
-): Promise<{ success: boolean; message: string }> {
-  const {
-    success,
-    error,
-    data: parsedData,
-  } = proposalBioflocSchema.safeParse(payload);
-
-  if (!success) {
-    return {
-      success: false,
-      message: "Validasi data dari form ditolak server: " + error.message,
-    };
-  }
-
-  try {
-    await db.createProposalBioflocThematicProgramService(parsedData);
-    return {
-      success: true,
-      message: "Proposal berhasil diajukan",
-    };
-  } catch (error) {
-    return { success: false, message: "Error create proposal: " + error };
-  }
-}
-
-export async function getProposalBioflocThematicPrograms() {
-  return db.getProposalBioflocThematicProgramsService();
-}
+} from "@/features/proposal/types/proposal-biofloc";
+import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
+import { getSession } from "@/features/auth/session";
+import z from "zod";
+import {
+  ProposalVerificationFormValues,
+  proposalVerificationSchema,
+} from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
 
 export async function getProposalBioflocPaginated(
-  params: db.ProposalBioflocPaginationParams,
+  params: ProposalBioflocPaginationParams,
 ) {
   return db.getProposalBioflocPaginatedService(params);
 }
 
-export async function updateProposalBioflocStatus(
-  id: number,
-  status: ProposalBioflocStatus,
+export async function verifyProposalBiofloc(
+  id: string,
+  values: ProposalVerificationFormValues,
 ) {
-  const data = await db.updateProposalStatusService(id, status);
+  const { role, sub } = await getSession();
 
-  revalidatePath("/monitoring");
-  revalidatePath("/monitoring/biofloc_thematic/proposal");
-  revalidatePath("/monitoring/biofloc_thematic/bantuan-2025");
+  if (role !== "pmo") {
+    throw new Error("Anda tidak memiliki akses untuk memverifikasi proposal");
+  }
 
-  return data;
+  const validateStatus = proposalVerificationSchema.safeParse(values);
+
+  if (!validateStatus.success) {
+    throw new Error("Status proposal tidak valid");
+  }
+
+  const result = await db.verifyProposalBioflocService(
+    id,
+    sub,
+    validateStatus.data,
+  );
+
+  return result;
 }
 
-export async function createSignedUrlForProposalBiofloc(id: number) {
+export async function createSignedUrlForProposalBiofloc(id: string) {
   const { blob, originalPath } = await db.createSignedUrl(id);
   const fileName = originalPath.split("/").pop();
   return { blob, fileName };
 }
 
-export async function getProposalBioflocDetail(id: number) {
+export async function getProposalBioflocDetail(id: string) {
   return db.getProposalBioflocDetailService(id);
 }
 
 export async function convertProposalToProgram(
-  proposalId: number,
+  proposalId: string,
   values: BioflocProgramFormValues,
 ): Promise<{ success: boolean; message: string }> {
   try {
