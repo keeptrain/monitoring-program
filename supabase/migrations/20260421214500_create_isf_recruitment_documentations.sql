@@ -1,7 +1,7 @@
 -- Create recruitment documentations table 
 -- phase: 1: Sosialisasi, 2: Seleksi, 3: Pelatihan, 4: Penempatan
 CREATE TABLE IF NOT EXISTS isf_recruitment_documentations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     phase SMALLINT NOT NULL, -- 1: Sosialisasi, 2: Seleksi, 3: Pelatihan, 4: Penempatan
     file_path TEXT NOT NULL,
     file_name TEXT NOT NULL,

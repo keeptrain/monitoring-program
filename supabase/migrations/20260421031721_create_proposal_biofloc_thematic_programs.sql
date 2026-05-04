@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS proposal_biofloc_thematic_programs (
   -- Status & Review
   status VARCHAR(20) NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending','approved','rejected','revision','converted')),
-  user_id UUID REFERENCES auth.users(id),
-  reviewed_by UUID REFERENCES users(id),
-  reviewed_at TIMESTAMPTZ,
-  rejection_reason TEXT,
-  admin_notes TEXT,
+  user_id UUID REFERENCES public.users(id),
+  reviewed_by UUID REFERENCES public.users(id) DEFAULT NULL,
+  reviewed_at TIMESTAMPTZ DEFAULT NULL,
+  rejection_reason TEXT DEFAULT NULL,
+  admin_notes TEXT DEFAULT NULL,
 
   -- Proposal-specific data (TIDAK ada di biofloc_thematic)
   land_slope DECIMAL(5,2),

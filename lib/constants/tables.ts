@@ -8,4 +8,8 @@ export const TABLES = {
   LOGS: "monitoring_logs",
   UPT: "technical_units",
   KDMP_ENTITIES: "kdmp_entities",
+  REF_PROVINCES: "ref_provinces",
+  REF_REGENCIES: "ref_regencies",
+  REF_DISTRICTS: "ref_districts",
+  REF_VILLAGES: "ref_villages",
 } as const;
