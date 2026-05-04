@@ -92,7 +92,7 @@ export default function PublicMonitoringIsfDetailSheet({
       {/* Fixed Bottom Button - Locked to Bottom of Sheet */}
       <SheetFooter>
         <Button size="lg" asChild>
-          <Link href={`/monitoring/isf/zona${step_id}`}>
+          <Link href={`/isf/${step_id}`}>
             Lihat lebih lanjut
             <ArrowRightIcon className="size-4" />
           </Link>
