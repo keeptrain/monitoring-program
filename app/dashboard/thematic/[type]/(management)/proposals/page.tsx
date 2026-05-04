@@ -8,12 +8,14 @@ import { proposalBioflocQueryKey } from "@/features/thematic/api/getProposalBiof
 import ProposalBioflocProgramPage from "@/features/thematic/pages/ProposalBioflocProgramPage";
 import { notFound } from "next/navigation";
 import React from "react";
+import { getSessionCached } from "@/features/auth/session";
+import { UserRole } from "@/features/auth/types/user";
 
 const PAGE_CONFIG: Record<
   string,
   {
     label: string;
-    Component: React.ComponentType;
+    Component: React.ComponentType<{ role: UserRole }>;
   }
 > = {
   biofloc: {
@@ -43,6 +45,8 @@ export default async function ThematicProposalPage({
     return notFound();
   }
 
+  const { role } = await getSessionCached();
+
   const queryClient = new QueryClient();
 
   // Prefetch only if biofloc for now
@@ -65,7 +69,7 @@ export default async function ThematicProposalPage({
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ComponentPage />
+        <ComponentPage role={role} />
       </HydrationBoundary>
     </div>
   );

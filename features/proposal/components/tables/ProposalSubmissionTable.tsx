@@ -2,17 +2,20 @@
 
 import Datatable from "@/components/datatable/datatable";
 import { useMemo, useState } from "react";
-import { ProposalSubmissionTableColumns } from "./ProposalSubmissionTableColumns";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
 import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { UserRole } from "@/features/auth/types/user";
+import { ProposalSubmissionTableColumns } from "./ProposalSubmissionTableColumns";
 
 export default function ProposalSubmissionTable({
   enabled = true,
+  role = undefined,
 }: {
   enabled?: boolean;
+  role?: UserRole | undefined;
 }) {
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -33,7 +36,7 @@ export default function ProposalSubmissionTable({
     enabled,
   );
 
-  const columns = useMemo(() => ProposalSubmissionTableColumns(), []);
+  const columns = useMemo(() => ProposalSubmissionTableColumns(role), [role]);
 
   return (
     <Datatable

@@ -14,7 +14,7 @@ export default async function Navbar() {
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
-          href="/"
+          href="/biofloc-thematic"
           className="text-foreground flex items-center gap-2 text-sm font-semibold"
         >
           <div className="relative size-10 sm:size-12">

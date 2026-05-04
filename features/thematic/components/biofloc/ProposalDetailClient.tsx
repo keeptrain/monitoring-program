@@ -1,10 +1,10 @@
 "use client";
 
-import { ProposalDownloadButton } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
 import { CameraIcon, MapIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useGetDocumentationGroupsByTypeAndId } from "@/features/documentation/api/getDocumentationGroupsByTypeAndId";
 import { CarouselDApiDemo } from "@/components/shared/DocumentationCarouselGallery";
+import { ProposalDownloadButton } from "@/features/proposal/components/tables/ProposalDownloadButton";
 
 const LazyMap = dynamic(() => import("@/components/shared/MapPinPicker"), {
   ssr: false,

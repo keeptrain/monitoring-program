@@ -16,9 +16,16 @@ import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import RegencySelect from "@/components/shared/RegencySelect";
 import DistrictSelect from "@/components/shared/DistrictSelect";
 import VillageSelect from "@/components/shared/VillageSelect";
+import { LocationKdmpValues } from "../forms/location-kdmp-schema";
 
-export default function LocationKdmpForm() {
-  const { form, onSubmit } = useLocationKdmpForm();
+export default function LocationKdmpForm(
+  props: {
+    initialData?: LocationKdmpValues;
+    proposalId?: string;
+  },
+) {
+  const { initialData } = props;
+  const { form, onSubmit } = useLocationKdmpForm(initialData);
   const {
     formState: { errors },
   } = form;

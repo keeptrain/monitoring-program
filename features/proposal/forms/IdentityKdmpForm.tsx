@@ -9,10 +9,17 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
+import { IdentifyKdmpFormValues } from "../forms/identify-kdmp-schema";
 import { useIdentifyKdmpForm } from "../hooks/useIdentifyKdmpForm";
 
-export default function IdentityKdmpForm() {
-  const { form, onSubmit } = useIdentifyKdmpForm();
+export default function IdentityKdmpForm(
+  props: {
+    initialData?: IdentifyKdmpFormValues;
+    proposalId?: string;
+  },
+) {
+  const { initialData } = props;
+  const { form, onSubmit } = useIdentifyKdmpForm(initialData);
   const { errors } = form.formState;
 
   return (
@@ -188,13 +195,6 @@ export default function IdentityKdmpForm() {
             <FieldError>{errors.memberCount.message}</FieldError>
           )}
         </Field>
-
-        <div className="col-span-2">
-          {/* <Field>
-            <FieldLabel>Lokasi</FieldLabel>
-            <LocationFormSection form={form} />
-          </Field> */}
-        </div>
       </FieldGroup>
     </form>
   );

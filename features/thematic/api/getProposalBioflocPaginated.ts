@@ -13,7 +13,7 @@ export const useGetProposalBioflocPaginated = (
   useQuery({
     queryKey: proposalBioflocQueryKey(params),
     queryFn: () => getProposalBioflocPaginated(params),
-    staleTime: 30 * 1000, // 30 seconds (proposals change frequently)
-    gcTime: 2 * 60 * 1000,
+    staleTime: 3 * 60 * 1000, // 30 seconds (proposals change frequently)
+    gcTime: 5 * 60 * 1000,
     enabled,
   });

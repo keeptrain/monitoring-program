@@ -7,7 +7,7 @@ import { MapPinIcon } from "lucide-react";
 import { getProposalBioflocDetail } from "../actions/proposal-biofloc";
 import { proposalBioflocDetailQueryKey } from "../api/getProposalBioflocDetail";
 import { formatDateWithTime } from "@/lib/utils";
-import { StatusBadge } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { StatusBadge } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailItem } from "@/components/shared/DetailItem";
 import ProposalDetailClient from "../components/biofloc/ProposalDetailClient";

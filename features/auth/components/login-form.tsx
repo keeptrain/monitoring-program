@@ -12,6 +12,7 @@ import { Loader2Icon } from "lucide-react";
 export function LoginForm() {
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const [state, action, isPending] = useActionState(
     async (prevState: ActionState | null, formData: FormData) => {
       const result = await login(prevState, formData);

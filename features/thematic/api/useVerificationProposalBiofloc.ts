@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { verifyProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
-import { ProposalVerificationFormValues } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
 
 export const useVerificationProposalBiofloc = () => {
   const queryClient = useQueryClient();

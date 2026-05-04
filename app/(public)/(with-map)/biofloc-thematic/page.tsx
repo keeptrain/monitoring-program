@@ -9,10 +9,12 @@ import MonitoringThematicHeader from "@/features/monitoring/components/thematic/
 import { getThematicProgramQuotasQueryOptions } from "@/features/monitoring/api/getBioflocProgramQuotas";
 import LazyThematicProposalTable from "@/features/monitoring/components/thematic/LazyThematicProposalTable";
 import { ThematicType } from "@/features/thematic/constants/filter-state";
+import { getSessionCached } from "@/features/auth/session";
 
 export default async function MonitoringBioflocThematicPage() {
   const type: ThematicType = "biofloc_thematic";
   const queryClient = new QueryClient();
+  const { role } = await getSessionCached();
 
   const { data, proposal_total } = await queryClient.fetchQuery(
     getThematicProgramQuotasQueryOptions("biofloc_thematic"),
@@ -28,7 +30,7 @@ export default async function MonitoringBioflocThematicPage() {
             <ProposalProvinceTable data={data} />
           </div>
           <div className="lg:col-span-6">
-            <LazyThematicProposalTable />
+            <LazyThematicProposalTable role={role} />
           </div>
         </div>
       </HydrationBoundary>

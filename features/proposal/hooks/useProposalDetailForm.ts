@@ -12,7 +12,7 @@ import {
   getFormDataFromStore,
   ProposalState,
 } from "../api/proposal-store";
-import { createProposal } from "../api/proposal-actions";
+import { createProposal, updateRevisionProposal } from "../api/proposal-actions";
 import { toast } from "sonner";
 
 const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
@@ -25,7 +25,10 @@ const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
   documentations: [{ image_before_paths: [] }],
 };
 
-export const useProposalDetailForm = () => {
+export const useProposalDetailForm = (
+  initialData?: Partial<ProposalDetailFormInput>,
+  proposalId?: string,
+) => {
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(3).withOptions({
@@ -46,16 +49,22 @@ export const useProposalDetailForm = () => {
     undefined,
     ProposalDetailFormValues
   >({
-    defaultValues: { ...CREATE_DEFAULT_VALUES, ...step3Data },
+    defaultValues: { ...CREATE_DEFAULT_VALUES, ...initialData, ...step3Data },
     resolver: zodResolver(proposalDetailSchema),
   });
 
-  // Re-hydrate form from store on client mount
+  // Re-hydrate form from store or initialData on client mount
   useEffect(() => {
     const handleHydration = (state: ProposalState) => {
-      if (state && state.step3Data && Object.keys(state.step3Data).length > 0) {
-        form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step3Data });
-      }
+      const storeData = state.step3Data;
+      const hasStoreData = storeData && Object.keys(storeData).length > 0;
+
+      // Always reset so old data is cleared when store is emptied
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? storeData : {}),
+      });
     };
 
     if (useProposalStore.persist.hasHydrated()) {
@@ -64,7 +73,7 @@ export const useProposalDetailForm = () => {
 
     const unsub = useProposalStore.persist.onFinishHydration(handleHydration);
     return () => unsub();
-  }, [form]);
+  }, [form, initialData]);
 
   useEffect(() => {
     if (serverErrors && step === 3) {
@@ -82,7 +91,10 @@ export const useProposalDetailForm = () => {
     // 2. Submit ke Server Action
     startTransition(async () => {
       const fd = getFormDataFromStore();
-      const result = await createProposal(fd);
+
+      const result = proposalId
+        ? await updateRevisionProposal(proposalId, fd)
+        : await createProposal(fd);
 
       if (!result.success) {
         toast.error(result.message);

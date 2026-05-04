@@ -32,6 +32,14 @@ export type ProposalBioflocThematicProgram = {
     board_member_count?: number;
     member_count?: number;
   };
+  available_locations: {
+    name: string;
+    province_code: string;
+    village_code: string | null;
+    ref_villages: {
+      name: string;
+    } | null;
+  };
 };
 
 export type ProposalBioflocDetail = ProposalBioflocThematicProgram & {

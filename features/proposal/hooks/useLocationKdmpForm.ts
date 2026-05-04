@@ -23,7 +23,9 @@ const CREATE_DEFAULT_VALUES: DefaultValues<LocationKdmpInput> = {
   village_name: "",
 };
 
-export const useLocationKdmpForm = () => {
+export const useLocationKdmpForm = (
+  initialData?: Partial<LocationKdmpInput>,
+) => {
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(2).withOptions({
@@ -38,16 +40,22 @@ export const useLocationKdmpForm = () => {
   const setServerErrors = useProposalStore((state) => state.setServerErrors);
 
   const form = useForm<LocationKdmpInput, undefined, LocationKdmpValues>({
-    defaultValues: { ...CREATE_DEFAULT_VALUES, ...step2Data },
+    defaultValues: { ...CREATE_DEFAULT_VALUES, ...initialData, ...step2Data },
     resolver: zodResolver(locationKdmpSchema),
   });
 
-  // Re-hydrate form from store on client mount
+  // Re-hydrate form from store or initialData on client mount
   useEffect(() => {
     const handleHydration = (state: ProposalState) => {
-      if (state && state.step2Data && Object.keys(state.step2Data).length > 0) {
-        form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step2Data });
-      }
+      const storeData = state.step2Data;
+      const hasStoreData = storeData && Object.keys(storeData).length > 0;
+
+      // Always reset so old data is cleared when store is emptied
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? storeData : {}),
+      });
     };
 
     if (useProposalStore.persist.hasHydrated()) {
@@ -56,7 +64,7 @@ export const useLocationKdmpForm = () => {
 
     const unsub = useProposalStore.persist.onFinishHydration(handleHydration);
     return () => unsub();
-  }, [form]);
+  }, [form, initialData]);
 
   useEffect(() => {
     if (serverErrors && step === 2) {

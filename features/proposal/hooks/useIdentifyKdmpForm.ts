@@ -24,7 +24,7 @@ const CREATE_DEFAULT_VALUES: IdentifyKdmpInput = {
   memberCount: undefined,
 };
 
-export function useIdentifyKdmpForm() {
+export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({
@@ -40,27 +40,31 @@ export function useIdentifyKdmpForm() {
 
   const form = useForm<IdentifyKdmpInput, undefined, IdentifyKdmpFormValues>({
     resolver: zodResolver(identifyKdmpSchema),
-    defaultValues: { ...CREATE_DEFAULT_VALUES, ...step1Data },
+    defaultValues: { ...CREATE_DEFAULT_VALUES, ...initialData, ...step1Data },
   });
 
-  // Re-hydrate form from store on client mount
+  // Re-hydrate form from store or initialData on client mount
   useEffect(() => {
     const handleHydration = (state: ProposalState) => {
-      if (state && state.step1Data && Object.keys(state.step1Data).length > 0) {
-        form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step1Data });
-      }
+      const storeData = state.step1Data;
+      const hasStoreData = storeData && Object.keys(storeData).length > 0;
+
+      // Always reset so old data is cleared when store is emptied
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? storeData : {}),
+      });
     };
 
-    // Jika sudah selesai hydrate sebelum useEffect jalan (sering terjadi)
     if (useProposalStore.persist.hasHydrated()) {
       handleHydration(useProposalStore.getState());
     }
 
-    // Listener jika hydrate butuh waktu ekstra
     const unsub = useProposalStore.persist.onFinishHydration(handleHydration);
 
     return () => unsub();
-  }, [form]);
+  }, [form, initialData]);
 
   useEffect(() => {
     if (serverErrors && step === 1) {

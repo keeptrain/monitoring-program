@@ -30,6 +30,7 @@ export function ConvertProposalButton({
       title={`Konversi proposal "${proposalName}" ke Program Tematik`}
     >
       <Plus className="size-4" />
+      Potensial
     </Button>
   );
 }

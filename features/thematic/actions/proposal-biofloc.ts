@@ -7,12 +7,21 @@ import { getSession } from "@/features/auth/session";
 import {
   ProposalVerificationFormValues,
   proposalVerificationSchema,
-} from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+} from "../forms/proposal-verification-schema";
 
 export async function getProposalBioflocPaginated(
   params: ProposalBioflocPaginationParams,
 ) {
-  return db.getProposalBioflocPaginatedService(params);
+  const { sub, role, isLoggedIn } = await getSession();
+
+  // Smart logic:
+  // 1. If not logged in, no userId filter (public view)
+  // 2. If logged in as PMO or Admin, no userId filter (admin view)
+  // 3. Otherwise (regular user), filter by their own ID
+  const userIdFilter =
+    isLoggedIn && (role === "pmo" || role === "admin") ? undefined : sub;
+
+  return db.getProposalBioflocPaginatedService(params, userIdFilter);
 }
 
 export async function verifyProposalBiofloc(

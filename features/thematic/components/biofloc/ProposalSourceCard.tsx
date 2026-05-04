@@ -2,7 +2,7 @@ import { getProposalBioflocDetail } from "@/features/thematic/actions/proposal-b
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { notFound } from "next/navigation";
-import { StatusBadge } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { StatusBadge } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
 import { getProvinceNameByIdOrFallback } from "@/lib/utils";
 
 export default async function ProposalSourceCard({

@@ -9,6 +9,7 @@ import React from "react";
 import StepNavigation from "@/features/proposal/components/StepNavigation";
 import DraftHandler from "@/features/proposal/components/DraftHandler";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RevisionProposalData } from "./api/proposal-actions";
 
 const IdentityKdmpForm = dynamic(
   () => import("@/features/proposal/forms/IdentityKdmpForm"),
@@ -51,7 +52,14 @@ const ProposalDetailForm = dynamic(
 
 const PAGE_CONFIG: Record<
   number,
-  { title: string; Component: React.ComponentType }
+  {
+    title: string;
+    Component: React.ComponentType<{
+      // TODO: Replace any with actual type
+      initialData?: any;
+      proposalId?: string;
+    }>;
+  }
 > = {
   1: { title: "Identitas KDMP", Component: IdentityKdmpForm },
   2: { title: "Informasi Wilayah KDMP", Component: LocationKdmpForm },
@@ -60,8 +68,12 @@ const PAGE_CONFIG: Record<
 
 export default async function ProposalThematicPage({
   searchParams,
+  initialData,
+  proposalId,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  initialData?: RevisionProposalData;
+  proposalId?: string;
 }) {
   const params = await searchParams;
 
@@ -75,10 +87,15 @@ export default async function ProposalThematicPage({
   const { isLoggedIn, role } = await getSessionCached();
 
   if (!isLoggedIn && role !== "officer") {
-    redirect("/");
+    redirect("/login");
   }
 
   const Component = pageConfig.Component;
+
+  // Select only relevant data for the current step
+  const stepData = initialData
+    ? initialData[`step${currentStep}Data` as keyof typeof initialData]
+    : undefined;
 
   return (
     <div className="mx-auto mb-6 max-w-6xl space-y-4">
@@ -99,7 +116,7 @@ export default async function ProposalThematicPage({
         <CardContent>
           <CardTitle>{pageConfig.title}</CardTitle>
           <div className="min-h-[300px]">
-            <Component />
+            <Component initialData={stepData} proposalId={proposalId} />
           </div>
         </CardContent>
         <CardFooter className="justify-end gap-4">

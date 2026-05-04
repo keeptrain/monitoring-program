@@ -14,11 +14,21 @@ import { useProposalDetailForm } from "../hooks/useProposalDetailForm";
 import { Controller } from "react-hook-form";
 import DocumentationsFormSection from "../../documentation/DocumentationsFormSection";
 import { Checkbox } from "@/components/ui/checkbox";
-import { POTENTIAL_COMMODITY_OPTIONS } from "./proposal-detail-schema";
+import {
+  POTENTIAL_COMMODITY_OPTIONS,
+  ProposalDetailFormValues,
+} from "./proposal-detail-schema";
 import { Input } from "@/components/ui/input";
+import {} from "../forms/proposal-detail-schema";
 
-export default function ProposalDetailForm() {
-  const { form, onSubmit } = useProposalDetailForm();
+export default function ProposalDetailForm({
+  initialData,
+  proposalId,
+}: {
+  initialData?: ProposalDetailFormValues;
+  proposalId?: string;
+}) {
+  const { form, onSubmit } = useProposalDetailForm(initialData, proposalId);
 
   const otherCommodityPotentialError =
     form.formState.errors.other_commodity_potential?.message;

@@ -6,10 +6,8 @@ import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
 import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
-import {
-  ProposalAdminTableColumns,
-  ProposalVerificationFormValues,
-} from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
+import { ProposalSubmissionTableColumns } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
+import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
 import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import {
@@ -29,13 +27,27 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ProposalBioflocStatus } from "@/features/proposal/types/proposal-biofloc";
+import {
+  ProposalBioflocStatus,
+  ProposalBioflocThematicProgram,
+} from "@/features/proposal/types/proposal-biofloc";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangleIcon, Loader2Icon } from "lucide-react";
+import { UserRole } from "@/features/auth/types/user";
 
-export default function ProposalBioflocProgramPage() {
+export default function ProposalBioflocProgramPage({
+  role = undefined,
+}: {
+  role?: UserRole | undefined;
+}) {
   const router = useRouter();
-  const [id, setId] = useState<string | null>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedProposal, setSelectedProposal] =
+    useState<ProposalBioflocThematicProgram | null>(null);
+
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -53,17 +65,21 @@ export default function ProposalBioflocProgramPage() {
 
   // Action Handlers
   const handleAction = useCallback(
-    (id: string, action: "verify" | "convert") => {
+    (
+      proposal: ProposalBioflocThematicProgram,
+      action: "verify" | "convert",
+    ) => {
       if (action === "verify") {
-        setId(id);
+        setSelectedProposal(proposal);
+        setIsOpen(true);
       }
     },
-    [setId],
+    [setSelectedProposal, setIsOpen],
   );
 
   const columns = useMemo(
-    () => ProposalAdminTableColumns(handleAction),
-    [handleAction],
+    () => ProposalSubmissionTableColumns(role, handleAction),
+    [handleAction, role],
   );
 
   const handleRowClick = (id: string) =>
@@ -118,29 +134,42 @@ export default function ProposalBioflocProgramPage() {
         )}
       />
 
-      <Sheet open={id !== null} onOpenChange={() => setId(null)}>
-        <SheetContent>
+      <Sheet open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+        <SheetContent className="sm:max-w-md">
           <SheetHeader>
             <SheetTitle>Verifikasi Proposal</SheetTitle>
             <SheetDescription>
               Lengkapi form di bawah untuk melakukan verifikasi proposal
             </SheetDescription>
           </SheetHeader>
-          <VerificationForm id={id} />
-          <SheetFooter>
-            <Button type="submit" form="proposal-verification">
-              Save changes
-            </Button>
-          </SheetFooter>
+          {selectedProposal?.rejection_reason && (
+            <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+              <AlertTriangleIcon className="size-4" />
+              <AlertTitle>Permohonan ini pernah ditolak</AlertTitle>
+              <AlertDescription>
+                Dengan catatan: {selectedProposal.rejection_reason}
+              </AlertDescription>
+            </Alert>
+          )}
+          <VerificationForm
+            id={selectedProposal?.id || null}
+            onCloseSheet={() => setIsOpen(false)}
+          />
         </SheetContent>
       </Sheet>
     </>
   );
 }
 
-function VerificationForm({ id }: { id: string | null }) {
+function VerificationForm({
+  id,
+  onCloseSheet,
+}: {
+  id: string | null;
+  onCloseSheet: () => void;
+}) {
   const [status, setStatus] = useState<ProposalBioflocStatus | null>(null);
-  const { mutate } = useVerificationProposalBiofloc();
+  const { mutate, isPending } = useVerificationProposalBiofloc();
 
   const handleSubmit = async (formData: FormData) => {
     if (!id) return;
@@ -150,50 +179,64 @@ function VerificationForm({ id }: { id: string | null }) {
     };
     mutate(
       { id, data: values },
-      { onError: (error) => toast.error(error.message) },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message);
+          onCloseSheet();
+        },
+        onError: (error) => toast.error(error.message),
+      },
     );
   };
 
   return (
-    <form id="proposal-verification" action={handleSubmit} className="mx-4">
-      <FieldGroup className="space-y-3">
-        <Field>
-          <FieldLabel>Hasil Verifikasi</FieldLabel>
-          <RadioGroup
-            name="status"
-            className="w-fit"
-            defaultValue="approved"
-            required
-          >
-            <div className="flex items-center gap-3">
-              <RadioGroupItem
-                id="approved"
-                value="approved"
-                onClick={() => setStatus("approved")}
-              />
-              <Label htmlFor="approved">Setujui</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem
-                id="rejected"
-                value="rejected"
-                onClick={() => setStatus("rejected")}
-              />
-              <Label htmlFor="rejected">Tolak</Label>
-            </div>
-          </RadioGroup>
-        </Field>
+    <>
+      <form id="proposal-verification" action={handleSubmit} className="mx-4">
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Hasil Verifikasi</FieldLabel>
+            <RadioGroup
+              name="status"
+              className="w-fit"
+              defaultValue="approved"
+              required
+            >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  id="approved"
+                  value="approved"
+                  onClick={() => setStatus("approved")}
+                />
+                <Label htmlFor="approved">Setujui</Label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  id="rejected"
+                  value="rejected"
+                  onClick={() => setStatus("rejected")}
+                />
+                <Label htmlFor="rejected">Tolak</Label>
+              </div>
+            </RadioGroup>
+          </Field>
 
-        <Field>
-          <FieldLabel>Alasan Penolakan</FieldLabel>
-          <Textarea
-            disabled={status !== "rejected"}
-            name="rejection_reason"
-            placeholder="Masukkan alasan..."
-            required={status === "rejected"}
-          />
-        </Field>
-      </FieldGroup>
-    </form>
+          <Field>
+            <FieldLabel>Alasan Penolakan</FieldLabel>
+            <Textarea
+              disabled={status !== "rejected"}
+              name="rejection_reason"
+              placeholder="Masukkan alasan..."
+              required={status === "rejected"}
+            />
+          </Field>
+        </FieldGroup>
+      </form>
+      <SheetFooter>
+        <Button disabled={isPending} type="submit" form="proposal-verification">
+          {isPending ? <Loader2Icon className="size-4 animate-spin" /> : null}
+          Simpan perubahan
+        </Button>
+      </SheetFooter>
+    </>
   );
 }

@@ -3,6 +3,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInViewOnce } from "@/hooks/useInViewOnce";
 import dynamic from "next/dynamic";
+import { UserRole } from "@/features/auth/types/user";
 
 const IN_VIEW_OPTIONS = {
   root: null,
@@ -11,18 +12,22 @@ const IN_VIEW_OPTIONS = {
 } as const;
 
 const LazyTableComponent = dynamic(
-  () => import("../biofloc/ProposalSubmissionTable"),
+  () => import("../../../proposal/components/tables/ProposalSubmissionTable"),
   {
     loading: () => <Skeleton className="h-[500px] w-full" />,
   },
 );
 
-export default function LazyThematicProposalTable() {
+export default function LazyThematicProposalTable({
+  role = undefined,
+}: {
+  role?: UserRole | undefined;
+}) {
   const { ref, isInView } = useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
 
   return (
     <div ref={ref} className="min-h-[550px]">
-      {isInView && <LazyTableComponent enabled={isInView} />}
+      {isInView && <LazyTableComponent enabled={isInView} role={role} />}
     </div>
   );
 }

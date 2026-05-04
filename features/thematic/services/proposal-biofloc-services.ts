@@ -8,8 +8,8 @@ import {
   PaginatedProposalBioflocResult,
   ProposalBioflocProvinceSummary,
 } from "@/features/proposal/types/proposal-biofloc";
-import { ProposalVerificationFormValues } from "@/features/monitoring/components/biofloc/ProposalSubmissionTableColumns";
 import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
+import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
 
 function normalizeProvinceName(province: string): string {
   return province.trim().toLowerCase();
@@ -21,6 +21,7 @@ function normalizeProvinceName(province: string): string {
  */
 export async function getProposalBioflocPaginatedService(
   params: ProposalBioflocPaginationParams,
+  userId?: string,
 ): Promise<PaginatedProposalBioflocResult> {
   const supabase = await createClient();
 
@@ -32,20 +33,31 @@ export async function getProposalBioflocPaginatedService(
     `
       id, 
       status, 
-      created_at,
       entity_id,
       location_id,
-      kdmp_entities!inner (name, kusuka_number),
-      available_locations!inner (province_code, regency_code)
+      proposed_commodity,
+      commodity_potentials,
+      rejection_reason,
+      created_at,
+      kdmp_entities!inner (name, name_search),
+      available_locations!inner (
+        province_code, 
+        village_code,
+        ref_villages (name)
+      )
       `,
     { count: "exact" },
   );
 
-  // Optimized search: use the name from joined entity
+  if (userId !== undefined) {
+    query = query.eq("user_id", userId);
+  }
+
   if (search && search.trim().length > 0) {
-    query = query.ilike(
-      "kdmp_entities.name",
-      `%${search.trim().toLowerCase()}%`,
+    // Optimized search: use prefix search to leverage B-tree index
+    query = query.like(
+      "kdmp_entities.name_search",
+      `${search.trim().toLowerCase()}%`,
     );
   }
 
@@ -141,32 +153,59 @@ export async function getProposalBioflocProvinceSummary(
   };
 }
 
-/** Update proposal status (admin action) */
+/** Update proposal status (admin action) with smart metadata handling */
 export async function verifyProposalBioflocService(
   id: string,
   verifierId: string,
   data: ProposalVerificationFormValues,
 ) {
   const supabase = await createClient();
+
+  // Get current data proposal
+  const { data: existingProposal, error: errorExistingProposal } =
+    await supabase
+      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .select("reviewed_at, rejection_reason")
+      .eq("id", id)
+      .single();
+
+  if (errorExistingProposal || !existingProposal) {
+    return { success: false, message: "Proposal tidak ditemukan" };
+  }
+
+  const now = new Date().toISOString();
+
+  // 2. Siapkan payload update
+  const updatePayload: {
+    status: string;
+    rejection_reason: string | null;
+    reviewed_by: string;
+    reviewed_at: string;
+  } = {
+    status: data.status,
+    // If approved, remove rejection reason.
+    // If rejected again, use new rejection reason (or keep old one if new one is empty)
+    rejection_reason:
+      data.status === "approved"
+        ? null
+        : (data.rejectionReason ?? existingProposal.rejection_reason),
+    reviewed_by: verifierId,
+    reviewed_at: now,
+  };
+
   const { error } = await supabase
     .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .update({
-      status: data.status,
-      reviewed_by: verifierId,
-      reviewed_at: new Date().toISOString(),
-      rejection_reason:
-        data.status === "rejected" ? (data.rejectionReason ?? null) : null,
-    })
+    .update(updatePayload)
     .eq("id", id);
 
   if (error) {
     console.error("Error update proposal status:", error);
-    throw error;
+    return { success: false, message: error.message };
   }
 
   return {
     success: true,
-    message: `Berhasil memverifikasi proposal`,
+    message: "Verifikasi proposal berhasil disimpan",
   };
 }
 
