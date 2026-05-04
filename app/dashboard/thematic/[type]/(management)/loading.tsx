@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ThematicManagementLoading() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       {/* Table Skeleton (Broad strokes) */}
       <div className="space-y-4">
         {/* Filter Mock */}

@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       {/* Header */}
       <div className="mb-10">
         <p className="text-muted-foreground mb-2 text-xs font-medium tracking-widest uppercase">

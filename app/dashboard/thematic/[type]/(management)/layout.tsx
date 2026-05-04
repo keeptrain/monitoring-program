@@ -20,7 +20,7 @@ export default async function ThematicTypeLayout({
   const config = PAGE_CONFIG[type] || { label: type };
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-6 space-y-2">
         <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
           <Link

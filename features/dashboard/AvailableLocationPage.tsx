@@ -15,7 +15,7 @@ export default function AvailableLocationPage({
 }) {
   const getColumns = useMemo(() => AvailableLocationTableColumns(), []);
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row items-start sm:justify-between gap-4">
         <div>

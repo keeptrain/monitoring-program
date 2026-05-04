@@ -31,7 +31,7 @@ export default function AvailableLocationFormPage({
   };
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-8">
         <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
           Dashboard / Lokasi / {locationId ? "Ubah" : "Buat"}

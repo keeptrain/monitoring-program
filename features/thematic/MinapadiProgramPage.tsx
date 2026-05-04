@@ -1,3 +1,3 @@
 export default function MinapadiProgramPage() {
-  return <div className="mx-auto max-w-4xl"></div>;
+  return <div className="mx-auto max-w-6xl"></div>;
 }

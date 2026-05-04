@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function FormSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       {/* Header Skeleton */}
       <div className="mb-6 space-y-1">
         <Skeleton className="mb-1 h-4 w-48" />

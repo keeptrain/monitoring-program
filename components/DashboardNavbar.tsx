@@ -10,7 +10,7 @@ export default async function DashboardNavbar({
 }) {
   return (
     <header className="text-background sticky top-0 z-20 bg-[#006ebf] shadow-xs">
-      <nav className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4 sm:px-0">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
           href={homeHref}

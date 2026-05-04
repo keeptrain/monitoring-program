@@ -12,7 +12,7 @@ export default async function UsersPage() {
   const users = await queryClient.fetchQuery(getUsersQueryOptions());
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-2">
+    <div className="mx-auto flex max-w-6xl flex-col gap-2">
       <div className="mb-6 space-y-2">
         <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
           <Link

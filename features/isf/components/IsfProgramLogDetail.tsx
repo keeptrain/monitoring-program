@@ -23,7 +23,7 @@ import { STEPS } from "../constants/isf-step";
 
 export default function IsfProgramLogDetail({ data }: { data: IsfProgramLog }) {
   return (
-    <div className="mx-auto max-w-4xl space-y-8 pb-4 sm:pb-10">
+    <div className="mx-auto max-w-6xl space-y-8 pb-4 sm:pb-10">
       <Header data={data} />
 
       <div className="space-y-8">

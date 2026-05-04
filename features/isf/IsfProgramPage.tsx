@@ -43,7 +43,7 @@ export default function IsfProgramPage({ data }: { data: IsfStepSummary[] }) {
   const [activeTab, setActiveTab] = useState<Tab>("zona");
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
         <div>
           <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">

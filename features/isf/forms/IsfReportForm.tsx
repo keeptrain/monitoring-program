@@ -34,7 +34,7 @@ export default function IsfReportForm({
   } = useIsfReportForm(zone, initialData);
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-6 space-y-1">
         <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
           Dashboard / ISF / Laporan / {isEdit ? "Ubah" : "Buat"}

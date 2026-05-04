@@ -67,7 +67,7 @@ export default async function ThematicProposalPage({
   const ComponentPage = config.Component;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ComponentPage role={role} />
       </HydrationBoundary>

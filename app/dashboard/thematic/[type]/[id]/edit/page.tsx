@@ -24,7 +24,7 @@ export default async function ThematicProgramEditPage({
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <ThematicFormHeader isEdit />
       <BioflocProgramForm initialData={program as ThematicProgramDetail} />
     </div>

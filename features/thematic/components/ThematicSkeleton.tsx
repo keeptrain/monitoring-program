@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export function ThematicListSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
         <div className="space-y-2">
           <Skeleton className="h-4 w-32" />
@@ -27,7 +27,7 @@ export function ThematicListSkeleton() {
 
 export function ThematicDetailSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
@@ -154,7 +154,7 @@ export function ThematicDetailSkeleton() {
 
 export function ThematicFormSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="mb-6 space-y-2">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-8 w-48" />
