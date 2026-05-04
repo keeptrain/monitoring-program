@@ -3,12 +3,12 @@ import { getDocumentationGroupsByTypeAndId } from "../actions";
 
 export const getDocumentationGroupsByTypeAndIdQueryKey = (
   type: string,
-  id: number,
+  id: string | number,
 ) => ["documentation-groups", type, id];
 
 export const useGetDocumentationGroupsByTypeAndId = (
   type: string,
-  id: number,
+  id: string | number,
   enabled: boolean = true,
 ) => {
   return useQuery({

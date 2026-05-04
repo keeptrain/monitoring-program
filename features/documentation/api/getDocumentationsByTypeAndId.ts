@@ -3,10 +3,10 @@ import { getDocumentationsByTypeAndId } from "../actions";
 
 export const getDocumentationByTypeAndIdQueryKey = (
   type: string,
-  id: number,
+  id: string | number,
 ) => ["documentations", type, id];
 
-export const useGetDocumentationsByTypeAndId = (type: string, id: number) =>
+export const useGetDocumentationsByTypeAndId = (type: string, id: string | number) =>
   useQuery({
     queryKey: getDocumentationByTypeAndIdQueryKey(type, id),
     queryFn: async () => await getDocumentationsByTypeAndId(type, id),

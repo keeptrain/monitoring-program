@@ -37,7 +37,7 @@ export const documentationFormSchema = z.object({
 
 export const documentationInsertRowSchema = z.object({
   program_type: documentationProgramTypeSchema,
-  program_id: z.number().int().positive(),
+  program_id: z.union([z.number(), z.string()]),
   group_id: z.string().min(1), // Changed to string for flexibility
   type: z.enum(["before", "after", "proposal_before"]),
   path: z.string().min(1, "Path wajib diisi"),

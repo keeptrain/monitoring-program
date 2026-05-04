@@ -13,7 +13,7 @@ import { getDocumentationGroupsByTypeAndIdQueryKey } from "../api/getDocumentati
 
 interface ManageDocumentationsSheetProps {
   programType: string;
-  programId: number;
+  programId: string;
   onSuccess?: () => void;
 }
 

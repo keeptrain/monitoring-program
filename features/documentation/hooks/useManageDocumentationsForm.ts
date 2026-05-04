@@ -7,7 +7,7 @@ import {
 import { useGetDocumentationGroupsByTypeAndId } from "../api/getDocumentationGroupsByTypeAndId";
 import { useEffect } from "react";
 
-export const useManageDocumentationsForm = (type: string, id: number) => {
+export const useManageDocumentationsForm = (type: string, id: string) => {
   const {
     data: documentations,
     isLoading,

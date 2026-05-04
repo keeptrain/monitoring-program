@@ -25,7 +25,7 @@ type SaveDocumentationsResult = {
  * Kini menggunakan objek DocumentationImage untuk mendukung file_name.
  */
 export type ProgramDocumentationGroup = {
-  programId: number;
+  programId: string | number;
   groupId: string | number | null;
   beforeImages: DocumentationImage[];
   afterImages: DocumentationImage[];
@@ -62,7 +62,7 @@ function toPublicStorageUrl(path: string): string {
 }
 
 function mapToDocumentationRows(
-  programId: number,
+  programId: string | number,
   programType: string,
   documentations: DocumentationFormValue["documentations"],
 ): { rows: DocumentationInsertRow[]; groupIds: number[] } {
@@ -115,7 +115,7 @@ function mapToDocumentationRows(
 
 export async function saveDocumentationsAction(
   supabase: SupabaseClient,
-  programId: number,
+  programId: string | number,
   programType: string,
   documentations: DocumentationFormValue["documentations"],
 ): Promise<SaveDocumentationsResult> {
@@ -123,7 +123,7 @@ export async function saveDocumentationsAction(
   const groupId = Date.now();
 
   try {
-    if (!Number.isInteger(programId) || programId <= 0) {
+    if (!programId) {
       throw new Error("Program ID tidak valid.");
     }
 
@@ -171,17 +171,17 @@ export async function saveDocumentationsAction(
 
 type DocumentationProgramIdsQueryParams = {
   programType: string;
-  programIds: number[];
+  programIds: (string | number)[];
 };
 
 type DocumentationProgramIdQueryParams = {
   programType: string;
-  programId: number;
+  programId: string | number;
 };
 
 type DocumentationQueryRow = {
   id: number;
-  program_id: number;
+  program_id: string | number;
   group_id: string | number | null;
   type: "before" | "after" | "proposal_before";
   path: string;
@@ -193,7 +193,10 @@ function isBeforeDocumentationType(type: DocumentationQueryRow["type"]): boolean
   return type === "before" || type === "proposal_before";
 }
 
-export async function getDocumentationsByTypeAndId(type: string, id: number) {
+export async function getDocumentationsByTypeAndId(
+  type: string,
+  id: string | number,
+) {
   const supabase = await createClient();
   return getDocumentationsByProgramId(supabase, {
     programType: type,
@@ -204,12 +207,12 @@ export async function getDocumentationsByTypeAndId(type: string, id: number) {
 export async function getDocumentationsByProgramIds(
   supabase: SupabaseClient,
   params: DocumentationProgramIdsQueryParams,
-): Promise<Map<number, ProgramDocumentationGroup>> {
+): Promise<Map<string | number, ProgramDocumentationGroup>> {
   const normalizedProgramType = documentationProgramTypeSchema.parse(
     params.programType,
   );
   const normalizedProgramIds = Array.from(
-    new Set(params.programIds.filter((id) => Number.isInteger(id) && id > 0)),
+    new Set(params.programIds.filter((id) => id !== 0 && id !== "")),
   );
 
   if (normalizedProgramIds.length === 0) {
@@ -228,7 +231,7 @@ export async function getDocumentationsByProgramIds(
     throw new Error(error.message);
   }
 
-  const groupedByProgram = new Map<number, ProgramDocumentationGroup>();
+  const groupedByProgram = new Map<string | number, ProgramDocumentationGroup>();
 
   // Catatan: logika ranking grup disederhanakan untuk kebutuhan Map per-program (biasanya hanya ambil satu grup terbaru)
   for (const row of (data ?? []) as DocumentationQueryRow[]) {
@@ -285,7 +288,7 @@ export async function getDocumentationGroupsByProgramId(
   );
   const programId = params.programId;
 
-  if (!Number.isInteger(programId) || programId <= 0) {
+  if (!programId) {
     return [];
   }
 
@@ -337,7 +340,7 @@ export async function getDocumentationGroupsByProgramId(
 
 export async function getDocumentationGroupsByTypeAndId(
   type: string,
-  id: number,
+  id: string | number,
 ): Promise<ProgramDocumentationGroup[]> {
   const supabase = await createClient();
   return getDocumentationGroupsByProgramId(supabase, {
@@ -347,7 +350,7 @@ export async function getDocumentationGroupsByTypeAndId(
 }
 
 export async function upsertDocumentations(
-  programId: number,
+  programId: string | number,
   programType: string,
   documentations: DocumentationFormValue["documentations"],
 ): Promise<{ success: boolean; message?: string }> {
