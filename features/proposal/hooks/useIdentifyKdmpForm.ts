@@ -9,7 +9,7 @@ import {
   IdentifyKdmpFormValues,
 } from "../forms/identify-kdmp-schema";
 import { useEffect } from "react";
-import { useProposalStore } from "../proposal-store";
+import { ProposalState, useProposalStore } from "../api/proposal-store";
 
 const CREATE_DEFAULT_VALUES: IdentifyKdmpInput = {
   name: "",
@@ -45,7 +45,7 @@ export function useIdentifyKdmpForm() {
 
   // Re-hydrate form from store on client mount
   useEffect(() => {
-    const handleHydration = (state: any) => {
+    const handleHydration = (state: ProposalState) => {
       if (state && state.step1Data && Object.keys(state.step1Data).length > 0) {
         form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step1Data });
       }

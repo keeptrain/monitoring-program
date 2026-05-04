@@ -13,14 +13,15 @@ import ProposalLocationFormSection from "../components/ProposalLocationFormSecti
 import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
 import { Controller } from "react-hook-form";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
+import RegencySelect from "@/components/shared/RegencySelect";
+import DistrictSelect from "@/components/shared/DistrictSelect";
+import VillageSelect from "@/components/shared/VillageSelect";
 
 export default function LocationKdmpForm() {
   const { form, onSubmit } = useLocationKdmpForm();
   const {
     formState: { errors },
   } = form;
-
-  console.log(errors);
 
   return (
     <form id="step-2-form" onSubmit={onSubmit}>
@@ -57,21 +58,30 @@ export default function LocationKdmpForm() {
             <FieldContent>
               <Controller
                 control={form.control}
-                name="province_id"
+                name="province_code"
                 render={({ field }) => (
                   <ProvinceSelect
                     value={field.value ?? ""}
-                    onChange={field.onChange}
+                    onChange={(val, name) => {
+                      field.onChange(val);
+                      form.setValue("province_name", name || "");
+                      form.setValue("regency_code", "");
+                      form.setValue("regency_name", "");
+                      form.setValue("district_code", "");
+                      form.setValue("district_name", "");
+                      form.setValue("village_code", "");
+                      form.setValue("village_name", "");
+                    }}
                     allLabel="Pilih Provinsi"
                     showAll
                     className="w-full"
-                    aria-invalid={!!errors.province_id}
+                    aria-invalid={!!errors.province_code}
                   />
                 )}
               />
             </FieldContent>
-            {errors.province_id && (
-              <FieldError>{errors.province_id.message}</FieldError>
+            {errors.province_code && (
+              <FieldError>{errors.province_code.message}</FieldError>
             )}
           </Field>
 
@@ -80,14 +90,29 @@ export default function LocationKdmpForm() {
               Kabupaten/Kota <span className="text-destructive">*</span>
             </FieldLabel>
             <FieldContent>
-              <Input
-                {...form.register("regency_id")}
-                placeholder="Contoh: Sidoarjo"
-                aria-invalid={!!errors.regency_id}
+              <Controller
+                control={form.control}
+                name="regency_code"
+                render={({ field }) => (
+                  <RegencySelect
+                    provinceCode={form.watch("province_code") ?? ""}
+                    value={field.value ?? ""}
+                    onChange={(val, name) => {
+                      field.onChange(val);
+                      form.setValue("regency_name", name || "");
+                      form.setValue("district_code", "");
+                      form.setValue("district_name", "");
+                      form.setValue("village_code", "");
+                      form.setValue("village_name", "");
+                    }}
+                    className="w-full"
+                    aria-invalid={!!errors.regency_code}
+                  />
+                )}
               />
             </FieldContent>
-            {errors.regency_id && (
-              <FieldError>{errors.regency_id.message}</FieldError>
+            {errors.regency_code && (
+              <FieldError>{errors.regency_code.message}</FieldError>
             )}
           </Field>
 
@@ -96,14 +121,27 @@ export default function LocationKdmpForm() {
               Kecamatan <span className="text-destructive">*</span>
             </FieldLabel>
             <FieldContent>
-              <Input
-                {...form.register("district_id")}
-                placeholder="Contoh: Gedangan"
-                aria-invalid={!!errors.district_id}
+              <Controller
+                control={form.control}
+                name="district_code"
+                render={({ field }) => (
+                  <DistrictSelect
+                    regencyCode={form.watch("regency_code") ?? ""}
+                    value={field.value ?? ""}
+                    onChange={(val, name) => {
+                      field.onChange(val);
+                      form.setValue("district_name", name || "");
+                      form.setValue("village_code", "");
+                      form.setValue("village_name", "");
+                    }}
+                    className="w-full"
+                    aria-invalid={!!errors.district_code}
+                  />
+                )}
               />
             </FieldContent>
-            {errors.district_id && (
-              <FieldError>{errors.district_id.message}</FieldError>
+            {errors.district_code && (
+              <FieldError>{errors.district_code.message}</FieldError>
             )}
           </Field>
 
@@ -112,14 +150,25 @@ export default function LocationKdmpForm() {
               Desa/Kelurahan <span className="text-destructive">*</span>
             </FieldLabel>
             <FieldContent>
-              <Input
-                {...form.register("village_id")}
-                placeholder="Contoh: Keboansikep"
-                aria-invalid={!!errors.village_id}
+              <Controller
+                control={form.control}
+                name="village_code"
+                render={({ field }) => (
+                  <VillageSelect
+                    districtCode={form.watch("district_code") ?? ""}
+                    value={field.value ?? ""}
+                    onChange={(val, name) => {
+                      field.onChange(val);
+                      form.setValue("village_name", name || "");
+                    }}
+                    className="w-full"
+                    aria-invalid={!!errors.village_code}
+                  />
+                )}
               />
             </FieldContent>
-            {errors.village_id && (
-              <FieldError>{errors.village_id.message}</FieldError>
+            {errors.village_code && (
+              <FieldError>{errors.village_code.message}</FieldError>
             )}
           </Field>
 

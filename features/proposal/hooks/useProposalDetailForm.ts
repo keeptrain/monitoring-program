@@ -7,11 +7,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useTransition } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useProposalStore, getFormDataFromStore } from "../proposal-store";
-import { createProposal } from "../proposal-actions";
+import {
+  useProposalStore,
+  getFormDataFromStore,
+  ProposalState,
+} from "../api/proposal-store";
+import { createProposal } from "../api/proposal-actions";
 import { toast } from "sonner";
-
-import { DEFAULT_GROUP } from "../../documentation/forms/documentation-schema";
 
 const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
   has_letter_of_land_preparation_and_use: undefined,
@@ -20,7 +22,7 @@ const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
   commodity_potentials: [],
   other_commodity_potential: "",
   proposal_path: "",
-  documentations: [DEFAULT_GROUP],
+  documentations: [{ image_before_paths: [] }],
 };
 
 export const useProposalDetailForm = () => {
@@ -50,7 +52,7 @@ export const useProposalDetailForm = () => {
 
   // Re-hydrate form from store on client mount
   useEffect(() => {
-    const handleHydration = (state: any) => {
+    const handleHydration = (state: ProposalState) => {
       if (state && state.step3Data && Object.keys(state.step3Data).length > 0) {
         form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step3Data });
       }

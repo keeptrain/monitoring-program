@@ -7,16 +7,20 @@ import {
 } from "../forms/location-kdmp-schema";
 import { useEffect } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useProposalStore } from "../proposal-store";
+import { ProposalState, useProposalStore } from "../api/proposal-store";
 
 const CREATE_DEFAULT_VALUES: DefaultValues<LocationKdmpInput> = {
   latitude: "",
   longitude: "",
   landSlope: "",
-  province_id: "",
-  regency_id: "",
-  district_id: "",
-  village_id: "",
+  province_code: "",
+  province_name: "",
+  regency_code: "",
+  regency_name: "",
+  district_code: "",
+  district_name: "",
+  village_code: "",
+  village_name: "",
 };
 
 export const useLocationKdmpForm = () => {
@@ -40,7 +44,7 @@ export const useLocationKdmpForm = () => {
 
   // Re-hydrate form from store on client mount
   useEffect(() => {
-    const handleHydration = (state: any) => {
+    const handleHydration = (state: ProposalState) => {
       if (state && state.step2Data && Object.keys(state.step2Data).length > 0) {
         form.reset({ ...CREATE_DEFAULT_VALUES, ...state.step2Data });
       }

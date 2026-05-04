@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useProposalStore } from "../proposal-store";
+import { useProposalStore } from "../api/proposal-store";
 import { useQueryState, parseAsInteger } from "nuqs";
 import { useSearchParams } from "next/navigation";
 

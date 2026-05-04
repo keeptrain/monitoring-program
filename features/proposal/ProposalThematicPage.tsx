@@ -6,9 +6,8 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import dynamic from "next/dynamic";
 import React from "react";
-import StepNavigation from "@/features/proposal/StepNavigation";
+import StepNavigation from "@/features/proposal/components/StepNavigation";
 import DraftHandler from "@/features/proposal/components/DraftHandler";
-
 import { Skeleton } from "@/components/ui/skeleton";
 
 const IdentityKdmpForm = dynamic(

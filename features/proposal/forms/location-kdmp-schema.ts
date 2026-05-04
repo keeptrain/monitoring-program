@@ -15,10 +15,14 @@ export const locationKdmpSchema = z.object({
     (val) => (val === "" ? undefined : val),
     z.coerce.number("Harus berupa angka").min(0, "Minimal 0%"),
   ),
-  province_id: z.string().min(1, "Provinsi wajib diisi"),
-  regency_id: z.string().min(1, "Kabupaten/Kota wajib diisi"),
-  district_id: z.string().min(1, "Kecamatan wajib diisi"),
-  village_id: z.string().min(1, "Desa/Kelurahan wajib diisi"),
+  province_code: z.string().min(1, "Provinsi wajib diisi"),
+  province_name: z.string().optional(),
+  regency_code: z.string().min(1, "Kabupaten/Kota wajib diisi"),
+  regency_name: z.string().optional(),
+  district_code: z.string().min(1, "Kecamatan wajib diisi"),
+  district_name: z.string().optional(),
+  village_code: z.string().min(1, "Desa/Kelurahan wajib diisi"),
+  village_name: z.string().optional(),
 });
 
 export type LocationKdmpInput = z.input<typeof locationKdmpSchema>;
