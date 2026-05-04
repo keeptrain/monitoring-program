@@ -25,7 +25,7 @@ export function UserDropdown() {
       await setStatuses(null);
       await logout();
       if (pathname !== "/") {
-        router.push("/");
+        router.push("/biofloc-thematic");
       } else {
         router.refresh();
       }

@@ -21,7 +21,7 @@ export default async function LoginPage() {
                       className="absolute left-0"
                       asChild
                     >
-                      <Link href="/">
+                      <Link href="/biofloc-thematic">
                         <ArrowLeftIcon className="text-muted-foreground size-4" />
                       </Link>
                     </Button>
