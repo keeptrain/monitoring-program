@@ -13,8 +13,10 @@ import { useTransition } from "react";
 import { logout } from "@/features/auth/auth-actions";
 import { useQueryState } from "nuqs";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function UserDropdown() {
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -23,6 +25,7 @@ export function UserDropdown() {
   const handleLogout = () => {
     startTransition(async () => {
       await setStatuses(null);
+      queryClient.clear();
       await logout();
       if (pathname !== "/") {
         router.push("/biofloc-thematic");

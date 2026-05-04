@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { loginFormSchema } from "./form/login-schema";
 import z from "zod";
 import { getIronSession } from "iron-session";
@@ -16,6 +15,7 @@ export type ActionState = {
     [key: string]: string[] | undefined;
   };
   message?: string;
+  redirectPath?: string;
 };
 
 export async function getSession() {
@@ -52,13 +52,11 @@ export async function login(
 
   const { email, password } = validatedFields.data;
 
-  let isSuccesful = false;
   let redirectPath = "/";
   // Check mock users
   try {
     const user = await db.login(email, password);
     await buildSession(user.id, user.role, user.programScope);
-    isSuccesful = true;
     redirectPath = getRedirectPath(user.role, user.programScope);
   } catch (error) {
     return {
@@ -69,13 +67,10 @@ export async function login(
     };
   }
 
-  if (isSuccesful) {
-    redirect(redirectPath);
-  }
-
   return {
-    success: false,
-    message: "Terjadi kesalahan saat mencoba untuk masuk.",
+    success: true,
+    message: "Login berhasil.",
+    redirectPath,
   };
 }
 

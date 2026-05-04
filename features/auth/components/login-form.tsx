@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -8,10 +10,21 @@ import { ActionState, login } from "@/features/auth/auth-actions";
 import { Loader2Icon } from "lucide-react";
 
 export function LoginForm() {
-  const [state, action, isPending] = useActionState<
-    ActionState | null,
-    FormData
-  >(login, null);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const [state, action, isPending] = useActionState(
+    async (prevState: ActionState | null, formData: FormData) => {
+      const result = await login(prevState, formData);
+
+      if (result.success && result.redirectPath) {
+        queryClient.clear();
+        router.push(result.redirectPath);
+      }
+
+      return result;
+    },
+    null,
+  );
 
   const { errors } = state ?? {};
   const errorsEmail = errors?.email;
