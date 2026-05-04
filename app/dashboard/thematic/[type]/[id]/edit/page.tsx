@@ -10,15 +10,14 @@ export default async function ThematicProgramEditPage({
   params: Promise<{ type: string; id: string }>;
 }) {
   const { type, id } = await params;
-  const programId = Number(id);
 
-  if (Number.isNaN(programId) || (type !== "biofloc" && type !== "minapadi")) {
+  if (type !== "biofloc" && type !== "minapadi") {
     return notFound();
   }
 
   let program;
   try {
-    program = await getThematicProgramById(programId);
+    program = await getThematicProgramById(id);
   } catch (error) {
     console.error("Error loading thematic program for edit:", error);
     return notFound();
