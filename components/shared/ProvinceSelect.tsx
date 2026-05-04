@@ -8,7 +8,7 @@ import { PROVINCES_BY_ISLAND } from "@/features/thematic/constants/indonesia-pro
 interface ProvinceSelectProps {
   /** Current selected province ID (or "" for all) */
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, name?: string) => void;
   /** Label for the "all" option, defaults to "Semua Provinsi" */
   allLabel?: string;
   /** Show the "all" option at the top, defaults to true */
@@ -30,21 +30,41 @@ export default function ProvinceSelect({
   return (
     <NativeSelect
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => {
+        const val = e.target.value;
+        if (!val) {
+          onChange(val, "");
+          return;
+        }
+        for (const group of PROVINCES_BY_ISLAND) {
+          const found = group.provinces.find((p) => p.province_id === val);
+          if (found) {
+            onChange(val, found.name);
+            return;
+          }
+        }
+        onChange(val);
+      }}
       className={className}
       disabled={disabled}
       aria-invalid={ariaInvalid}
     >
       {showAll && <NativeSelectOption value="">{allLabel}</NativeSelectOption>}
-      {PROVINCES_BY_ISLAND.map(({ island, provinces }) => (
-        <NativeSelectOptGroup key={island} label={island}>
-          {provinces.map((p) => (
-            <NativeSelectOption key={p.province_id} value={p.province_id}>
-              {p.name}
-            </NativeSelectOption>
-          ))}
-        </NativeSelectOptGroup>
-      ))}
+      {PROVINCES_BY_ISLAND.map(({ island, provinces }) => {
+        const filteredProvinces = provinces.filter((p) => p.name === "Jawa Barat");
+
+        if (filteredProvinces.length === 0) return null;
+
+        return (
+          <NativeSelectOptGroup key={island} label={island}>
+            {filteredProvinces.map((p) => (
+              <NativeSelectOption key={p.province_id} value={p.province_id}>
+                {p.name}
+              </NativeSelectOption>
+            ))}
+          </NativeSelectOptGroup>
+        );
+      })}
     </NativeSelect>
   );
 }

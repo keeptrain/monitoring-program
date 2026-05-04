@@ -17,7 +17,7 @@ import { id as idLocale } from "date-fns/locale";
 type ReportDatePickerProps = {
   zoneId: number;
   initialDate?: Date;
-  onReportSelect?: (reportId: number, date: string) => void;
+  onReportSelect?: (reportId: string, date: string) => void;
 };
 
 export function ReportDatePicker({

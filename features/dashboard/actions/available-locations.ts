@@ -17,6 +17,7 @@ export interface AvailableLocation {
   id: number;
   type: LocationType;
   name: string;
+  province_name: string;
   latitude?: number;
   longitude?: number;
   created_at?: string;
@@ -26,7 +27,7 @@ export async function getAvailableLocations() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("available_locations")
-    .select("id, type, name, latitude, longitude, created_at")
+    .select("id, type, name, province_name, latitude, longitude, created_at")
     .order("name");
 
   if (error) {
@@ -129,7 +130,7 @@ export async function getAvailableLocationById(id: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("available_locations")
-    .select("id, type, name, latitude, longitude, created_at")
+    .select("id, type, name, province_name, latitude, longitude, created_at")
     .eq("id", id)
     .single();
 

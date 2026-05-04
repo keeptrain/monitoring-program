@@ -24,6 +24,7 @@ export async function getPublicAvailableLocations(): Promise<
       progress_percent,
       available_locations(
           name,
+          province_name,
           latitude,
           longitude
       )
@@ -41,11 +42,13 @@ export async function getPublicAvailableLocations(): Promise<
     available_locations:
       | {
           name: string | null;
+          province_name: string | null;
           latitude: number | null;
           longitude: number | null;
         }
       | Array<{
           name: string | null;
+          province_name: string | null;
           latitude: number | null;
           longitude: number | null;
         }>
@@ -69,7 +72,7 @@ export async function getPublicAvailableLocations(): Promise<
       {
         id: item.id,
         location_name: location.name ?? "Unknown",
-        province_name: "Unknown",
+        province_name: location.province_name ?? "Unknown",
         progress_percent: item.progress_percent,
         position: {
           latitude: location.latitude,

@@ -23,7 +23,7 @@ export type DocumentationImage = {
 
 type DocumentationCarouselGalleryProps = {
   type: string;
-  id: number;
+  id: string | number;
   beforeImage?: DocumentationImage | null;
   afterImages?: DocumentationImage[];
   beforeLabel?: string;
