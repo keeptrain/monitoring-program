@@ -13,13 +13,14 @@ import { STEPS } from "../constants/isf-step";
 import { insertDocumentations } from "@/features/documentation/actions";
 import { getReportBounds } from "../utils/report-date-window";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { uuidv7 } from "uuidv7";
 
 async function validateSandwichProgress(
   supabase: SupabaseClient,
   stepId: number,
   progressDate: string,
   progressPercent: number,
-  excludeId?: number,
+  excludeId?: string,
 ) {
   // most recent report before this date
   let prevQuery = supabase
@@ -132,7 +133,7 @@ export async function getIsfProgramLogsByStep(
   };
 }
 
-export async function getIsfProgramLogById(id: number) {
+export async function getIsfProgramLogById(id: string) {
   const supabase = await createClient();
   const { data: log, error } = await supabase
     .from("isf_program_logs")
@@ -217,7 +218,7 @@ export async function createIsfProgramLog(
 
   const { data: createdLog, error } = await supabase
     .from("isf_program_logs")
-    .insert({ ...toDbPayload(data), step_id: stepId })
+    .insert({ ...toDbPayload(data), id: uuidv7(), step_id: stepId })
     .select("id, step_id")
     .single();
 
@@ -232,7 +233,7 @@ export async function createIsfProgramLog(
   if (data.documentations.length > 0) {
     const savedDocumentations = await insertDocumentations(
       supabase,
-      createdLog.id as number,
+      createdLog.id,
       "isf",
       data.documentations,
     );
@@ -249,13 +250,13 @@ export async function createIsfProgramLog(
   revalidatePath("/monitoring");
 
   return {
-    id: createdLog.id as number,
+    id: createdLog.id,
     stepId: createdLog.step_id as number,
   };
 }
 
 export async function updateIsfProgramLog(
-  id: number,
+  id: string,
   stepId: number,
   data: IsfReportFormValues,
 ) {
@@ -303,7 +304,7 @@ export async function updateIsfProgramLog(
   return { id, stepId: stepId };
 }
 
-export async function deleteIsfProgramLog(id: number, stepId: number) {
+export async function deleteIsfProgramLog(id: string, stepId: number) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("isf_program_logs")

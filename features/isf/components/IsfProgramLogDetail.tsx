@@ -201,7 +201,7 @@ function Narrative({ data }: { data: IsfProgramLog }) {
   );
 }
 
-function DocumentationSection({ programId }: { programId: number }) {
+function DocumentationSection({ programId }: { programId: string }) {
   const { data: groups, isPending } = useGetDocumentationGroupsByTypeAndId(
     "isf",
     programId,

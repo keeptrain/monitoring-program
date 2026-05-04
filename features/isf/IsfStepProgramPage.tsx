@@ -34,7 +34,7 @@ export default function IsfStepProgramPage({
 }) {
   const router = useRouter();
   const [openSheet, setOpenSheet] = useState<boolean | null>(null);
-  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
   const stepData = STEPS.find((s) => s.id === step);
   const {
@@ -44,13 +44,13 @@ export default function IsfStepProgramPage({
     errorMessage,
   } = availableDate;
 
-  const handleUpdateDocumentations = useCallback((id: number) => {
+  const handleUpdateDocumentations = useCallback((id: string) => {
     setSelectedReportId(id);
     setOpenSheet(true);
   }, []);
 
   const handleDeleteReport = useCallback(
-    async (id: number) => {
+    async (id: string) => {
       if (window.confirm("Apakah Anda yakin ingin menghapus laporan ini?")) {
         try {
           // Note: using 'step' which is the zone id
@@ -140,7 +140,7 @@ export default function IsfStepProgramPage({
             </SheetHeader>
             <ManageDocumentationsSheet
               programType="isf"
-              programId={selectedReportId}
+              programId={selectedReportId!}
               onSuccess={() => setOpenSheet(false)}
             />
           </SheetContent>

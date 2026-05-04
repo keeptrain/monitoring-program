@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
+import { uuidv7 } from "uuidv7";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
 
   // 2. Insert dokumentasi yang baru
   const rows = images.map((img) => ({
+    id: uuidv7(),
     phase,
     file_path: img.file_path,
     file_name: img.file_name,

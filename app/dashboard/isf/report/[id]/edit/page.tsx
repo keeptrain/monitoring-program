@@ -8,14 +8,10 @@ export default async function IsfReportEditPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const reportId = Number(id);
-  if (Number.isNaN(reportId)) {
-    return notFound();
-  }
 
   let report;
   try {
-    report = await getIsfProgramLogById(reportId);
+    report = await getIsfProgramLogById(id);
   } catch (error) {
     console.error("Error loading ISF report for edit:", error);
     return notFound();

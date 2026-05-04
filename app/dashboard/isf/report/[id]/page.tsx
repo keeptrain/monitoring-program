@@ -8,14 +8,10 @@ export default async function IsfReportDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const reportId = Number(id);
-  if (Number.isNaN(reportId)) {
-    return notFound();
-  }
 
   let data;
   try {
-    data = await getIsfProgramLogById(reportId);
+    data = await getIsfProgramLogById(id);
   } catch (error) {
     console.error("Error loading ISF report detail:", error);
     return notFound();

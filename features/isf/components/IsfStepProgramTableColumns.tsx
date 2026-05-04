@@ -7,7 +7,7 @@ import IsfStatusBadge from "./IsfStatusBadge";
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface IsfReport {
-  id: number;
+  id: string;
   progress_date: string;
   progress_percent: number;
   name: string;
@@ -19,8 +19,8 @@ export const IsfStepProgramTableColumns = ({
   onUpdateDocumentations,
   onDeleteReport,
 }: {
-  onUpdateDocumentations: (id: number) => void;
-  onDeleteReport: (id: number) => void;
+  onUpdateDocumentations: (id: string) => void;
+  onDeleteReport: (id: string) => void;
 }): ColumnDef<IsfReport>[] => [
   {
     header: "Dilaporkan Pada",

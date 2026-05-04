@@ -1,7 +1,7 @@
 import { IsfReportDateWindow } from "../utils/report-date-window";
 
 export interface IsfProgramLog {
-  id: number;
+  id: string;
   step_id: number;
   progress_percent: number;
   progress_date: string;
