@@ -5,12 +5,12 @@ import {
   STEP_HEX_COLORS,
 } from "@/features/isf/constants/isf-step";
 import { Label, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { PublicMonitoringIsf } from "../types/monitoring-types";
+import { MonitoringIsf } from "../types/monitoring-types";
 
 export default function OverallSummaryIsf({
   data,
 }: {
-  data: PublicMonitoringIsf;
+  data: MonitoringIsf;
 }) {
   const { overall_progress, overall_summary } = data;
 
@@ -72,8 +72,8 @@ function PieChartIsf({
 
   return (
     <div style={{ width: 300, height: 200 }}>
-      <ResponsiveContainer>
-        <PieChart width={300} height={200}>
+      <ResponsiveContainer width={300} height={200}>
+        <PieChart>
           <Pie
             data={fullData}
             dataKey="value"

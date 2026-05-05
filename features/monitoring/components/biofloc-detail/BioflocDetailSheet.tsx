@@ -41,9 +41,7 @@ export default function BioflocDetailSheet({
         <p className="text-muted-foreground text-sm font-semibold tracking-[0.2em]">
           Progres
         </p>
-        <div className="relative size-48">
-          <ProgressPieChartZoneIsf progress={data.progress_percent} />
-        </div>
+        <ProgressPieChartZoneIsf progress={data.progress_percent} size={192} />
       </div>
 
       <Button className="w-full" asChild>

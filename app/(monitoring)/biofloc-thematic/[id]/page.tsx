@@ -53,9 +53,7 @@ export default async function PublicBioflocDetailPage({
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center p-6">
-            <div className="size-36">
-              <ProgressPieChartZoneIsf progress={program.progress_percent} />
-            </div>
+            <ProgressPieChartZoneIsf progress={program.progress_percent} size={144} />
             <p className="mt-4 text-sm font-semibold text-muted-foreground">
               {program.progress_percent}% Selesai
             </p>

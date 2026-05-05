@@ -3,8 +3,8 @@ import {
   LocationType,
 } from "@/features/dashboard/actions/available-locations";
 import { PublicAvailableLocation } from "@/features/dashboard/actions/public-available-locations";
-import { getPublicMonitoringIsf } from "@/features/monitoring/actions/public-location";
-import { PublicMonitoringIsf } from "../types/monitoring-types";
+import { getMonitoringIsf } from "@/features/monitoring/actions/public-location";
+import { MonitoringIsf } from "../types/monitoring-types";
 import { useQuery, useQueries, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -29,7 +29,7 @@ const getLocationsQueryOptions = (type: LocationType, status: LocationStatus) =>
     gcTime: 5 * 60 * 1000,
   });
 
-export const useGetPublicLocationsByType = (
+export const useGetMonitoringLocationsByType = (
   type: LocationType,
   status: LocationStatus,
   enabled: boolean = true,
@@ -39,7 +39,7 @@ export const useGetPublicLocationsByType = (
     enabled,
   });
 
-export const useGetPublicLocationsCombined = (
+export const useGetMonitoringLocationsCombined = (
   type: LocationType,
   statuses: LocationStatus[],
 ) => {
@@ -73,15 +73,15 @@ export const useGetPublicLocationsCombined = (
   };
 };
 
-export const getPublicMonitoringIsfQueryKey = () => [
-  "public-monitoring",
+export const getMonitoringIsfQueryKey = () => [
+  "monitoring",
   "isf",
 ];
 
-export const useGetPublicMonitoringIsf = () =>
+export const useGetMonitoringIsf = () =>
   useQuery({
-    queryKey: getPublicMonitoringIsfQueryKey(),
-    queryFn: async (): Promise<PublicMonitoringIsf> => getPublicMonitoringIsf(),
+    queryKey: getMonitoringIsfQueryKey(),
+    queryFn: async (): Promise<MonitoringIsf> => getMonitoringIsf(),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });

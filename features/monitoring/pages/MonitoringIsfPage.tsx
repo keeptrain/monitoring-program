@@ -30,13 +30,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useGetPublicMonitoringIsf } from "../api/getPublicLocationsByType";
+import { useGetMonitoringIsf } from "../api/getMonitoringLocationsByType";
 import { PIN_LOCATIONS } from "../utils/monitoring-constants";
 import OverallSummaryIsf from "../components/OverallSummaryIsf";
 import ProgressChartIsf from "../components/ProgressChartIsf";
 import PublicMonitoringIsfDetailSheet from "../components/isf-detail/PublicMonitoringIsfDetailSheet";
 import Autoplay from "embla-carousel-autoplay";
-import { PublicMonitoringIsf as PublicMonitoringIsfType } from "../types/monitoring-types";
+import { MonitoringIsf as MonitoringIsfType } from "../types/monitoring-types";
 
 export default function MonitoringIsfPage() {
   const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
@@ -44,7 +44,7 @@ export default function MonitoringIsfPage() {
     null,
   );
 
-  const { data, isLoading } = useGetPublicMonitoringIsf();
+  const { data, isLoading } = useGetMonitoringIsf();
 
   const selectedZone = selectedStep
     ? data?.data.find((zone: any) => zone?.step_id === selectedStep.id)
@@ -198,7 +198,7 @@ const EQUIPMENT_DATA = [
   { label: "Kendaraan Operasional", value: 10 },
 ];
 
-function RightSideStats({ data }: { data?: PublicMonitoringIsfType }) {
+function RightSideStats({ data }: { data?: MonitoringIsfType }) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 text-center md:w-fit">
       <div className="w-full space-y-6">

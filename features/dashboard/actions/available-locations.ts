@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "./public-available-locations";
-import { LocationStatus } from "@/features/monitoring/api/getPublicLocationsByType";
+import { LocationStatus } from "@/features/monitoring/api/getMonitoringLocationsByType";
 import { cookies } from "next/headers";
 import {
   getActiveLocationsService,

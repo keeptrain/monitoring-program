@@ -7,10 +7,10 @@ import { LocationType } from "@/features/dashboard/actions/available-locations";
 import { getPublicThematicProgram } from "@/features/thematic/actions/public-thematic-programs";
 import {
   MonitoringDetailTypeMap,
-  PublicMonitoringIsf,
+  MonitoringIsf,
 } from "../types/monitoring-types";
 
-export async function getPublicLocationDetail<T extends LocationType>(
+export async function getMonitoringLocationDetail<T extends LocationType>(
   type: T,
   id: number | string,
 ): Promise<MonitoringDetailTypeMap[T] | null> {
@@ -36,7 +36,7 @@ export async function getPublicLocationDetail<T extends LocationType>(
   return null;
 }
 
-export async function getPublicBiofloc(id: number): Promise<{ data: any }> {
+export async function getBiofloc(id: number): Promise<{ data: any }> {
   const supabase = await createClient();
 
   // 1. Fetch program data with locations
@@ -105,7 +105,7 @@ export async function getPublicBiofloc(id: number): Promise<{ data: any }> {
   };
 }
 
-export async function getPublicMonitoringIsf(): Promise<PublicMonitoringIsf> {
+export async function getMonitoringIsf(): Promise<MonitoringIsf> {
   const supabase = await createClient();
   const stepIds = STEPS.map((step) => step.id);
 

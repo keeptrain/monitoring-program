@@ -22,17 +22,17 @@ import { ProgressPercentage } from "./components/ProgressPercentage";
 import { Button } from "@/components/ui/button";
 import { LocationType } from "../dashboard/actions/available-locations";
 import { MapPin, iconThematic, iconPotential } from "./components/MapPinIcon";
-import { useGetPublicLocationByTypeAndId } from "./api/getPublicLocationByTypeAndId";
+import { useGetMonitoringLocationByTypeAndId } from "./api/getMonitoringLocationByTypeAndId";
 import BioflocDetailSheet from "./components/biofloc-detail/BioflocDetailSheet";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
 import { MonitoringDetailTypeMap } from "./types/monitoring-types";
 import Link from "next/link";
 import {
   getLocationsQueryKey,
-  useGetPublicLocationsByType,
-  useGetPublicLocationsCombined,
+  useGetMonitoringLocationsByType,
+  useGetMonitoringLocationsCombined,
   LocationStatus,
-} from "./api/getPublicLocationsByType";
+} from "./api/getMonitoringLocationsByType";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Map as LeafletMap } from "leaflet";
@@ -122,7 +122,7 @@ function MapTopContent({
     parseAsArrayOf(parseAsString).withDefault(["active"]),
   );
 
-  const { data: kdmpCount, isPending } = useGetPublicLocationsByType(
+  const { data: kdmpCount, isPending } = useGetMonitoringLocationsByType(
     type,
     "active",
   );
@@ -274,7 +274,7 @@ function MapDetailSheet({
     setIsOpen(false);
   }
 
-  const { data: detailData, isLoading } = useGetPublicLocationByTypeAndId(
+  const { data: detailData, isLoading } = useGetMonitoringLocationByTypeAndId(
     type,
     activeId ?? "",
   );
@@ -353,7 +353,7 @@ function MapMarker({
     parseAsArrayOf(parseAsString).withDefault(["active"]),
   );
 
-  const { data: locations = [] } = useGetPublicLocationsCombined(
+  const { data: locations = [] } = useGetMonitoringLocationsCombined(
     type,
     statuses as LocationStatus[],
   );

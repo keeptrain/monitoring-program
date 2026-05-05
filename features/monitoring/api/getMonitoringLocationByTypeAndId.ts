@@ -1,21 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { LocationType } from "../../dashboard/actions/available-locations";
-import { getPublicLocationDetail } from "../actions/public-location";
+import { getMonitoringLocationDetail } from "../actions/public-location";
 import { MonitoringDetailTypeMap } from "../types/monitoring-types";
 
-export const getPublicLocationByTypeAndIdQueryKey = (
+export const getMonitoringLocationByTypeAndIdQueryKey = (
   type: LocationType,
   id: number | string,
-) => ["public-location", type, id];
+) => ["monitoring-location", type, id];
 
-export const useGetPublicLocationByTypeAndId = <T extends LocationType>(
+export const useGetMonitoringLocationByTypeAndId = <T extends LocationType>(
   type: T,
   id: number | string,
 ) =>
   useQuery({
-    queryKey: getPublicLocationByTypeAndIdQueryKey(type, id),
+    queryKey: getMonitoringLocationByTypeAndIdQueryKey(type, id),
     queryFn: () =>
-      getPublicLocationDetail(type, id) as Promise<
+      getMonitoringLocationDetail(type, id) as Promise<
         MonitoringDetailTypeMap[T] | null
       >,
     staleTime: 3 * 60 * 1000,

@@ -1,4 +1,10 @@
-import { LeafIcon, WavesIcon, Grid3x3Icon, UserIcon } from "lucide-react";
+import {
+  LeafIcon,
+  WavesIcon,
+  Grid3x3Icon,
+  UserIcon,
+  ShrimpIcon,
+} from "lucide-react";
 
 export const DASHBOARD_LINKS = [
   {
@@ -28,6 +34,12 @@ export const DASHBOARD_LINKS = [
   {
     href: "/dashboard/isf",
     label: "Integrated Shrimp Farming (ISF)",
+    icon: ShrimpIcon,
+    description: "Kelola program Integrated Shrimp Farming",
+  },
+  {
+    href: "/dashboard/revitalisasi",
+    label: "Revitalisasi Tambak Pantura",
     icon: WavesIcon,
     description: "Kelola program Integrated Shrimp Farming",
   },
