@@ -197,13 +197,13 @@ VALUES
   (90, '35', 'Jawa Timur', '35.01', '35.01.00', '35.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Boyolangu', 17.34, 115.5),
   (91, '35', 'Jawa Timur', '35.01', '35.01.00', '35.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Bolorejo', -8.057629, 111.85468),
   (92, '35', 'Jawa Timur', '35.01', '35.01.00', '35.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Jabalsari', 16.12, 127.7),
-  (93, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Gadingsari', 7.968132, 110.253772),
-  (94, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Argomulyo', 7.803485, 110.276333),
-  (95, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Karangrejek', -7.988977, 110.597615),
-  (96, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Genjahan', 1.0, 2.0),
-  (97, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Banaran', -7.969333, 110.21456),
-  (98, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Sidoarum', 7.772327, 110.329316),
-  (99, '00', 'Perlu Update (Legacy)', '00.01', '00.01.00', '00.01.00.0000', 'biofloc_thematic', 'Koperasi Desa Merah Putih Tamanmartani', 7.715584, 110.482561)
+  (93, '34', 'Daerah Istimewa Yogyakarta', '34.02', '34.02.02', '34.02.02.2001', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Gadingsari', 7.968132, 110.253772),
+  (94, '34', 'Daerah Istimewa Yogyakarta', '34.02', '34.02.17', '34.02.17.2004', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Argomulyo', 7.803485, 110.276333),
+  (95, '34', 'Daerah Istimewa Yogyakarta', '34.03', '34.03.01', '34.03.01.2014', 'biofloc_thematic', 'Koperasi Desa Merah Putih Karangrejek', -7.988977, 110.597615),
+  (96, '34', 'Daerah Istimewa Yogyakarta', '34.03', '34.03.10', '34.03.10.2006', 'biofloc_thematic', 'Koperasi Desa Merah Putih Genjahan', -7.961605, 110.722687),
+  (97, '34', 'Daerah Istimewa Yogyakarta', '34.01', '34.01.04', '34.01.04.2001', 'biofloc_thematic', 'Koperasi Desa Merah Putih Banaran', -7.969333, 110.21456),
+  (98, '34', 'Daerah Istimewa Yogyakarta', '34.04', '34.04.02', '34.04.02.2006', 'biofloc_thematic', 'Koperasi Kelurahan Merah Putih Sidoarum', 7.772327, 110.329316),
+  (99, '34', 'Daerah Istimewa Yogyakarta', '34.04', '34.04.10', '34.04.10.2003', 'biofloc_thematic', 'Koperasi Desa Merah Putih Tamanmartani', 7.715584, 110.482561)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO biofloc_thematic_programs (id, entity_id, location_id, status, fiscal_year, progress_percent, commodity_aid, commodity_potential, land_area, distribution_amount, production_value, sppg_partner, address, s_curve_path)
