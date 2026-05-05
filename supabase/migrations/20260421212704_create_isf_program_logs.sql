@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS isf_program_logs (
   provider_name TEXT NOT NULL,
   production TEXT NOT NULL,
   intervention TEXT NOT NULL,
-  total_worker INTEGER NOT NULL,
+  total_worker INTEGER NOT NULL CHECK (total_worker >= 0),
 
   outcome TEXT NOT NULL,
   constraints TEXT NOT NULL,
@@ -25,13 +25,28 @@ CREATE TABLE IF NOT EXISTS isf_program_logs (
   UNIQUE(step_id, progress_date)
 );
 
-CREATE INDEX idx_logs_step_date 
-ON isf_program_logs (step_id, progress_date DESC);
+-- Trigger untuk update updated_at otomatis
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_isf_program_logs_updated_at
+    BEFORE UPDATE ON isf_program_logs
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+-- Index yang dioptimalkan untuk View (sesuai urutan ORDER BY)
+CREATE INDEX idx_logs_step_reporting_latest 
+ON isf_program_logs (step_id, reporting_week DESC, created_at DESC);
 
 CREATE INDEX idx_logs_date 
 ON isf_program_logs (progress_date);
 
--- View to get the latest log for each step in ISF program
+-- View untuk mengambil log terbaru per step
 CREATE OR REPLACE VIEW latest_isf_logs AS
 SELECT DISTINCT ON (step_id)
   id,
@@ -55,6 +70,4 @@ FROM isf_program_logs
 ORDER BY step_id, reporting_week DESC, created_at DESC;
 
 GRANT ALL ON TABLE isf_program_logs TO anon, authenticated, service_role;
-
--- Grant access to the view
 GRANT SELECT ON latest_isf_logs TO anon, authenticated, service_role;
