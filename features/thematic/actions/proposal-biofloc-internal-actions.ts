@@ -8,6 +8,8 @@ import {
   ProposalVerificationFormValues,
   proposalVerificationSchema,
 } from "../forms/proposal-verification-schema";
+import { createClient } from "@/utils/supabase";
+import { TABLES } from "@/lib/constants/tables";
 
 export async function getProposalBioflocPaginated(
   params: ProposalBioflocPaginationParams,
@@ -55,8 +57,70 @@ export async function createSignedUrlForProposalBiofloc(id: string) {
   return { blob, fileName };
 }
 
+/**
+ * Get proposal detail with ownership verification
+ * - PMO and Admin can view any proposal
+ * - Officers can only view their own proposals (based on sub)
+ */
 export async function getProposalBioflocDetail(id: string) {
-  return db.getProposalBioflocDetailService(id);
+  const { sub, role, isLoggedIn } = await getSession();
+
+  if (!isLoggedIn || !sub) {
+    return {
+      success: false,
+      message: "Unauthorized",
+      data: null,
+    };
+  }
+
+  try {
+    const data = await db.getProposalBioflocDetailService(id);
+
+    // PMO and Admin can view any proposal
+    if (role === "pmo" || role === "admin") {
+      return {
+        success: true,
+        message: "Berhasil mendapatkan detail proposal",
+        data,
+      };
+    }
+
+    // Officers can only view their own proposals
+    const supabase = await createClient();
+    const { data: proposal, error } = await supabase
+      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .select("user_id")
+      .eq("id", id)
+      .single();
+
+    if (error || !proposal) {
+      return {
+        success: false,
+        message: "Proposal tidak ditemukan",
+        data: null,
+      };
+    }
+
+    if (proposal.user_id !== sub) {
+      return {
+        success: false,
+        message: "Anda tidak memiliki akses ke proposal ini",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Berhasil mendapatkan detail proposal",
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Terjadi kesalahan",
+      data: null,
+    };
+  }
 }
 
 export async function convertProposalToProgram(

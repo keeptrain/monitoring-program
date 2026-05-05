@@ -281,7 +281,11 @@ export async function getProposalBioflocDetailService(
         district_code,
         village_code,
         latitude,
-        longitude
+        longitude,
+        ref_provinces (name),
+        ref_regencies (name),
+        ref_districts (name),
+        ref_villages (name)
       )
     `,
     )
