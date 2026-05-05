@@ -1,5 +1,4 @@
 import { MenuDashboardTriggerClient } from "@/components/MenuDashboardTriggerClient";
-import Navbar from "@/components/Navbar";
 import PublicPageHeader from "@/components/PublicPageHeader";
 import { Button } from "@/components/ui/button";
 import { getSessionCached } from "@/features/auth/session";
@@ -17,7 +16,6 @@ export default async function PublicLayout({
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr]">
-      <Navbar />
       <PublicPageHeader label="Monitoring" title="Dashboard Program Prioritas">
         {!isLoggedIn ? (
           <MenuDashboardTriggerClient
