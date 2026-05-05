@@ -16,7 +16,6 @@ interface ProposalBioflocDetailContentProps {
 
 export function ProposalBioflocDetailContent({
   id,
-  breadcrumbLabel = "Dashboard / Tematik / biofloc / Proposal / Detail",
 }: ProposalBioflocDetailContentProps) {
   const { data: result } = useGetProposalBioflocDetail(id, !!id);
 
@@ -55,9 +54,6 @@ export function ProposalBioflocDetailContent({
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            {breadcrumbLabel}
-          </p>
           <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
             {kdmp_entities?.name ?? "-"}
           </h1>
