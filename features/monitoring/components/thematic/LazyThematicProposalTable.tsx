@@ -26,7 +26,7 @@ export default function LazyThematicProposalTable({
   const { ref, isInView } = useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
 
   return (
-    <div ref={ref} className="min-h-[550px]">
+    <div ref={ref} className="mb-6">
       {isInView && <LazyTableComponent enabled={isInView} role={role} />}
     </div>
   );
