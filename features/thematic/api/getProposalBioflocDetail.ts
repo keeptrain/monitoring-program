@@ -1,17 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProposalBioflocDetail } from "@/features/thematic/actions/proposal-biofloc";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getProposalBioflocDetail } from "../actions/proposal-biofloc-internal-actions";
 
-export const proposalBioflocDetailQueryKey = (id: string) => [
+export const getProposalBioflocDetailQueryKey = (id: string) => [
   "proposal-biofloc",
   id,
 ];
 
-export function useGetProposalBioflocDetail(id: string, enabled = true) {
-  return useQuery({
-    queryKey: proposalBioflocDetailQueryKey(id),
+export const getProposalBioflocDetailQueryOptions = (id: string) =>
+  queryOptions({
+    queryKey: getProposalBioflocDetailQueryKey(id),
     queryFn: () => getProposalBioflocDetail(id),
-    enabled,
-    staleTime: 1000 * 60 * 3, // 3 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 3,
+    gcTime: 1000 * 60 * 5,
   });
-}
+
+export const useGetProposalBioflocDetail = (id: string, enabled = true) =>
+  useQuery({
+    ...getProposalBioflocDetailQueryOptions(id),
+    enabled,
+  });
