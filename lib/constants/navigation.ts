@@ -38,9 +38,4 @@ export const DASHBOARD_LINKS = [
     description: "Kelola program Integrated Shrimp Farming",
   },
   {
-    href: "/dashboard/revitalisasi",
-    label: "Revitalisasi Tambak Pantura",
-    icon: WavesIcon,
-    description: "Kelola program Integrated Shrimp Farming",
-  },
 ] as const;
