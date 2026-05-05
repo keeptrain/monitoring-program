@@ -10,6 +10,9 @@ import StepNavigation from "@/features/proposal/components/StepNavigation";
 import DraftHandler from "@/features/proposal/components/DraftHandler";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RevisionProposalData } from "./api/proposal-actions";
+import PublicPageHeader from "@/components/PublicPageHeader";
+import { AlertTriangleIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const IdentityKdmpForm = dynamic(
   () => import("@/features/proposal/forms/IdentityKdmpForm"),
@@ -97,32 +100,50 @@ export default async function ProposalThematicPage({
     ? initialData[`step${currentStep}Data` as keyof typeof initialData]
     : undefined;
 
-  return (
-    <div className="mx-auto mb-6 max-w-6xl space-y-4">
-      <DraftHandler />
-      <div className="flex items-center justify-between">
-        <Button variant="outline" asChild>
-          <Link href="/biofloc-thematic">
-            <XIcon className="size-4" />
-            Batal
-          </Link>
-        </Button>
+  const pageHeaderTitle = initialData
+    ? `Perbaiki proposal tematik bioflok`
+    : `Buat proposal tematik bioflok`;
 
-        <div className="text-muted-foreground text-sm font-medium">
-          Langkah <span className="text-foreground">{currentStep}</span> dari 3
-        </div>
-      </div>
-      <Card>
-        <CardContent>
-          <CardTitle>{pageConfig.title}</CardTitle>
-          <div className="min-h-[300px]">
-            <Component initialData={stepData} proposalId={proposalId} />
+  return (
+    <>
+      <PublicPageHeader label="Proposal" title={pageHeaderTitle} />
+      <div className="mx-auto max-w-6xl space-y-4">
+        {initialData && (
+          <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+            <AlertTriangleIcon className="size-4" />
+            <AlertTitle>Proposal kamu ditolak</AlertTitle>
+            <AlertDescription>
+              Dengan catatan: {initialData?.revisionReason || "-"}. Silakan
+              revisi proposal kamu berdasarkan catatan yang diberikan.
+            </AlertDescription>
+          </Alert>
+        )}
+        <DraftHandler />
+        <div className="flex items-center justify-between">
+          <Button variant="outline" asChild>
+            <Link href="/biofloc-thematic">
+              <XIcon className="size-4" />
+              Batal
+            </Link>
+          </Button>
+
+          <div className="text-muted-foreground text-sm font-medium">
+            Langkah <span className="text-foreground">{currentStep}</span> dari
+            3
           </div>
-        </CardContent>
-        <CardFooter className="justify-end gap-4">
-          <StepNavigation totalSteps={3} backHref="/biofloc-thematic" />
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+        <Card>
+          <CardContent>
+            <CardTitle>{pageConfig.title}</CardTitle>
+            <div className="min-h-[300px]">
+              <Component initialData={stepData} proposalId={proposalId} />
+            </div>
+          </CardContent>
+          <CardFooter className="justify-end gap-4">
+            <StepNavigation totalSteps={3} backHref="/biofloc-thematic" />
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 }
