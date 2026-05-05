@@ -10,7 +10,7 @@ export default async function Navbar() {
   const isAuthenticated = !!cookieStore.get("session")?.value;
 
   return (
-    <header className="border-border bg-background/90 sticky top-0 z-10 border-b backdrop-blur-sm">
+    <header className="border-border bg-background/90 sticky top-0 z-15 border-b backdrop-blur-sm">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-0">
         {/* Logo */}
         <Link
