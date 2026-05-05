@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
+import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
 import { useMutation } from "@tanstack/react-query";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
 

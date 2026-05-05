@@ -2,6 +2,7 @@
 
 import Datatable from "@/components/datatable/datatable";
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
 import { Input } from "@/components/ui/input";
@@ -9,6 +10,7 @@ import { PaginationState } from "@tanstack/react-table";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { UserRole } from "@/features/auth/types/user";
 import { ProposalSubmissionTableColumns } from "./ProposalSubmissionTableColumns";
+import { ProposalBioflocThematicProgram } from "@/features/proposal/types/proposal-biofloc";
 
 export default function ProposalSubmissionTable({
   enabled = true,
@@ -17,6 +19,7 @@ export default function ProposalSubmissionTable({
   enabled?: boolean;
   role?: UserRole | undefined;
 }) {
+  const router = useRouter();
   const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -47,6 +50,11 @@ export default function ProposalSubmissionTable({
       pageCount={data?.totalPages ?? -1}
       rowCount={data?.total ?? 0}
       pagination={pagination}
+      onRowClick={(row: ProposalBioflocThematicProgram) =>
+        role
+          ? router.push(`/biofloc-thematic/proposal/${row.id}/detail`)
+          : undefined
+      }
       onPaginationChange={setPagination}
       topContent={() => (
         <>

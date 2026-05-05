@@ -48,6 +48,13 @@ export type ProposalBioflocDetail = ProposalBioflocThematicProgram & {
     longitude: number;
     province_code?: string | null;
     province_name?: string | null;
+    regency_code?: string | null;
+    district_code?: string | null;
+    village_code?: string | null;
+    ref_provinces?: { name: string } | null;
+    ref_regencies?: { name: string } | null;
+    ref_districts?: { name: string } | null;
+    ref_villages?: { name: string } | null;
   } | null;
 };
 

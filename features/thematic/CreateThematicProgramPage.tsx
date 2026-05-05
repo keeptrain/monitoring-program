@@ -1,8 +1,6 @@
 import BioflocProgramForm from "@/features/thematic/forms/BioflocProgramForm";
 import { ThematicFormHeader } from "@/features/thematic/components/ThematicFormHeader";
 import { notFound } from "next/navigation";
-import ProposalSourceCard from "@/features/thematic/components/biofloc/ProposalSourceCard";
-import { getProposalBioflocDetail } from "@/features/thematic/actions/proposal-biofloc";
 
 export default async function CreateThematicProgramPage({
   params,
@@ -25,10 +23,6 @@ export default async function CreateThematicProgramPage({
   const initialData: any = null;
   if (proposalId) {
     try {
-      const proposal = await getProposalBioflocDetail(proposalId);
-      if (proposal.status !== "approved") {
-        return notFound();
-      }
       // Prepare initial data from proposal with default values for required fields
       // initialData = {
       //   id: 0,
@@ -59,7 +53,7 @@ export default async function CreateThematicProgramPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <ThematicFormHeader />
-      {proposalId && <ProposalSourceCard proposalId={proposalId} />}
+      {/* {proposalId && <ProposalSourceCard proposalId={proposalId} />} */}
       <BioflocProgramForm
         initialData={initialData}
         proposalId={proposalId}
