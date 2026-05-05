@@ -1,8 +1,6 @@
 import { ReactNode } from "react";
 import { ThematicProgramTabs } from "@/features/thematic/components/ThematicProgramTabs";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
 
 const PAGE_CONFIG: Record<string, { label: string }> = {
   biofloc: { label: "Bioflok" },
@@ -41,14 +39,14 @@ export default async function ThematicTypeLayout({
               DJPB.
             </p>
           </div>
-          <div className="shrink-0">
+          {/* <div className="shrink-0">
             <Button size="sm" asChild>
               <Link href={`/dashboard/thematic/${type}/create`}>
                 <PlusIcon className="size-4" />
                 KDMP
               </Link>
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
 
