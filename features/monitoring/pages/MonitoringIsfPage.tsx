@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { STEPS, STEP_COLORS } from "../isf/constants/isf-step";
+import { STEPS, STEP_COLORS } from "../../isf/constants/isf-step";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -30,13 +30,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useGetPublicMonitoringIsf } from "./api/getPublicLocationsByType";
-import { PIN_LOCATIONS } from "./utils/monitoring-constants";
-import OverallSummaryIsf from "./components/OverallSummaryIsf";
-import ProgressChartIsf from "./components/ProgressChartIsf";
-import PublicMonitoringIsfDetailSheet from "./components/isf-detail/PublicMonitoringIsfDetailSheet";
+import { useGetPublicMonitoringIsf } from "../api/getPublicLocationsByType";
+import { PIN_LOCATIONS } from "../utils/monitoring-constants";
+import OverallSummaryIsf from "../components/OverallSummaryIsf";
+import ProgressChartIsf from "../components/ProgressChartIsf";
+import PublicMonitoringIsfDetailSheet from "../components/isf-detail/PublicMonitoringIsfDetailSheet";
 import Autoplay from "embla-carousel-autoplay";
-import { PublicMonitoringIsf as PublicMonitoringIsfType } from "./types/monitoring-types";
+import { PublicMonitoringIsf as PublicMonitoringIsfType } from "../types/monitoring-types";
 
 export default function MonitoringIsfPage() {
   const [sheetOpen, setSheetOpen] = useState<boolean | null>(null);
@@ -47,11 +47,11 @@ export default function MonitoringIsfPage() {
   const { data, isLoading } = useGetPublicMonitoringIsf();
 
   const selectedZone = selectedStep
-    ? data?.data.find((zone) => zone?.step_id === selectedStep.id)
+    ? data?.data.find((zone: any) => zone?.step_id === selectedStep.id)
     : undefined;
 
   const handlePinClick = (stepId: number) => {
-    const step = STEPS.find((s) => s.id === stepId);
+    const step = STEPS.find((s: any) => s.id === stepId);
     if (step) {
       setSelectedStep(step);
       setSheetOpen(true);
@@ -74,7 +74,7 @@ export default function MonitoringIsfPage() {
             />
 
             {/* Pin Points */}
-            {STEPS.map((step) => (
+            {STEPS.map((step: any) => (
               <IsfPinPoint
                 key={step.id}
                 step={step}

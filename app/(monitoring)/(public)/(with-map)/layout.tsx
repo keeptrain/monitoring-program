@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
 import { getSessionCached } from "@/features/auth/session";
-import MonitoringMapPage from "@/features/monitoring/MonitoringMapPage";
+import MonitoringMapPage from "@/features/monitoring/pages/MonitoringMapPage";
 
 export default async function WithMapLayout({
   children,

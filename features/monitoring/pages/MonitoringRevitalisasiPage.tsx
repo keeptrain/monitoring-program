@@ -1,6 +1,6 @@
 import Image from "next/image";
-import RevitalisasiPinPoints from "./components/RevitalisasiPinPoint";
-import RevitalisasiRightSideStats from "./components/RevitalisasiRightSideStats";
+import RevitalisasiPinPoints from "../../revitalisasi/components/RevitalisasiPinPoint";
+import RevitalisasiRightSideStats from "../../revitalisasi/components/RevitalisasiRightSideStats";
 
 export default async function MonitoringRevitalisasiPage() {
   return (

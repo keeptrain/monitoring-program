@@ -1,4 +1,4 @@
-import MonitoringIsfPage from "@/features/monitoring/MonitoringIsfPage";
+import MonitoringIsfPage from "@/features/monitoring/pages/MonitoringIsfPage";
 import { checkRoleGuard } from "@/features/auth/utils";
 
 export default async function IsfMonitoringPage() {

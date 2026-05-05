@@ -2,19 +2,19 @@
 
 import { cn } from "@/lib/utils";
 import {
-  REVITALISASI_STEPS,
-  REVITALISASI_STEP_COLORS,
-} from "../constants/revitalisasi-step";
+  REVITALIZATION_AREAS,
+  REVITALIZATION_AREA_COLORS,
+} from "../constants/revitalization-area";
 import { REVITALISASI_PIN_LOCATIONS } from "../utils/revitalisasi-constants";
 
 export default function RevitalisasiPinPoints() {
   return (
     <>
-      {REVITALISASI_STEPS.map((step) => (
+      {REVITALIZATION_AREAS.map((area) => (
         <RevitalisasiPinPoint
-          key={step.id}
-          step={step}
-          onClick={() => console.log(`Clicked step ${step.id}`)}
+          key={area.id}
+          area={area}
+          onClick={() => console.log(`Clicked area ${area.id}`)}
         />
       ))}
     </>
@@ -22,13 +22,13 @@ export default function RevitalisasiPinPoints() {
 }
 
 function RevitalisasiPinPoint({
-  step,
+  area,
   onClick,
 }: {
-  step: (typeof REVITALISASI_STEPS)[0];
+  area: (typeof REVITALIZATION_AREAS)[0];
   onClick: () => void;
 }) {
-  const pos = REVITALISASI_PIN_LOCATIONS[step.id];
+  const pos = REVITALISASI_PIN_LOCATIONS[area.id];
   if (!pos) return null;
 
   return (
@@ -41,19 +41,19 @@ function RevitalisasiPinPoint({
         <div
           className={cn(
             "absolute size-8 animate-ping rounded-full opacity-40",
-            REVITALISASI_STEP_COLORS[step.id] || "bg-primary",
+            REVITALIZATION_AREA_COLORS[area.id] || "bg-primary",
           )}
         />
         <div
           className={cn(
             "relative flex size-6 items-center justify-center rounded-full border-2 border-white text-white shadow-xl",
-            REVITALISASI_STEP_COLORS[step.id] || "bg-primary",
+            REVITALIZATION_AREA_COLORS[area.id] || "bg-primary",
           )}
         >
-          <span className="text-[10px] font-bold">{step.id}</span>
+          <span className="text-[10px] font-bold">{area.id}</span>
         </div>
         <div className="bg-background/90 border-border text-foreground absolute top-full mt-2 hidden min-w-max border px-2 py-1 text-[10px] font-semibold tracking-wide uppercase shadow-lg backdrop-blur lg:group-hover:block">
-          {step.name}
+          {area.name}
         </div>
       </div>
     </button>
