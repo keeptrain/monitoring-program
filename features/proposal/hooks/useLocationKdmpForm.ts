@@ -66,6 +66,28 @@ export const useLocationKdmpForm = (
     return () => unsub();
   }, [form, initialData]);
 
+  // Subscribe to store changes (e.g. clearDraft) to keep form in sync
+  useEffect(() => {
+    let prevStep2Data = useProposalStore.getState().step2Data;
+
+    const unsub = useProposalStore.subscribe((state) => {
+      const newStep2Data = state.step2Data;
+      if (newStep2Data === prevStep2Data) return;
+      prevStep2Data = newStep2Data;
+
+      const hasStoreData =
+        newStep2Data && Object.keys(newStep2Data).length > 0;
+
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? newStep2Data : {}),
+      });
+    });
+
+    return () => unsub();
+  }, [form, initialData]);
+
   useEffect(() => {
     if (serverErrors && step === 2) {
       Object.entries(serverErrors).forEach(([field, messages]) => {

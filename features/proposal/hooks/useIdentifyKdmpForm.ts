@@ -20,8 +20,8 @@ const CREATE_DEFAULT_VALUES: IdentifyKdmpInput = {
   chairmanPhoneNumber: "",
   companionName: "",
   companionPhoneNumber: "",
-  boardMemberCount: undefined,
-  memberCount: undefined,
+  boardMemberCount: "",
+  memberCount: "",
 };
 
 export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
@@ -62,6 +62,28 @@ export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
     }
 
     const unsub = useProposalStore.persist.onFinishHydration(handleHydration);
+
+    return () => unsub();
+  }, [form, initialData]);
+
+  // Subscribe to store changes (e.g. clearDraft) to keep form in sync
+  useEffect(() => {
+    let prevStep1Data = useProposalStore.getState().step1Data;
+
+    const unsub = useProposalStore.subscribe((state) => {
+      const newStep1Data = state.step1Data;
+      if (newStep1Data === prevStep1Data) return;
+      prevStep1Data = newStep1Data;
+
+      const hasStoreData =
+        newStep1Data && Object.keys(newStep1Data).length > 0;
+
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? newStep1Data : {}),
+      });
+    });
 
     return () => unsub();
   }, [form, initialData]);

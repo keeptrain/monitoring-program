@@ -75,6 +75,28 @@ export const useProposalDetailForm = (
     return () => unsub();
   }, [form, initialData]);
 
+  // Subscribe to store changes (e.g. clearDraft) to keep form in sync
+  useEffect(() => {
+    let prevStep3Data = useProposalStore.getState().step3Data;
+
+    const unsub = useProposalStore.subscribe((state) => {
+      const newStep3Data = state.step3Data;
+      if (newStep3Data === prevStep3Data) return;
+      prevStep3Data = newStep3Data;
+
+      const hasStoreData =
+        newStep3Data && Object.keys(newStep3Data).length > 0;
+
+      form.reset({
+        ...CREATE_DEFAULT_VALUES,
+        ...initialData,
+        ...(hasStoreData ? newStep3Data : {}),
+      });
+    });
+
+    return () => unsub();
+  }, [form, initialData]);
+
   useEffect(() => {
     if (serverErrors && step === 3) {
       Object.entries(serverErrors).forEach(([field, messages]) => {
