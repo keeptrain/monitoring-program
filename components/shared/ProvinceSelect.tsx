@@ -51,13 +51,9 @@ export default function ProvinceSelect({
     >
       {showAll && <NativeSelectOption value="">{allLabel}</NativeSelectOption>}
       {PROVINCES_BY_ISLAND.map(({ island, provinces }) => {
-        const filteredProvinces = provinces.filter((p) => p.name === "Jawa Barat");
-
-        if (filteredProvinces.length === 0) return null;
-
         return (
           <NativeSelectOptGroup key={island} label={island}>
-            {filteredProvinces.map((p) => (
+            {provinces.map((p) => (
               <NativeSelectOption key={p.province_id} value={p.province_id}>
                 {p.name}
               </NativeSelectOption>

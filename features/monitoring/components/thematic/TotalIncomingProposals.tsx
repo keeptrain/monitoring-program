@@ -1,6 +1,6 @@
 export default function TotalIncomingProposals({ value }: { value: number }) {
   return (
-    <div className="flex flex-col items-center justify-center border border-zinc-200 bg-zinc-50 lg:col-span-2">
+    <div className="flex h-fit flex-col items-center justify-center self-start border border-zinc-200 bg-zinc-50 py-12 lg:col-span-2">
       <p className="text-muted-foreground mb-6 text-xs font-bold uppercase">
         Jumlah Proposal Masuk
       </p>
