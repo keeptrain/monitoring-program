@@ -12,7 +12,7 @@ import {
 } from "../actions/biofloc";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
-import { convertProposalToProgram } from "../actions/proposal-biofloc";
+import { convertProposalToProgram } from "../actions/proposal-biofloc-internal-actions";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";

@@ -83,7 +83,7 @@ export default function ProposalBioflocProgramPage({
   );
 
   const handleRowClick = (id: string) =>
-    router.push(`/dashboard/thematic/biofloc/proposals/${id}`);
+    router.push(`/biofloc-thematic/proposal/${id}/detail`);
 
   return (
     <>

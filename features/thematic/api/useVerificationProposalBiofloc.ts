@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { verifyProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc";
+import { verifyProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
 import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
 
 export const useVerificationProposalBiofloc = () => {
