@@ -6,15 +6,18 @@ import {
   REVITALIZATION_AREA_COLORS,
 } from "../constants/revitalization-area";
 import { REVITALISASI_PIN_LOCATIONS } from "../utils/revitalisasi-constants";
+import { useQueryState } from "nuqs";
 
 export default function RevitalisasiPinPoints() {
+  const [, setSelectedArea] = useQueryState("area");
+
   return (
     <>
       {REVITALIZATION_AREAS.map((area) => (
         <RevitalisasiPinPoint
           key={area.id}
           area={area}
-          onClick={() => console.log(`Clicked area ${area.id}`)}
+          onClick={() => setSelectedArea(area.slug)}
         />
       ))}
     </>

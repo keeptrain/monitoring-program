@@ -1,6 +1,7 @@
 import Image from "next/image";
 import RevitalisasiPinPoints from "../../revitalisasi/components/RevitalisasiPinPoint";
 import RevitalisasiRightSideStats from "../../revitalisasi/components/RevitalisasiRightSideStats";
+import MonitoringRevitalisasiClientPage from "./MonitoringRevitalisasiClientPage";
 
 export default async function MonitoringRevitalisasiPage() {
   return (
@@ -26,6 +27,7 @@ export default async function MonitoringRevitalisasiPage() {
           <RevitalisasiRightSideStats />
         </div>
       </div>
+      <MonitoringRevitalisasiClientPage />
     </div>
   );
 }

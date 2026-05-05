@@ -14,6 +14,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { useGetMonitoringRevitalization } from "@/features/monitoring/api/getMonitoringRevitalization";
 import Link from "next/link";
 
 const images = [
@@ -23,6 +24,8 @@ const images = [
 ];
 
 export default function RevitalisasiRightSideStats() {
+  const { data } = useGetMonitoringRevitalization();
+
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 text-center md:w-fit">
       <div className="w-full space-y-6">
@@ -40,7 +43,7 @@ export default function RevitalisasiRightSideStats() {
               <div className="flex items-center gap-3">
                 <UsersIcon className="text-primary size-5" />
                 <p className="text-xl font-bold tabular-nums">
-                  0
+                  {data?.total_workers || 0}
                   <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
                     Orang
                   </span>
