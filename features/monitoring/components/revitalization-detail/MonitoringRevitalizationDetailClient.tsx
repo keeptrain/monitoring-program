@@ -7,14 +7,12 @@ import { ProgressPieChartZoneIsf } from "../isf-detail/ProgressPieChartZoneIsf";
 import { RevitalizationReportDatePicker } from "./RevitalizationReportDatePicker";
 import { getRevitalizationProgramLogById } from "@/features/revitalisasi/actions/revitalization-program-logs";
 
-type MonitoringRevitalizationDetailClientProps = {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  data: any;
-};
-
 export default function MonitoringRevitalizationDetailClient({
   data,
-}: MonitoringRevitalizationDetailClientProps) {
+}: {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  data: any;
+}) {
   const latestReport = data?.data?.[0];
   const [currentReport, setCurrentReport] = useState<any>(latestReport);
 
