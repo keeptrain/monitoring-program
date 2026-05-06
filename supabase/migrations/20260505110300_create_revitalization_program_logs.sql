@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS revitalization_program_logs (
   progress_date DATE NOT NULL,
   reporting_week DATE NOT NULL,
 
+  name TEXT NOT NULL,
   status TEXT NOT NULL,
+  provider_name TEXT NOT NULL,
   production TEXT NOT NULL,
   intervention TEXT NOT NULL,
   total_worker INTEGER NOT NULL CHECK (total_worker >= 0),

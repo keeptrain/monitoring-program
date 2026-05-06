@@ -6,7 +6,7 @@ export const TABLES = {
   PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS: "proposal_biofloc_thematic_programs",
   PROGRAM_QUOTAS: "program_quotas",
   LOGS: "monitoring_logs",
-  UPT: "technical_units",
+  REVITALIZATION_LOGS: "revitalization_program_logs",
   KDMP_ENTITIES: "kdmp_entities",
   REF_PROVINCES: "ref_provinces",
   REF_REGENCIES: "ref_regencies",

@@ -4,6 +4,7 @@ export const documentationProgramTypeSchema = z.enum([
   "biofloc_thematic",
   "minapadi_thematic",
   "isf",
+  "revitalization",
   "proposal_biofloc_thematic",
 ]);
 
