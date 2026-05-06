@@ -7,17 +7,19 @@ import Link from "next/link";
 import { PieChart, Pie, Label } from "recharts";
 import { RevitalizationDetailSheet } from "../../types/monitoring-types";
 import { SheetFooter } from "@/components/ui/sheet";
-import React from "react";
-import { formatDateWithTime } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { getRevitalizationProgramLogById } from "@/features/revitalisasi/actions/revitalization-program-logs";
+import { RevitalizationReportDatePicker } from "./RevitalizationReportDatePicker";
+import { REVITALIZATION_AREAS } from "@/features/revitalisasi/constants/revitalization-area";
 
 export default function MonitoringRevitalizationDetailSheet({
   data: initialData,
 }: {
   data: RevitalizationDetailSheet;
 }) {
-  const [data, setData] = React.useState(initialData);
+  const [data, setData] = useState(initialData);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setData(initialData);
   }, [initialData]);
 
@@ -28,15 +30,33 @@ export default function MonitoringRevitalizationDetailSheet({
     progress_percent,
     progress_date,
     total_worker,
-    status,
-    updated_at,
   } = data;
+
+  const areaSlug =
+    REVITALIZATION_AREAS.find((a) => a.id === area_id)?.slug ?? area_id;
+
+  const handleReportSelect = async (reportId: string) => {
+    try {
+      const res = await getRevitalizationProgramLogById(reportId);
+      setData({
+        ...res.data,
+        area_id,
+        area_name,
+      } as RevitalizationDetailSheet);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col overflow-scroll">
       {/* Scrollable Content */}
       <div className="flex-1 space-y-10 overflow-y-auto px-4 pb-8">
-        <LastUpdateStatus progressDate={progress_date} updatedAt={updated_at} />
+        <LastUpdateStatus
+          progressDate={progress_date}
+          areaId={area_id}
+          onReportSelect={handleReportSelect}
+        />
 
         <div className="flex w-full items-center gap-12">
           <div className="size-[140px] shrink-0">
@@ -44,17 +64,6 @@ export default function MonitoringRevitalizationDetailSheet({
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                Status
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <p className="text-xl font-bold">{status}</p>
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-3">
               <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
                 Tenaga Kerja
@@ -77,7 +86,7 @@ export default function MonitoringRevitalizationDetailSheet({
       {/* Fixed Bottom Button - Locked to Bottom of Sheet */}
       <SheetFooter>
         <Button size="lg" asChild>
-          <Link href={`/revitalisasi/${area_id}`}>
+          <Link href={`/revitalisasi/${areaSlug}`}>
             Lihat lebih lanjut
             <ArrowRightIcon className="size-4" />
           </Link>
@@ -89,11 +98,15 @@ export default function MonitoringRevitalizationDetailSheet({
 
 function LastUpdateStatus({
   progressDate,
-  updatedAt,
+  areaId,
+  onReportSelect,
 }: {
   progressDate?: string | null;
-  updatedAt?: string | null;
+  areaId: number;
+  onReportSelect: (id: string) => void;
 }) {
+  const parsedDate = progressDate ? new Date(progressDate) : undefined;
+
   return (
     <div className="flex flex-col items-start gap-4 border-y border-dashed py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col items-start gap-3 text-base">
@@ -104,13 +117,11 @@ function LastUpdateStatus({
         <p>Data Terakhir Diperbarui</p>
       </div>
       <div className="flex flex-col items-end text-lg">
-        <p className="text-base font-semibold">
-          {progressDate
-            ? formatDateWithTime(progressDate)
-            : updatedAt
-              ? formatDateWithTime(updatedAt)
-              : "-"}
-        </p>
+        <RevitalizationReportDatePicker
+          areaId={areaId}
+          initialDate={parsedDate}
+          onReportSelect={onReportSelect}
+        />
       </div>
     </div>
   );

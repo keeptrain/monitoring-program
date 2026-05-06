@@ -321,6 +321,7 @@ function DocumentationCarousel() {
                   src={src}
                   alt={`Dokumentasi ${index + 1}`}
                   fill
+                  sizes="(max-width: 768px) 100vw, 336px"
                   className="object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />

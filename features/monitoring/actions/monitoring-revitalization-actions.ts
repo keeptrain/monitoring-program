@@ -79,7 +79,7 @@ export async function getRevitalizationPerMonthByArea(areaId: number) {
   const { data, error } = await supabase
     .from("revitalization_program_logs")
     .select(
-      "id, progress_date, progress_percent, reporting_week, status, production, intervention, total_worker, outcome, constraints, follow_up",
+      "id, name, progress_date, progress_percent, reporting_week, status, provider_name, production, intervention, total_worker, outcome, constraints, follow_up",
     )
     .eq("area_id", areaId)
     .order("progress_date", { ascending: false });
@@ -93,10 +93,12 @@ export async function getRevitalizationPerMonthByArea(areaId: number) {
     return {
       id: row.id,
       area_id: areaId,
+      name: row.name,
       progress_date: row.progress_date,
       reporting_week: row.reporting_week,
       progress_percent: row.progress_percent,
       status: row.status,
+      provider_name: row.provider_name,
       production: row.production,
       intervention: row.intervention,
       total_worker: row.total_worker,
@@ -139,4 +141,29 @@ export async function getRevitalizationPerMonthByArea(areaId: number) {
     data: datas,
     available_months: availableMonths,
   };
+}
+
+export async function getRevitalizationAvailableDatesByMonth(
+  areaId: number,
+  year: number,
+  month: number,
+) {
+  const supabase = await createClient();
+
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0);
+
+  const { data, error } = await supabase
+    .from("revitalization_program_logs")
+    .select("id, progress_date")
+    .eq("area_id", areaId)
+    .gte("progress_date", startDate.toLocaleDateString("en-CA"))
+    .lte("progress_date", endDate.toLocaleDateString("en-CA"));
+
+  if (error) {
+    console.error("Error fetching revitalization available dates:", error);
+    throw error;
+  }
+
+  return data;
 }
