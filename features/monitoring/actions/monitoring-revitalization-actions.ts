@@ -6,7 +6,13 @@ import {
   MonitoringRevitalization,
   RevitalizationDetailSheet,
 } from "../types/monitoring-types";
+import { TABLES } from "@/lib/constants/tables";
 
+/**
+ * Mengambil data ringkasan monitoring revitalisasi untuk seluruh area.
+ * Digunakan untuk menampilkan poin-poin pada peta, total progress akumulatif,
+ * dan total serapan tenaga kerja pada dashboard monitoring publik.
+ */
 export async function getMonitoringRevitalization(): Promise<MonitoringRevitalization> {
   const supabase = await createClient();
   const areaIds = REVITALIZATION_AREAS.map((area) => area.id);
@@ -26,10 +32,8 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
   );
 
   const overallProgress = +(
-    latestRows.reduce(
-      (acc, row) => acc + (row?.progress_percent || 0),
-      0,
-    ) / latestRows.length
+    latestRows.reduce((acc, row) => acc + (row?.progress_percent || 0), 0) /
+    latestRows.length
   ).toFixed(1);
 
   const overallSummary = latestRows.reduce(
@@ -45,10 +49,7 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
     .select("total_worker");
 
   const totalWorkers =
-    allWorkersData?.reduce(
-      (acc, row) => acc + (row.total_worker || 0),
-      0,
-    ) || 0;
+    allWorkersData?.reduce((acc, row) => acc + (row.total_worker || 0), 0) || 0;
 
   const mappedData: (RevitalizationDetailSheet | null)[] = latestRows.map(
     (row, idx) => {
@@ -166,4 +167,12 @@ export async function getRevitalizationAvailableDatesByMonth(
   }
 
   return data;
+}
+
+export async function getRevitalizationStats() {
+  const supabase = await createClient();
+
+  const data = supabase.from(TABLES.REVITALIZATION_LOGS);
+
+  return {};
 }

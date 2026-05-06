@@ -11,3 +11,10 @@ export const REVITALIZATION_AREA_COLORS: Record<number, string> = {
   3: "bg-amber-500",
   4: "bg-rose-500",
 } as const;
+
+export const REVITALIZATION_AREA_HEX_COLORS: Record<number, string> = {
+  1: "#3b82f6",
+  2: "#10b981",
+  3: "#f59e0b",
+  4: "#f43f5e",
+} as const;
