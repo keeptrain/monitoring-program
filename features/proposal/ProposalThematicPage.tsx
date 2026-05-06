@@ -119,7 +119,7 @@ export default async function ProposalThematicPage({
           </Alert>
         )}
         <DraftHandler />
-        <div className="flex items-center justify-between">
+        <div className="mx-4 flex items-center justify-between sm:mx-0">
           <Button variant="outline" asChild>
             <Link href="/biofloc-thematic">
               <XIcon className="size-4" />

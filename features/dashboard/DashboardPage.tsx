@@ -3,6 +3,9 @@ import { getSessionCached } from "../auth/session";
 import Link from "next/link";
 import { ArrowRightIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
+
+const breadcrumbItems = [{ label: "Admin Panel" }];
 
 export default async function DashboardPage() {
   const session = await getSessionCached();
@@ -21,16 +24,12 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* Header */}
-      <div className="mb-10">
-        <p className="text-muted-foreground mb-2 text-xs font-medium tracking-widest uppercase">
-          Admin Panel
-        </p>
-        <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-          Dashboard
-        </h1>
-        <p className="text-muted-foreground mt-2 text-sm">
+      <div className="space-y-2">
+        <BreadcrumbHeader items={breadcrumbItems} />
+        <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground text-sm">
           Kelola data untuk masing-masing program prioritas.
         </p>
       </div>

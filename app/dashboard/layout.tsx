@@ -6,7 +6,7 @@ const SCOPE_TO_PATH: Record<string, string> = {
   biofloc: "/biofloc-thematic",
   minapadi: "/minapadi-thematic",
   isf: "/isf",
-  revitalization: "/revitalisasi",
+  revitalisasi: "/revitalisasi",
 };
 
 export default async function DashboardLayout({
