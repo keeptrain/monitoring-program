@@ -5,7 +5,21 @@ import {
 } from "@tanstack/react-query";
 import { getRevitalizationAreasLatestQueryOptions } from "../api/getRevitalizationAreasLatest";
 import RevitalizationClientPage from "./RevitalizationClientPage";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
+import { Suspense } from "react";
+import { RevitalizationDashboardSkeleton } from "../components/RevitalizationDashboardSkeleton";
+import { REVITALIZATION_BREADCRUMBS } from "../constants/revitalization-breadcrumbs";
 
+const breadcrumbItems = [
+  REVITALIZATION_BREADCRUMBS.DASHBOARD,
+  REVITALIZATION_BREADCRUMBS.REVITALISASI,
+];
+
+/**
+ * Komponen halaman utama untuk modul Revitalisasi.
+ * Menampilkan ringkasan status revitalisasi di seluruh area.
+ * Route: /dashboard/revitalisasi
+ */
 export default async function RevitalizationPage() {
   const queryClient = new QueryClient();
 
@@ -13,25 +27,21 @@ export default async function RevitalizationPage() {
 
   const dehydratedState = dehydrate(queryClient);
   return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
-        <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            Dashboard / Revitalisasi
-          </p>
-          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-            Program Revitalisasi Tambak
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Monitoring Revitalisasi Tambak Pantura.
-          </p>
-        </div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="space-y-2">
+        <BreadcrumbHeader items={breadcrumbItems} />
+        <h1 className="text-xl font-semibold tracking-tight">
+          Program Revitalisasi Tambak
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          Monitoring Revitalisasi Tambak Pantura.
+        </p>
       </div>
-
-      {/* Area List wrapped in Suspense */}
-      <HydrationBoundary state={dehydratedState}>
-        <RevitalizationClientPage />
-      </HydrationBoundary>
+      <Suspense fallback={<RevitalizationDashboardSkeleton />}>
+        <HydrationBoundary state={dehydratedState}>
+          <RevitalizationClientPage />
+        </HydrationBoundary>
+      </Suspense>
     </div>
   );
 }

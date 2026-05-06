@@ -1,25 +1,19 @@
+"use client";
+
 import {
   REVITALIZATION_AREA_COLORS,
   REVITALIZATION_AREAS,
 } from "../constants/revitalization-area";
 import ProgramAreaItemCard from "@/components/shared/ProgramAreaItemCard";
-
-const data = REVITALIZATION_AREAS.map((area, index) => ({
-  id: `mock-${area.id}`,
-  area_id: area.id,
-  area_name: area.name,
-  progress_percent: [45, 12, 88, 0][index],
-  progress_date: new Date().toISOString(),
-  total_worker: [120, 45, 200, 0][index],
-  status: ["Konstruksi", "Persiapan", "Finishing", "Belum Dimulai"][index],
-  updated_at: new Date().toISOString(),
-}));
+import { useGetRevitalizationAreasLatest } from "../api/getRevitalizationAreasLatest";
 
 export default function RevitalizationClientPage() {
+  const { data } = useGetRevitalizationAreasLatest();
+
   return (
     <>
       {REVITALIZATION_AREAS.map((area) => {
-        const areaData = data.find((d) => d?.area_id === area.id);
+        const areaData = data?.find((d) => d.area_id === area.id);
         return (
           <ProgramAreaItemCard
             key={area.id}

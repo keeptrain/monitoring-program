@@ -5,7 +5,7 @@ import {
   REVITALIZATION_AREAS,
   REVITALIZATION_AREA_COLORS,
 } from "../constants/revitalization-area";
-import { REVITALISASI_PIN_LOCATIONS } from "../utils/revitalisasi-constants";
+import { REVITALISASI_PIN_LOCATIONS } from "../constants/revitalization-map";
 import { useQueryState } from "nuqs";
 
 export default function RevitalisasiPinPoints() {
