@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  ImageIcon,
-  Loader2,
-  MapIcon,
-  UploadIcon,
-  X,
-} from "lucide-react";
+import { ImageIcon, Loader2, MapIcon, UploadIcon, X } from "lucide-react";
 import { STEP_COLORS } from "./constants/isf-step";
 import { IsfStepSummary } from "./types/isf";
 import ProgramAreaItemCard from "@/components/shared/ProgramAreaItemCard";
@@ -350,5 +344,3 @@ function RecruitmentUploadForm({
     </div>
   );
 }
-
-

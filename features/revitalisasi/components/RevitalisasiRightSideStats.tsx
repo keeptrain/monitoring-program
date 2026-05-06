@@ -16,6 +16,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { useGetMonitoringRevitalization } from "@/features/monitoring/api/getMonitoringRevitalization";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const images = [
   "/images/bioflok.jpeg",
@@ -24,7 +25,7 @@ const images = [
 ];
 
 export default function RevitalisasiRightSideStats() {
-  const { data } = useGetMonitoringRevitalization();
+  const { data, isPending } = useGetMonitoringRevitalization();
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-8 text-center md:w-fit">
@@ -42,12 +43,16 @@ export default function RevitalisasiRightSideStats() {
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3">
                 <UsersIcon className="text-primary size-5" />
-                <p className="text-xl font-bold tabular-nums">
-                  {data?.total_workers || 0}
-                  <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
+                <div className="flex items-baseline gap-1 text-xl font-bold tabular-nums">
+                  {isPending ? (
+                    <Skeleton className="h-6 w-12" />
+                  ) : (
+                    data?.total_workers || 0
+                  )}
+                  <span className="text-muted-foreground text-xs font-medium uppercase">
                     Orang
                   </span>
-                </p>
+                </div>
               </div>
               <Button
                 variant="outline"
@@ -57,7 +62,7 @@ export default function RevitalisasiRightSideStats() {
               >
                 <Link href={`/monitoring/recruitment`}>
                   Rekrutmen
-                  <ArrowUpRight className="ml-1 size-4" />
+                  <ArrowUpRight className="size-4" />
                 </Link>
               </Button>
             </div>
@@ -70,9 +75,9 @@ export default function RevitalisasiRightSideStats() {
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3">
                 <TractorIcon className="text-primary size-5" />
-                <p className="text-xl font-bold tabular-nums">
+                <p className="flex items-baseline gap-1 text-xl font-bold tabular-nums">
                   0
-                  <span className="text-muted-foreground ml-1 text-xs font-medium uppercase">
+                  <span className="text-muted-foreground text-xs font-medium uppercase">
                     Unit
                   </span>
                 </p>
@@ -80,7 +85,7 @@ export default function RevitalisasiRightSideStats() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="sm">
-                    Rincian Alat Berat <InfoIcon className="ml-1 size-4" />
+                    Rincian Alat Berat <InfoIcon className="size-4" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-80 p-4">

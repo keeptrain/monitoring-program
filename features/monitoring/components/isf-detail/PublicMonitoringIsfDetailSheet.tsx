@@ -2,15 +2,15 @@
 
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
 import { Button } from "@/components/ui/button";
-import { ArrowRightIcon, TractorIcon, UsersIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { PieChart, Pie, Label } from "recharts";
 import { IsfDetailSheet } from "../../types/monitoring-types";
 import { SheetFooter } from "@/components/ui/sheet";
 import React from "react";
 
 import { getIsfProgramLogById } from "@/features/isf/actions/isf-program-logs";
 import { ReportDatePicker } from "@/components/shared/ReportDatePicker";
+import MetrictsSnapshot from "../shared/MetrictsSnapshot";
 
 export default function PublicMonitoringIsfDetailSheet({
   data: initialData,
@@ -23,7 +23,7 @@ export default function PublicMonitoringIsfDetailSheet({
     setData(initialData);
   }, [initialData]);
 
-  const { id, step_id, progress_percent, progress_date, total_worker } = data;
+  const { id, step_id, progress_percent, progress_date } = data;
 
   const handleReportSelect = async (reportId: string) => {
     try {
@@ -44,39 +44,7 @@ export default function PublicMonitoringIsfDetailSheet({
           onReportSelect={handleReportSelect}
         />
 
-        <div className="flex w-full items-center gap-12">
-          <div className="size-[140px] shrink-0">
-            <ZoneProgressChart progress={progress_percent} />
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                Tenaga Kerja
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <UsersIcon className="size-6" />
-                  <p className="text-xl font-bold">
-                    {total_worker} <span className="text-sm">Orang</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-                Alat Berat
-              </p>
-              <div className="flex items-center gap-3">
-                <TractorIcon className="size-6" />
-                <p className="text-xl font-bold">
-                  12 <span className="text-sm">Unit</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MetrictsSnapshot progressPercent={progress_percent} />
 
         <DocumentationCarouselGallery type="isf" id={id} />
 
@@ -130,45 +98,5 @@ function LastUpdateStatus({
         />
       </div>
     </div>
-  );
-}
-function ZoneProgressChart({ progress }: { progress: number }) {
-  const data = [
-    { name: "Progress", value: progress, fill: "#3b82f6" },
-    { name: "Sisa", value: 100 - progress, fill: "#f1f5f9" },
-  ];
-
-  return (
-    <PieChart width={140} height={140}>
-      <Pie
-        data={data}
-        innerRadius={55}
-        outerRadius={70}
-        startAngle={90}
-        endAngle={450}
-      >
-        <Label
-          content={({ viewBox }) => {
-            const { cx, cy } = viewBox as { cx: number; cy: number };
-            return (
-              <text
-                x={cx}
-                y={cy}
-                textAnchor="middle"
-                dominantBaseline="central"
-              >
-                <tspan
-                  x={cx}
-                  y={cy}
-                  className="fill-primary text-2xl font-bold"
-                >
-                  {progress}%
-                </tspan>
-              </text>
-            );
-          }}
-        />
-      </Pie>
-    </PieChart>
   );
 }

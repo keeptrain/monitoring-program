@@ -1,7 +1,7 @@
 import MonitoringIsfPage from "@/features/monitoring/pages/MonitoringIsfPage";
 import { checkRoleGuard } from "@/features/auth/utils";
 import { Suspense } from "react";
-import { MonitoringSkeleton } from "@/features/monitoring/components/MonitoringSkeleton";
+import { MonitoringSkeleton } from "@/features/monitoring/components/shared/MonitoringSkeleton";
 
 export default async function IsfMonitoringPage() {
   await checkRoleGuard("isf");
