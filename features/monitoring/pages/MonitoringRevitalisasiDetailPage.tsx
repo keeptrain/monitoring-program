@@ -22,7 +22,7 @@ export default async function MonitoringRevitalisasiDetailPage({
   const data = await getRevitalizationPerMonthByArea(areaInfo.id);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto mb-6 max-w-6xl">
       <MonitoringRevitalizationDetailClient data={data} />
     </div>
   );
