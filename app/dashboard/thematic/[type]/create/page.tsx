@@ -1,1 +1,1 @@
-export { default } from "@/features/thematic/CreateThematicProgramPage";
+export { default } from "@/features/thematic/pages/CreateThematicProgramPage";

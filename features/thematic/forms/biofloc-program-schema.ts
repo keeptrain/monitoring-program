@@ -1,5 +1,4 @@
 import { locationFormSchemaPattern } from "@/components/shared/location-schema";
-import { requiredLocationAdministrativeSchemaPattern } from "@/components/shared/location-schema";
 import { documentationFormSchema } from "@/features/documentation/forms/documentation-schema";
 import { sCurveSchema } from "@/features/documentation/forms/scurve-schema";
 import { z } from "zod";
@@ -16,20 +15,16 @@ export const bioflocBaseProgramSchema = z.object({
   production_value: z.string().min(1, "Produksi dibutuhkan"),
   total_management: z.coerce.number().int().min(0, "Minimal 0 pengurus"),
   total_members: z.coerce.number().int().min(0, "Minimal 0 anggota"),
-  distribution_amount: z.coerce.number().int().min(0, "Minimal 0 distribusi"),
   sppg_partner: z.string().min(1, "Mitra SPPG dibutuhkan"),
+  distribution_amount: z.coerce.number().int().min(0, "Minimal 0 distribusi"),
 });
 
 export const bioflocProgramSchema = bioflocBaseProgramSchema
-  .extend(sCurveSchema.shape)
+  .extend({ s_curve_path: sCurveSchema.shape.s_curve_path.optional() })
   .extend(locationFormSchemaPattern)
   .extend({
     documentations: documentationFormSchema.shape.documentations.optional(),
   });
-
-export const bioflocProgramCreateSchema = bioflocProgramSchema.extend(
-  requiredLocationAdministrativeSchemaPattern,
-);
 
 export type BioflocProgramFormInput = z.input<typeof bioflocProgramSchema>;
 export type BioflocProgramFormValues = z.output<typeof bioflocProgramSchema>;

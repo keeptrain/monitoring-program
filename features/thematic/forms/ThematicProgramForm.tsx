@@ -8,35 +8,27 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import ThematicInformationBasicFormSection from "../components/ThematicInformationBasicFormSection";
-import { ThematicProgramDetail } from "../types/thematic";
 import { Loader2 } from "lucide-react";
-import LocationFormSection from "@/components/shared/LocationFormSection";
 import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 
-export default function BioflocProgramForm({
-  initialData,
-  proposalId,
-  isConvertingFromProposal = false,
+export default function ThematicProgramForm({
+  form,
+  onSubmit,
+  isPending,
+  isEdit,
 }: {
-  initialData?: ThematicProgramDetail | null;
-  proposalId?: string;
-  isConvertingFromProposal?: boolean;
+  form: any;
+  onSubmit: any;
+  isPending: boolean;
+  isEdit: boolean;
 }) {
-  const isEdit = !!initialData;
-  const { form, onSubmit, isPending } = useThematicProgramForm(
-    initialData,
-    proposalId,
-    isConvertingFromProposal,
-  );
-
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Informasi Dasar</CardTitle>
+          <CardTitle>Informasi Program</CardTitle>
           <CardDescription>Isi informasi dasar program KDMP</CardDescription>
         </CardHeader>
         <CardContent>
@@ -46,21 +38,10 @@ export default function BioflocProgramForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>Lokasi</CardTitle>
-          <CardDescription>Isi informasi lokasi program</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LocationFormSection
-            form={form}
-            isReadOnly={isConvertingFromProposal}
-            showAdministrativeFields={!isConvertingFromProposal}
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Kurva S</CardTitle>
+          <CardTitle>
+            Kurva S{" "}
+            <span className="text-muted-foreground text-xs">(Opsional)</span>
+          </CardTitle>
           <CardDescription>Unggah visualisasi kurva S program</CardDescription>
         </CardHeader>
         <CardContent>

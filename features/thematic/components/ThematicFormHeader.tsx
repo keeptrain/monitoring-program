@@ -17,9 +17,6 @@ export function ThematicFormHeader({
       <h2 className="text-foreground text-2xl font-semibold tracking-tight">
         {isEdit ? "Ubah KDMP" : "Tambah KDMP Baru"}
       </h2>
-      <p className="text-muted-foreground text-sm">
-        Silahkan isi informasi KDMP di bawah ini
-      </p>
     </div>
   );
 }
