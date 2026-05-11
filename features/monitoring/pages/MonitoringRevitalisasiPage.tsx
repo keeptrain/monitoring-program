@@ -1,11 +1,13 @@
 import Image from "next/image";
 import RevitalisasiPinPoints from "../../revitalisasi/components/RevitalisasiPinPoint";
-import RevitalisasiRightSideStats from "../../revitalisasi/components/RevitalisasiRightSideStats";
+import { getMonitoringRevitalization } from "../actions/monitoring-revitalization-actions";
+import MonitoringRightSideStats from "../components/shared/MonitoringRightSideStats";
 import { Suspense } from "react";
 import { checkRoleGuard } from "@/features/auth/utils";
 import RevitalizationStatsSection from "../components/revitalization/RevitalizationStatsSection";
 import RevitalizationSheet from "../components/revitalization/RevitalizationSheet";
 import { MonitoringSkeleton } from "../components/shared/MonitoringSkeleton";
+import { IsfHeavyEquipmentPopover } from "../components/isf/IsfHeavyEquipmentPopover";
 
 export default async function MonitoringRevitalisasiPage() {
   await checkRoleGuard("revitalisasi");
@@ -18,6 +20,8 @@ export default async function MonitoringRevitalisasiPage() {
 }
 
 async function MonitoringRevitalisasiContent() {
+  const data = await getMonitoringRevitalization();
+
   return (
     <>
       <div className="bg-background mx-auto flex max-w-6xl flex-1 flex-col">
@@ -39,7 +43,12 @@ async function MonitoringRevitalisasiContent() {
             </div>
 
             {/* Stats & Carousel (Client Side) */}
-            <RevitalisasiRightSideStats />
+            <MonitoringRightSideStats
+              totalWorkers={data?.total_workers || 0}
+              documentationUrls={data?.latest_documentation_urls || []}
+              isPending={false}
+              heavyEquipmentPopoverContent={<IsfHeavyEquipmentPopover />}
+            />
           </div>
         </div>
 

@@ -10,31 +10,16 @@ import {
 import OverallSummary from "../shared/OverallSummary";
 import ProgressChart from "../shared/ProgressChart";
 
-const chartData = [
-  { name: "Jan", z1: 10, z2: 8, z3: 5, z4: 12 },
-  { name: "Feb", z1: 25, z2: 18, z3: 15, z4: 28 },
-  { name: "Mar", z1: 40, z2: 35, z3: 30, z4: 42 },
-  { name: "Apr", z1: 55, z2: 48, z3: 45, z4: 58 },
-  { name: "May", z1: 70, z2: 65, z3: 60, z4: 75 },
-  { name: "Jun", z1: 85, z2: 80, z3: 78, z4: 88 },
-  { name: "Jul", z1: 95, z2: 92, z3: 90, z4: 98 },
-];
-
-const summary: Record<number, number> = {
-  1: 85,
-  2: 70,
-  3: 90,
-  4: 57,
-};
-
-const overallProgress = 75.5;
-
 export default function RevitalizationStatsSection() {
   const { ref, isInView } = useInViewOnce<HTMLDivElement>({
     threshold: 0.8,
   });
 
-  const stats = useGetRevitalizationStats(isInView);
+  const { data: revitalizationStats } = useGetRevitalizationStats(isInView);
+
+  const chartData = revitalizationStats?.chartData || [];
+  const summary = revitalizationStats?.summary || {};
+  const overallProgress = revitalizationStats?.overallProgress || 0;
 
   const revitalizationSeriesConfig = REVITALIZATION_AREAS.map((area) => ({
     key: `z${area.id}`,

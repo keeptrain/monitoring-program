@@ -14,6 +14,7 @@ export default function RevitalizationDetailSheet({
   data: RevitalizationAreaType;
   areaSlug: string;
 }) {
+  console.log(data.total_worker);
   return (
     <>
       <div className="mx-4 space-y-6">
@@ -24,7 +25,10 @@ export default function RevitalizationDetailSheet({
           onReportSelect={(id) => console.log("Selected report:", id)}
         />
 
-        <MetrictsSnapshot progressPercent={data.progress_percent} />
+        <MetrictsSnapshot
+          progressPercent={data.progress_percent}
+          totalWorker={data.total_worker}
+        />
 
         {/* Documentation Gallery */}
         <DocumentationCarouselGallery type="revitalization" id={data.id} />
