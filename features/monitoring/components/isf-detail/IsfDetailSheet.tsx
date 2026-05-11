@@ -4,15 +4,14 @@ import DocumentationCarouselGallery from "@/components/shared/DocumentationCarou
 import { Button } from "@/components/ui/button";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { IsfDetailSheet } from "../../types/monitoring-types";
 import { SheetFooter } from "@/components/ui/sheet";
 import React from "react";
-
 import { getIsfProgramLogById } from "@/features/isf/actions/isf-program-logs";
 import { ReportDatePicker } from "@/components/shared/ReportDatePicker";
 import MetrictsSnapshot from "../shared/MetrictsSnapshot";
+import { type IsfDetailSheet } from "../../types/monitoring-types";
 
-export default function PublicMonitoringIsfDetailSheet({
+export default function IsfDetailSheet({
   data: initialData,
 }: {
   data: IsfDetailSheet;
@@ -23,7 +22,7 @@ export default function PublicMonitoringIsfDetailSheet({
     setData(initialData);
   }, [initialData]);
 
-  const { id, step_id, progress_percent, progress_date } = data;
+  const { id, step_id, progress_percent, total_worker, progress_date } = data;
 
   const handleReportSelect = async (reportId: string) => {
     try {
@@ -44,7 +43,10 @@ export default function PublicMonitoringIsfDetailSheet({
           onReportSelect={handleReportSelect}
         />
 
-        <MetrictsSnapshot progressPercent={progress_percent} />
+        <MetrictsSnapshot
+          progressPercent={progress_percent}
+          totalWorker={total_worker}
+        />
 
         <DocumentationCarouselGallery type="isf" id={id} />
 
