@@ -31,7 +31,7 @@ export default function ProposalDetailClient({
     groups?.flatMap((group) => group.beforeUrls ?? []).filter(Boolean) ?? [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
       <div className="flex items-end gap-2">
         <p className="text-base font-semibold">Download Dokumen Proposal:</p>
         <ProposalDownloadButton id={id} />
