@@ -12,12 +12,10 @@ import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
 import { IdentifyKdmpFormValues } from "../forms/identify-kdmp-schema";
 import { useIdentifyKdmpForm } from "../hooks/useIdentifyKdmpForm";
 
-export default function IdentityKdmpForm(
-  props: {
-    initialData?: IdentifyKdmpFormValues;
-    proposalId?: string;
-  },
-) {
+export default function IdentityKdmpForm(props: {
+  initialData?: IdentifyKdmpFormValues;
+  proposalId?: string;
+}) {
   const { initialData } = props;
   const { form, onSubmit } = useIdentifyKdmpForm(initialData);
   const { errors } = form.formState;
@@ -26,20 +24,31 @@ export default function IdentityKdmpForm(
     <form id="step-1-form" onSubmit={onSubmit} className="mt-6">
       <FieldGroup className="grid grid-cols-2">
         <Field>
-          <FieldLabel>Nama kdmp</FieldLabel>
+          <FieldLabel>
+            Nama kdmp
+            <span className="text-destructive">*</span>
+          </FieldLabel>
           <FieldContent>
-            <Input {...form.register("name")} aria-invalid={!!errors.name} />
+            <Input
+              {...form.register("name")}
+              placeholder="Masukkan nama kdmp"
+              aria-invalid={!!errors.name}
+            />
           </FieldContent>
           {errors.name && <FieldError>{errors.name.message}</FieldError>}
         </Field>
 
         <Field>
-          <FieldLabel>Nomor Induk Berusaha</FieldLabel>
+          <FieldLabel>
+            Nomor Induk Berusaha
+            <span className="text-destructive">*</span>
+          </FieldLabel>
           <FieldContent>
             <Input
               {...form.register("nib", {
                 onChange: handleInputNumberValueChange,
               })}
+              placeholder="Masukkan nomor induk berusaha"
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               maxLength={13}
@@ -50,12 +59,16 @@ export default function IdentityKdmpForm(
         </Field>
 
         <Field>
-          <FieldLabel>Nomor Kusuka</FieldLabel>
+          <FieldLabel>
+            Nomor Kusuka
+            <span className="text-destructive">*</span>
+          </FieldLabel>
           <FieldContent>
             <Input
               {...form.register("kusukaNumber", {
                 onChange: handleInputNumberValueChange,
               })}
+              placeholder="Masukkan nomor kusuka"
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               aria-invalid={!!errors.kusukaNumber}
@@ -67,12 +80,16 @@ export default function IdentityKdmpForm(
         </Field>
 
         <Field>
-          <FieldLabel>Nomor Badan Hukum</FieldLabel>
+          <FieldLabel>
+            Nomor Badan Hukum
+            <span className="text-destructive">*</span>
+          </FieldLabel>
           <FieldContent>
             <Input
               {...form.register("legalEntityNumber", {
                 onChange: handleInputNumberValueChange,
               })}
+              placeholder="Masukkan nomor badan hukum"
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               aria-invalid={!!errors.legalEntityNumber}
@@ -91,7 +108,7 @@ export default function IdentityKdmpForm(
             <Input
               {...form.register("chairmanName")}
               aria-invalid={!!errors.chairmanName}
-              placeholder="Contoh: Budi Santoso"
+              placeholder="Masukkan nama ketua kdmp"
             />
           </FieldContent>
           {errors.chairmanName && (
@@ -111,7 +128,7 @@ export default function IdentityKdmpForm(
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               aria-invalid={!!errors.chairmanPhoneNumber}
-              placeholder="Contoh: 081234567890"
+              placeholder="Masukkan nomor hp ketua kdmp"
             />
           </FieldContent>
           {errors.chairmanPhoneNumber && (
@@ -127,7 +144,7 @@ export default function IdentityKdmpForm(
             <Input
               {...form.register("companionName")}
               aria-invalid={!!errors.companionName}
-              placeholder="Contoh: Siti Aminah"
+              placeholder="Masukkan nama penyuluh pendamping"
             />
           </FieldContent>
           {errors.companionName && (
@@ -148,7 +165,7 @@ export default function IdentityKdmpForm(
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               aria-invalid={!!errors.companionPhoneNumber}
-              placeholder="Contoh: 081298765432"
+              placeholder="Masukkan nomor hp penyuluh pendamping"
             />
           </FieldContent>
           {errors.companionPhoneNumber && (
