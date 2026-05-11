@@ -60,7 +60,7 @@ export default function RevitalisasiRightSideStats() {
                 className="w-full text-xs"
                 asChild
               >
-                <Link href={`/monitoring/recruitment`}>
+                <Link href="/revitalisasi/rekrutment">
                   Rekrutmen
                   <ArrowUpRight className="size-4" />
                 </Link>

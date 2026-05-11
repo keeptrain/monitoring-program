@@ -2,26 +2,42 @@ import DocumentationCarouselGallery from "@/components/shared/DocumentationCarou
 import { RevitalizationReportDatePicker } from "./RevitalizationReportDatePicker";
 import { RevitalizationDetailSheet as RevitalizationAreaType } from "../../types/monitoring-types";
 import MetrictsSnapshot from "../shared/MetrictsSnapshot";
+import { SheetFooter } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 
 export default function RevitalizationDetailSheet({
   data,
+  areaSlug,
 }: {
   data: RevitalizationAreaType;
+  areaSlug: string;
 }) {
   return (
-    <div className="mx-4 space-y-6">
-      {/* Last Update & Date Picker */}
-      <LastUpdateStatus
-        areaId={data.area_id}
-        progressDate={data.progress_date}
-        onReportSelect={(id) => console.log("Selected report:", id)}
-      />
+    <>
+      <div className="mx-4 space-y-6">
+        {/* Last Update & Date Picker */}
+        <LastUpdateStatus
+          areaId={data.area_id}
+          progressDate={data.progress_date}
+          onReportSelect={(id) => console.log("Selected report:", id)}
+        />
 
-      <MetrictsSnapshot progressPercent={data.progress_percent} />
+        <MetrictsSnapshot progressPercent={data.progress_percent} />
 
-      {/* Documentation Gallery */}
-      <DocumentationCarouselGallery type="revitalisasi" id={data.id} />
-    </div>
+        {/* Documentation Gallery */}
+        <DocumentationCarouselGallery type="revitalization" id={data.id} />
+      </div>
+      <SheetFooter>
+        <Button size="lg" asChild>
+          <Link href={`/revitalisasi/${areaSlug}`}>
+            Lihat lebih lanjut
+            <ArrowRightIcon className="size-4" />
+          </Link>
+        </Button>
+      </SheetFooter>
+    </>
   );
 }
 

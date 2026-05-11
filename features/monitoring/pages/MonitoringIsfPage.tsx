@@ -228,7 +228,7 @@ function RightSideStats({ data }: { data?: MonitoringIsfType }) {
                 className="w-full text-xs"
                 asChild
               >
-                <Link href={`/monitoring/recruitment`}>
+                <Link href="/isf/rekrutmen">
                   Rekrutmen
                   <ArrowUpRight className="ml-1 size-4" />
                 </Link>

@@ -1,19 +1,16 @@
 "use client";
 
-import { ArrowRightIcon, ClipboardXIcon } from "lucide-react";
+import { ClipboardXIcon } from "lucide-react";
 import { useQueryState } from "nuqs";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
 import { REVITALIZATION_AREAS } from "@/features/revitalisasi/constants/revitalization-area";
 import RevitalizationDetailSheet from "../revitalization-detail/RevitalizationDetailSheet";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useGetMonitoringRevitalization } from "../../api/getMonitoringRevitalization";
 import { RevitalizationDetailSheet as RevitalizationAreaType } from "../../types/monitoring-types";
 
@@ -36,15 +33,11 @@ export default function RevitalizationSheet() {
           </SheetDescription>
         </SheetHeader>
 
-        {isEmpty ? <Empty /> : <RevitalizationDetailSheet data={data} />}
-        <SheetFooter>
-          <Button size="lg" asChild>
-            <Link href={`/revitalisasi/${area?.slug}`}>
-              Lihat lebih lanjut
-              <ArrowRightIcon className="size-4" />
-            </Link>
-          </Button>
-        </SheetFooter>
+        {isEmpty || !area?.slug ? (
+          <Empty />
+        ) : (
+          <RevitalizationDetailSheet data={data} areaSlug={area.slug} />
+        )}
       </SheetContent>
     </Sheet>
   );
