@@ -40,7 +40,7 @@ export default function RootLayout({
         <Providers>
           <NuqsAdapter>{children}</NuqsAdapter>
         </Providers>
-        <Toaster position="top-center" />
+        <Toaster position="top-center" closeButton />
       </body>
     </html>
   );

@@ -8,13 +8,29 @@ import {
 import { ThematicProgramDetailComponent as Component } from "@/features/thematic/components/ThematicProgramDetail";
 import { CycleDataDetail } from "@/features/thematic/components/biofloc-detail/CycleDataDetail";
 import { InformationDetail } from "@/features/thematic/components/biofloc-detail/InformationDetail";
-import { getThematicProgramById } from "@/features/thematic/actions/biofloc";
+import { getThematicProgramById } from "@/features/thematic/actions/biofloc-actions";
 import { ThematicProgramDetail } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
 import { LinkBackButton } from "@/components/shared/LinkBackButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
+import SCurveDownloadButton from "@/features/thematic/components/SCurveDownloadButton";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
+
+const breadcrumbItems = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+  },
+  {
+    label: "Tematik Bioflok",
+    href: "/dashboard/thematic/biofloc",
+  },
+  {
+    label: "Detail",
+  },
+];
 
 export default async function BioflocDetailPage({
   params,
@@ -38,10 +54,8 @@ export default async function BioflocDetailPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            Dashboard / Tematik / {type} / Detail
-          </p>
+        <div className="space-y-2">
+          <BreadcrumbHeader items={breadcrumbItems} />
           <div className="flex items-center gap-1">
             <LinkBackButton href={`/dashboard/thematic/${type}`} />
             <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
@@ -100,11 +114,20 @@ export default async function BioflocDetailPage({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center">
-                <p className="text-muted-foreground text-sm italic">
-                  Kurva S belum tersedia
-                </p>
-              </div>
+              {program.s_curve_path ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-muted-foreground text-sm">
+                    Berkas Kurva S tersedia untuk diunduh.
+                  </p>
+                  <SCurveDownloadButton id={program.id} />
+                </div>
+              ) : (
+                <div className="flex h-20 items-center justify-center rounded-md border border-dashed">
+                  <p className="text-muted-foreground text-sm italic">
+                    Kurva S belum diunggah
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

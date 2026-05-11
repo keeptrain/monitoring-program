@@ -1,9 +1,31 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { BioflocProgramListItem } from "@/features/thematic/types/thematic";
+import {
+  BioflocProgramListItem,
+  ThematicProgramStatus,
+} from "@/features/thematic/types/thematic";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
 import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
 import { ConstructionIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+
+const STATUS_VARIANT: Record<
+  string,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
+  potential: "default",
+  active: "secondary",
+  inactive: "destructive",
+};
+
+export const StatusBadge = ({ status }: { status: string }) => {
+  return (
+    <Badge variant={STATUS_VARIANT[status]}>
+      {ThematicProgramStatus[status]}
+    </Badge>
+  );
+};
 
 const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   {
@@ -12,6 +34,11 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
     cell: ({ row }) => (
       <span className="font-semibold">{row.original.entity_name}</span>
     ),
+  },
+  {
+    header: "Status",
+    accessorKey: "status",
+    cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
   {
     header: "Komoditas",
@@ -59,7 +86,7 @@ export const BioflocProgramsInternalTableColumns = (opts: {
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : "Gagal menghapus program";
-        alert(errorMessage);
+        toast.error(errorMessage);
       }
     }
   };
