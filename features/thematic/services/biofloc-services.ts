@@ -35,14 +35,24 @@ const DETAIL_SELECT = `
         nib,
         legal_entity_number,
         board_member_count,
-        member_count
+        member_count,
+        chairman_name,
+        chairman_phone,
+        companion_name,
+        companion_phone
       ),
       available_locations (
         name,
         latitude,
         longitude,
         province_code,
-        province_name
+        province_name,
+        regency_code,
+        district_code,
+        village_code
+      ),
+      proposal_biofloc_thematic_programs (
+        land_slope
       )
     ` as const;
 
@@ -73,6 +83,7 @@ export async function getBioflocThematicProgramsService() {
 
 const INTERNAL_PAGINATED_SELECT = `
   id,
+  status,
   commodity_aid,
   progress_percent,
   distribution_amount,
@@ -93,6 +104,7 @@ const INTERNAL_PAGINATED_SELECT = `
 
 const PUBLIC_PAGINATED_SELECT = `
   id,
+  status,
   commodity_aid,
   progress_percent,
   distribution_amount,
@@ -112,6 +124,7 @@ const PUBLIC_PAGINATED_SELECT = `
 
 type BioflocProgramListRow = {
   id: string;
+  status: string;
   commodity_aid: string;
   progress_percent: number;
   distribution_amount: number;
@@ -168,6 +181,7 @@ export async function getBioflocProgramsPaginatedService(
   const rows = (data ?? []) as unknown as BioflocProgramListRow[];
   const mappedRows: BioflocProgramListItem[] = rows.map((row) => ({
     id: row.id,
+    status: row.status,
     entity_name: row.kdmp_entities?.name ?? "Tidak Diketahui",
     location_name: row.available_locations?.name ?? "-",
     commodity_aid: row.commodity_aid,
@@ -257,8 +271,46 @@ export async function getBioflocThematicProgramByIdService(
     legal_entity_number: entity?.legal_entity_number ?? "",
     total_management: entity?.board_member_count ?? 0,
     total_members: entity?.member_count ?? 0,
+    chairman_name: entity?.chairman_name ?? "",
+    chairman_phone: entity?.chairman_phone ?? "",
+    companion_name: entity?.companion_name ?? "",
+    companion_phone: entity?.companion_phone ?? "",
+    location_name: location?.name ?? "",
+    latitude: location?.latitude ?? "",
+    longitude: location?.longitude ?? "",
+    province_code: location?.province_code ?? "",
+    regency_code: location?.regency_code ?? "",
+    district_code: location?.district_code ?? "",
+    village_code: location?.village_code ?? "",
     documentations: Object.values(docGroups),
   } as unknown as ThematicProgramDetail;
+}
+
+export async function downloadSCurveFileService(id: string) {
+  const supabase = await createClient();
+  const { data: program, error: programError } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .select("s_curve_path")
+    .eq("id", id)
+    .single();
+
+  if (programError) {
+    throw new Error(`Gagal mendapatkan data Kurva S: ${programError.message}`);
+  }
+
+  if (!program?.s_curve_path) {
+    throw new Error("Berkas Kurva S tidak ditemukan.");
+  }
+
+  const { data: blob, error } = await supabase.storage
+    .from("demo")
+    .download(program.s_curve_path);
+
+  if (error) {
+    throw new Error(`Gagal mengunduh berkas Kurva S: ${error.message}`);
+  }
+
+  return { blob, originalPath: program.s_curve_path };
 }
 
 export async function createBioflocThematicService(
@@ -372,6 +424,58 @@ export async function updateBioflocThematicProgramService(
   }
 }
 
+import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
+import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
+
+export async function updateKdmpEntityService(
+  entityId: string | number,
+  data: IdentifyKdmpFormValues,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from(TABLES.KDMP_ENTITIES)
+    .update({
+      name: data.name,
+      kusuka_number: data.kusukaNumber,
+      nib: data.nib,
+      legal_entity_number: data.legalEntityNumber,
+      chairman_name: data.chairmanName,
+      chairman_phone: data.chairmanPhoneNumber,
+      companion_name: data.companionName,
+      companion_phone: data.companionPhoneNumber,
+      board_member_count: Number(data.boardMemberCount),
+      member_count: Number(data.memberCount),
+    })
+    .eq("id", entityId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function updateLocationService(
+  locationId: string | number,
+  data: LocationKdmpValues,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from(TABLES.AVAILABLE_LOCATIONS)
+    .update({
+      province_code: data.province_code,
+      province_name: data.province_name || "Provinsi",
+      regency_code: data.regency_code,
+      district_code: data.district_code,
+      village_code: data.village_code,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    })
+    .eq("id", locationId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function updateBioflocThematicProgramProgressService(
   id: string,
   progress_percent: number,
@@ -407,7 +511,7 @@ export async function deleteBioflocThematicProgramService(id: string) {
   // Validasi: jika tidak ada proposal_id dan merupakan tahun 2025
   if (!program?.proposal_id && program?.fiscal_year === 2025) {
     throw new Error(
-      "Program tahun 2025 yang bukan berasal dari proposal tidak dapat dihapus secara manual.",
+      "Program tahun 2025 yang bukan berasal dari proposal tidak dapat dihapus.",
     );
   }
 
@@ -421,6 +525,18 @@ export async function deleteBioflocThematicProgramService(id: string) {
     if (updateProposalError) {
       throw updateProposalError;
     }
+  }
+
+  // Hapus semua dokumentasi terkait program ini
+  const { error: deleteDocsError } = await supabase
+    .from("documentations")
+    .delete()
+    .eq("program_type", "biofloc_thematic")
+    .eq("program_id", id);
+
+  if (deleteDocsError) {
+    console.error("Error deleting documentations:", deleteDocsError);
+    // Kita tetap lanjut hapus program utama
   }
 
   // Hapus program (diberlakukan untuk semua yang lolos validasi)

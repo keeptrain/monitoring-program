@@ -8,8 +8,9 @@ import {
   PaginatedProposalBioflocResult,
   ProposalBioflocProvinceSummary,
 } from "@/features/proposal/types/proposal-biofloc";
-import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
+import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
+import { uuidv7 } from "uuidv7";
 
 function normalizeProvinceName(province: string): string {
   return province.trim().toLowerCase();
@@ -309,7 +310,7 @@ export async function getProposalBioflocDetailService(
  */
 export async function convertProposalToThematicProgramService(
   proposalId: string,
-  value: BioflocProgramFormValues,
+  value: ThematicProgramFormValues,
 ): Promise<{ success: boolean; message: string }> {
   const supabase = await createClient();
 
@@ -330,10 +331,22 @@ export async function convertProposalToThematicProgramService(
     throw new Error("Proposal belum di setujui.");
   }
 
+  // Fetch location name for address
+  const { data: locationData, error: locationError } = await supabase
+    .from(TABLES.AVAILABLE_LOCATIONS)
+    .select("name")
+    .eq("id", proposal.location_id)
+    .single();
+
+  if (locationError) {
+    throw new Error("Gagal mendapatkan data lokasi: " + locationError.message);
+  }
+
   // Create new thematic program with normalized references
   const { error: bioflocInsertError } = await supabase
     .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
     .insert({
+      id: uuidv7(),
       proposal_id: proposalId,
       entity_id: proposal.entity_id,
       location_id: proposal.location_id,
@@ -345,7 +358,7 @@ export async function convertProposalToThematicProgramService(
       production_value: value.production_value,
       distribution_amount: value.distribution_amount,
       sppg_partner: value.sppg_partner,
-      // address: value.address, // Now comes from form or entity
+      address: locationData?.name || "Alamat tidak diketahui",
       s_curve_path: value.s_curve_path,
       fiscal_year: new Date().getFullYear(),
     });

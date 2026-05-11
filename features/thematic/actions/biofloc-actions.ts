@@ -2,8 +2,9 @@
 
 import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import * as db from "../services/biofloc-services";
+import { createClient } from "@/utils/supabase";
+import { TABLES } from "@/lib/constants/tables";
 import { UpdateProgressFormValues } from "../forms/update-progress-schema";
 import {
   BioflocProgramsPaginatedInput,
@@ -37,26 +38,70 @@ export async function createThematicProgram(
   }
 }
 
-export async function updateThematicPrograms(
-  id: string,
-  data: BioflocProgramFormValues,
-) {
-  const documentations = db.normalizeDocumentations(data.documentations);
+export async function downloadSCurveFile(id: string) {
+  const { blob, originalPath } = await db.downloadSCurveFileService(id);
+  const fileName = originalPath.split("/").pop();
+  return { blob, fileName };
+}
 
-  try {
-    await db.updateBioflocThematicProgramService(id, {
-      ...data,
-      documentations,
-    });
-  } catch (error) {
+export async function updateThematicProgram(
+  id: string,
+  data: ThematicProgramFormValues,
+): Promise<{ success: boolean; message: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .update({
+      progress_percent: data.progress_percent,
+      commodity_aid: data.commodity_aid,
+      commodity_potential: data.commodity_potential,
+      land_area: data.land_area,
+      production_value: data.production_value,
+      distribution_amount: data.distribution_amount,
+      sppg_partner: data.sppg_partner,
+      s_curve_path: data.s_curve_path,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (error) {
     console.error("Error updating thematic program:", error);
-    return;
+    throw error;
   }
 
-  revalidatePath("/dashboard/thematic");
-  revalidatePath(`/dashboard/thematic/${id}`);
-  revalidatePath(`/dashboard/thematic/form/${id}`);
-  redirect("/dashboard/thematic");
+  return {
+    success: true,
+    message: "Proposal berhasil diperbarui",
+  };
+}
+
+import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
+import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
+import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
+
+export async function updateKdmpEntity(
+  entityId: string | number,
+  data: IdentifyKdmpFormValues,
+) {
+  try {
+    await db.updateKdmpEntityService(entityId, data);
+    revalidatePath("/dashboard/thematic");
+  } catch (error) {
+    console.error("Error updating KDMP entity:", error);
+    throw error;
+  }
+}
+
+export async function updateLocation(
+  locationId: string | number,
+  data: LocationKdmpValues,
+) {
+  try {
+    await db.updateLocationService(locationId, data);
+  } catch (error) {
+    console.error("Error updating location:", error);
+    throw error;
+  }
 }
 
 export async function updateThematicProgramProgress(

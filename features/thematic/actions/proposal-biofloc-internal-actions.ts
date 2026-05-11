@@ -2,7 +2,6 @@
 
 import * as db from "../services/proposal-biofloc-services";
 import { ProposalBioflocPaginationParams } from "@/features/proposal/types/proposal-biofloc";
-import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { getSession } from "@/features/auth/session";
 import {
   ProposalVerificationFormValues,
@@ -10,6 +9,7 @@ import {
 } from "../forms/proposal-verification-schema";
 import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
+import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
 
 export async function getProposalBioflocPaginated(
   params: ProposalBioflocPaginationParams,
@@ -125,7 +125,7 @@ export async function getProposalBioflocDetail(id: string) {
 
 export async function convertProposalToProgram(
   proposalId: string,
-  values: BioflocProgramFormValues,
+  values: ThematicProgramFormValues,
 ): Promise<{ success: boolean; message: string }> {
   try {
     await db.convertProposalToThematicProgramService(proposalId, values);

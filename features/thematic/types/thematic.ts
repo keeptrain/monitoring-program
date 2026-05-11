@@ -1,9 +1,20 @@
+export const ThematicProgramStatus: Record<string, string> = {
+  potential: "Potensial",
+  active: "Aktif",
+  inactive: "Tidak Aktif",
+};
+
+export type ThematicProgramStatusType =
+  (typeof ThematicProgramStatus)[keyof typeof ThematicProgramStatus];
+
 export type BioflocScope = "internal" | "public";
 
 export interface ThematicPrograms {
   id: string; // UUID
   entity_id: number;
   location_id: number;
+  proposal_id: string | null;
+  status: string;
   progress_percent: number;
   commodity_aid: string;
   commodity_potential: string | null;
@@ -31,15 +42,32 @@ export type ThematicProgramDetail = ThematicPrograms & {
   legal_entity_number: string;
   chairman_name: string;
   chairman_phone: string;
+  companion_name: string;
+  companion_phone: string;
   total_management: number;
   total_members: number;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  province_code: string;
+  regency_code: string;
+  district_code: string;
+  village_code: string;
   available_locations: {
     name: string;
     latitude: number;
     longitude: number;
     province_id?: string | null;
     regency_id?: string | null;
+    province_code?: string;
+    province_name?: string;
+    regency_code?: string;
+    district_code?: string;
+    village_code?: string;
   };
+  proposal_biofloc_thematic_programs: {
+    land_slope: number | null;
+  } | null;
   kdmp_entities: {
     name: string;
     kusuka_number: string;
@@ -73,6 +101,7 @@ export type ThematicProgramIndex = Pick<
 
 export interface BioflocProgramListItem {
   id: string; // UUID
+  status: string;
   entity_name: string;
   location_name: string;
   commodity_aid: string;
