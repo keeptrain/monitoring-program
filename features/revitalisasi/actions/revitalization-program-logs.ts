@@ -128,6 +128,8 @@ export async function getRevitalizationProgramLogsByArea(
   };
 }
 
+import { toPreviewUrl } from "@/lib/utils";
+
 export async function getRevitalizationProgramLogById(id: string) {
   const supabase = await createClient();
   const { data: log, error } = await supabase
@@ -141,8 +143,26 @@ export async function getRevitalizationProgramLogById(id: string) {
     throw error;
   }
 
+  // Fetch documentation
+  const { data: docs } = await supabase
+    .from("documentations")
+    .select("path, type")
+    .eq("program_type", "revitalization")
+    .eq("program_id", id);
+
+  const beforeUrls =
+    docs?.filter((d) => d.type === "before").map((d) => toPreviewUrl(d.path)) ||
+    [];
+  const afterUrls =
+    docs?.filter((d) => d.type === "after").map((d) => toPreviewUrl(d.path)) ||
+    [];
+
   return {
-    data: log as RevitalizationProgramLog,
+    data: {
+      ...log,
+      beforeUrls,
+      afterUrls,
+    } as RevitalizationProgramLog,
   };
 }
 
@@ -150,9 +170,7 @@ export async function getRevitalizationAreaSummaries() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("revitalization_program_logs")
-    .select(
-      "area_id, progress_percent, updated_at, progress_date, created_at",
-    )
+    .select("area_id, progress_percent, updated_at, progress_date, created_at")
     .order("area_id", { ascending: true })
     .order("progress_date", { ascending: false })
     .order("created_at", { ascending: false });
@@ -161,7 +179,10 @@ export async function getRevitalizationAreaSummaries() {
     throw error;
   }
 
-  const latestByArea = new Map<number, { progress_percent: number; updated_at: string }>();
+  const latestByArea = new Map<
+    number,
+    { progress_percent: number; updated_at: string }
+  >();
   for (const row of data ?? []) {
     if (!latestByArea.has(row.area_id)) {
       latestByArea.set(row.area_id, {
@@ -301,7 +322,10 @@ export async function updateRevitalizationProgramLog(
   return { id, areaId };
 }
 
-export async function deleteRevitalizationProgramLog(id: string, areaId: number) {
+export async function deleteRevitalizationProgramLog(
+  id: string,
+  areaId: number,
+) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("revitalization_program_logs")

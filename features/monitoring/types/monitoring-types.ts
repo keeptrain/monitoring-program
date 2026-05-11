@@ -36,9 +36,14 @@ export type IsfDashboardLinePoint = {
 
 export type MonitoringIsf = {
   data: (IsfDetailSheet | null)[];
-  overall_progress: number;
-  overall_summary: Record<number, number>;
   total_workers: number;
+  latest_documentation_urls?: string[];
+};
+
+export type IsfStats = {
+  overallProgress: number;
+  summary: Record<number, number>;
+  chartData: IsfChartPoint[];
 };
 
 export type IsfChartPoint = {
@@ -60,7 +65,6 @@ export type RevitalizationDetailSheet = {
 
 export type MonitoringRevitalization = {
   data: (RevitalizationDetailSheet | null)[];
-  overall_progress: number;
-  overall_summary: Record<number, number>;
   total_workers: number;
+  latest_documentation_urls?: string[];
 };

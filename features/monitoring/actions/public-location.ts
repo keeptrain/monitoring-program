@@ -105,6 +105,8 @@ export async function getBiofloc(id: number): Promise<{ data: any }> {
   };
 }
 
+import { toPreviewUrl } from "@/lib/utils";
+
 export async function getMonitoringIsf(): Promise<MonitoringIsf> {
   const supabase = await createClient();
   const stepIds = STEPS.map((step) => step.id);
@@ -120,23 +122,36 @@ export async function getMonitoringIsf(): Promise<MonitoringIsf> {
     throw error;
   }
 
+  // Get the most recent log across all zones for documentation carousel
+  const mostRecentLog = [...data].sort(
+    (a, b) =>
+      new Date(b.progress_date).getTime() - new Date(a.progress_date).getTime(),
+  )[0];
+
+  let images: string[] = [];
+  if (mostRecentLog) {
+    const { data: docs } = await supabase
+      .from("documentations")
+      .select("path, type")
+      .eq("program_type", "isf")
+      .eq("program_id", mostRecentLog.id);
+
+    if (docs) {
+      const beforeImages = docs
+        .filter((d) => d.type === "before")
+        .map((d) => toPreviewUrl(d.path));
+      const afterImages = docs
+        .filter((d) => d.type === "after")
+        .map((d) => toPreviewUrl(d.path));
+
+      images = [...beforeImages, ...afterImages];
+    }
+  }
+
   // Because .in() takes ALL rows, we filter in memory MacBook/Vercel
   // to get the latest from each step_id
   const latestRows = stepIds.map(
     (id) => data.find((row) => row.step_id === id) || null,
-  );
-
-  const overallProgress = +(
-    latestRows.reduce((acc, row) => acc + (row?.progress_percent || 0), 0) /
-    latestRows.length
-  ).toFixed(1);
-
-  const overallSummary = latestRows.reduce(
-    (acc, row, index) => {
-      acc[index + 1] = row?.progress_percent || 0;
-      return acc;
-    },
-    {} as Record<number, number>,
   );
 
   // Get cumulative workers from all historical rows
@@ -149,9 +164,8 @@ export async function getMonitoringIsf(): Promise<MonitoringIsf> {
 
   return {
     data: latestRows,
-    overall_progress: overallProgress,
-    overall_summary: overallSummary,
     total_workers: totalWorkers,
+    latest_documentation_urls: images,
   };
 }
 

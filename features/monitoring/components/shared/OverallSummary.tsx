@@ -54,7 +54,7 @@ export default function OverallSummary({
   return (
     <div className="flex w-full flex-col items-center">
       {!isVisible ? (
-        <IsNotInViewSkeleton />
+        <IsNotInViewSkeleton hasManyAreas={areas.length > 4} />
       ) : (
         <div className="flex w-full flex-col items-center justify-center gap-6 sm:flex-row">
           <div style={{ width: 300, height: 200 }}>
@@ -108,31 +108,68 @@ export default function OverallSummary({
           </div>
 
           {/* Progress Grid */}
-          <div className="flex flex-1 justify-center gap-x-6 gap-y-8">
-            <div className="space-y-4">
-              {areas.map((a) => (
-                <div key={a.id} className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm font-semibold tracking-tight uppercase">
+          <div className="flex flex-1 justify-center gap-2">
+            <div className="space-y-3">
+              {(areas.length > 4
+                ? areas.slice(0, Math.ceil(areas.length / 2))
+                : areas
+              ).map((a) => (
+                <div
+                  key={a.id}
+                  className="flex items-center gap-1.5 text-sm font-semibold tracking-tight uppercase"
+                >
+                  <span
+                    className={cn(
+                      "flex h-8 w-28 items-center justify-center rounded px-2 text-center text-[9px] text-white shadow-xs",
+                      areaColors[a.id] || "bg-primary",
+                    )}
+                    title={a.name.replace("Kabupaten ", "")}
+                  >
+                    <span className="truncate">
+                      {a.name.replace("Kabupaten ", "")}
+                    </span>
+                  </span>
+                  <span
+                    className={cn(
+                      "flex h-8 w-11 items-center justify-center rounded text-[10px] font-black text-white tabular-nums shadow-xs",
+                      areaColors[a.id] || "bg-primary",
+                    )}
+                  >
+                    {summary[a.id]}%
+                  </span>
+                </div>
+              ))}
+            </div>
+            {areas.length > 4 && (
+              <div className="space-y-3">
+                {areas.slice(Math.ceil(areas.length / 2)).map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center gap-1.5 text-sm font-semibold tracking-tight uppercase"
+                  >
                     <span
                       className={cn(
-                        "flex w-32 justify-center rounded py-1 text-[10px] text-white shadow-xs",
+                        "flex h-8 w-28 items-center justify-center rounded px-2 text-center text-[9px] text-white shadow-xs",
                         areaColors[a.id] || "bg-primary",
                       )}
+                      title={a.name.replace("Kabupaten ", "")}
                     >
-                      {a.name.replace("Kabupaten ", "")}
+                      <span className="truncate">
+                        {a.name.replace("Kabupaten ", "")}
+                      </span>
                     </span>
                     <span
                       className={cn(
-                        "flex w-12 justify-center rounded py-1 text-[10px] font-black text-white tabular-nums shadow-xs",
+                        "flex h-8 w-11 items-center justify-center rounded text-[10px] font-black text-white tabular-nums shadow-xs",
                         areaColors[a.id] || "bg-primary",
                       )}
                     >
                       {summary[a.id]}%
                     </span>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -140,7 +177,7 @@ export default function OverallSummary({
   );
 }
 
-function IsNotInViewSkeleton() {
+function IsNotInViewSkeleton({ hasManyAreas }: { hasManyAreas: boolean }) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-6 sm:flex-row">
       {/* Chart Skeleton Wrapper (Matching 300x200 chart container) */}
@@ -152,12 +189,20 @@ function IsNotInViewSkeleton() {
       </div>
 
       {/* Progress Grid Skeleton */}
-      <div className="flex flex-1 justify-center">
+      <div className="flex flex-1 justify-center gap-x-10">
         <div className="space-y-4">
-          <Skeleton className="h-7 w-48 rounded" />
-          <Skeleton className="h-7 w-48 rounded" />
-          <Skeleton className="h-7 w-48 rounded" />
+          <Skeleton className="h-7 w-40 rounded" />
+          <Skeleton className="h-7 w-40 rounded" />
+          <Skeleton className="h-7 w-40 rounded" />
+          <Skeleton className="h-7 w-40 rounded" />
         </div>
+        {hasManyAreas && (
+          <div className="space-y-4">
+            <Skeleton className="h-7 w-40 rounded" />
+            <Skeleton className="h-7 w-40 rounded" />
+            <Skeleton className="h-7 w-40 rounded" />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,7 +6,10 @@ export const getDocumentationByTypeAndIdQueryKey = (
   id: string | number,
 ) => ["documentations", type, id];
 
-export const useGetDocumentationsByTypeAndId = (type: string, id: string | number) =>
+export const useGetDocumentationsByTypeAndId = (
+  type: string,
+  id: string | number,
+) =>
   useQuery({
     queryKey: getDocumentationByTypeAndIdQueryKey(type, id),
     queryFn: async () => await getDocumentationsByTypeAndId(type, id),

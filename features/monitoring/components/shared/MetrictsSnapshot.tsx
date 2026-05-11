@@ -1,10 +1,12 @@
-import { TractorIcon, UsersIcon } from "lucide-react";
+import { UsersIcon } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
 
 export default function MetrictsSnapshot({
   progressPercent,
+  totalWorker,
 }: {
   progressPercent: number;
+  totalWorker: number;
 }) {
   return (
     <div className="flex w-full items-center gap-12">
@@ -21,21 +23,9 @@ export default function MetrictsSnapshot({
             <div className="flex items-center gap-3">
               <UsersIcon className="size-6" />
               <p className="text-xl font-bold">
-                {12} <span className="text-sm">Orang</span>
+                {totalWorker} <span className="text-sm">Orang</span>
               </p>
             </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-            Alat Berat
-          </p>
-          <div className="flex items-center gap-3">
-            <TractorIcon className="size-6" />
-            <p className="text-xl font-bold">
-              12 <span className="text-sm">Unit</span>
-            </p>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ import {
 } from "../types/monitoring-types";
 import { TABLES } from "@/lib/constants/tables";
 
+import { toPreviewUrl } from "@/lib/utils";
+
 /**
  * Mengambil data ringkasan monitoring revitalisasi untuk seluruh area.
  * Digunakan untuk menampilkan poin-poin pada peta, total progress akumulatif,
@@ -17,6 +19,7 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
   const supabase = await createClient();
   const areaIds = REVITALIZATION_AREAS.map((area) => area.id);
 
+  // 1. Get latest logs for each area
   const { data, error } = await supabase
     .from("latest_revitalization_logs")
     .select("*")
@@ -31,18 +34,13 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
     (id) => data.find((row) => row.area_id === id) || null,
   );
 
-  const overallProgress = +(
-    latestRows.reduce((acc, row) => acc + (row?.progress_percent || 0), 0) /
-    latestRows.length
-  ).toFixed(1);
-
-  const overallSummary = latestRows.reduce(
-    (acc, row, index) => {
-      acc[index + 1] = row?.progress_percent || 0;
-      return acc;
-    },
-    {} as Record<number, number>,
-  );
+  // 2. Fetch documentations for these specific latest reports
+  const reportIds = latestRows.map((r) => r?.id).filter(Boolean) as string[];
+  const { data: docs } = await supabase
+    .from("documentations")
+    .select("program_id, type, path")
+    .eq("program_type", "revitalization")
+    .in("program_id", reportIds);
 
   const { data: allWorkersData } = await supabase
     .from("revitalization_program_logs")
@@ -54,6 +52,16 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
   const mappedData: (RevitalizationDetailSheet | null)[] = latestRows.map(
     (row, idx) => {
       if (!row) return null;
+
+      // Filter docs for this specific report
+      const reportDocs = docs?.filter((d) => d.program_id === row.id) || [];
+      const beforeUrls = reportDocs
+        .filter((d) => d.type === "before")
+        .map((d) => toPreviewUrl(d.path));
+      const afterUrls = reportDocs
+        .filter((d) => d.type === "after")
+        .map((d) => toPreviewUrl(d.path));
+
       return {
         id: row.id,
         area_id: row.area_id,
@@ -63,15 +71,35 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
         total_worker: row.total_worker,
         status: row.status,
         updated_at: row.updated_at,
+        beforeUrls,
+        afterUrls,
       };
     },
   );
 
+  // 3. Get images for the most recent report across all areas for the main carousel
+  const mostRecentReport = [...(data || [])].sort(
+    (a, b) =>
+      new Date(b.progress_date).getTime() - new Date(a.progress_date).getTime(),
+  )[0];
+
+  let overallImages: string[] = [];
+  if (mostRecentReport) {
+    const reportDocs =
+      docs?.filter((d) => d.program_id === mostRecentReport.id) || [];
+    const beforeUrls = reportDocs
+      .filter((d) => d.type === "before")
+      .map((d) => toPreviewUrl(d.path));
+    const afterUrls = reportDocs
+      .filter((d) => d.type === "after")
+      .map((d) => toPreviewUrl(d.path));
+    overallImages = [...beforeUrls, ...afterUrls];
+  }
+
   return {
     data: mappedData,
-    overall_progress: overallProgress,
-    overall_summary: overallSummary,
     total_workers: totalWorkers,
+    latest_documentation_urls: overallImages,
   };
 }
 
@@ -172,7 +200,85 @@ export async function getRevitalizationAvailableDatesByMonth(
 export async function getRevitalizationStats() {
   const supabase = await createClient();
 
-  const data = supabase.from(TABLES.REVITALIZATION_LOGS);
+  // 1. Ambil data log terbaru untuk summary & overall progress
+  const areaIds = REVITALIZATION_AREAS.map((area) => area.id);
 
-  return {};
+  const { data: latestData, error: latestError } = await supabase
+    .from("latest_revitalization_logs")
+    .select("area_id, progress_percent")
+    .in("area_id", areaIds);
+
+  if (latestError) {
+    console.error("Error fetching latest revitalization logs:", latestError);
+    throw latestError;
+  }
+
+  const latestRows = areaIds.map(
+    (id) => latestData.find((row) => row.area_id === id) || null,
+  );
+
+  const overallProgress =
+    +(
+      latestRows.reduce((acc, row) => acc + (row?.progress_percent || 0), 0) /
+      latestRows.length
+    ).toFixed(1) || 0;
+
+  const summary = latestRows.reduce(
+    (acc, row, index) => {
+      acc[index + 1] = row?.progress_percent || 0;
+      return acc;
+    },
+    {} as Record<number, number>,
+  );
+
+  // 2. Ambil semua log secara kronologis untuk chart
+  const { data: logs, error: logsError } = await supabase
+    .from(TABLES.REVITALIZATION_LOGS)
+    .select("area_id, progress_percent, progress_date")
+    .order("progress_date", { ascending: true });
+
+  if (logsError) {
+    console.error("Error fetching all revitalization logs:", logsError);
+    throw logsError;
+  }
+
+  // Grup data berdasarkan tanggal
+  const groupedByDate = new Map<string, Record<string, number>>();
+
+  // Inisialisasi nilai awal 0 untuk tiap area
+  const latestValues: Record<string, number> = {};
+  areaIds.forEach((id) => (latestValues[`z${id}`] = 0));
+
+  logs?.forEach((log) => {
+    const dateKey = log.progress_date.slice(0, 10);
+    const zoneKey = `z${log.area_id}`;
+
+    // Update progress terakhir untuk area ini
+    latestValues[zoneKey] = log.progress_percent;
+
+    // Simpan snapshot untuk tanggal tersebut
+    groupedByDate.set(dateKey, { ...latestValues });
+  });
+
+  const chartData = Array.from(groupedByDate.entries())
+    .map(([date, values]) => {
+      const parsedDate = new Date(date);
+      const name = parsedDate.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+      });
+
+      return {
+        name,
+        date,
+        ...values,
+      };
+    })
+    .slice(-12);
+
+  return {
+    overallProgress,
+    summary,
+    chartData,
+  };
 }
