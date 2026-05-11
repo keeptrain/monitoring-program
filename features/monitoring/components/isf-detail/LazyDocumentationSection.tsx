@@ -41,7 +41,7 @@ export function LazyDocumentationSection({
   );
 
   return (
-    <div ref={sectionRef} className="space-y-8">
+    <div ref={sectionRef} className="mb-6 space-y-8">
       <div className="flex items-center gap-2">
         <CameraIcon className="size-6" />
         <p className="text-base font-bold tracking-widest">Dokumentasi</p>
