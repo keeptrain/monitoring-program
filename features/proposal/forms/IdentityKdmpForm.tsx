@@ -15,13 +15,18 @@ import { useIdentifyKdmpForm } from "../hooks/useIdentifyKdmpForm";
 export default function IdentityKdmpForm(props: {
   initialData?: IdentifyKdmpFormValues;
   proposalId?: string;
+  onSubmit?: (data: IdentifyKdmpFormValues) => void;
 }) {
-  const { initialData } = props;
-  const { form, onSubmit } = useIdentifyKdmpForm(initialData);
+  const { initialData, onSubmit: onSubmitOverride } = props;
+  const { form, onSubmit: defaultOnSubmit } = useIdentifyKdmpForm(initialData);
   const { errors } = form.formState;
 
+  const handleSubmit = onSubmitOverride
+    ? form.handleSubmit(onSubmitOverride)
+    : defaultOnSubmit;
+
   return (
-    <form id="step-1-form" onSubmit={onSubmit} className="mt-6">
+    <form id="step-1-form" onSubmit={handleSubmit} className="mt-6">
       <FieldGroup className="grid grid-cols-2">
         <Field>
           <FieldLabel>

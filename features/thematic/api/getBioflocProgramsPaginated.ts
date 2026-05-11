@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBioflocProgramsPaginated } from "../actions/biofloc";
+import { getBioflocProgramsPaginated } from "../actions/biofloc-actions";
 import { BioflocScope } from "../types/thematic";
 import { BioflocProgramsPaginatedInput } from "../forms/biofloc-program-query-schema";
 

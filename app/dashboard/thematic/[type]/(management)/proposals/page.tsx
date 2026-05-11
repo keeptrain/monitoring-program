@@ -4,7 +4,7 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { getProposalBioflocPaginated } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
-import { proposalBioflocQueryKey } from "@/features/thematic/api/getProposalBioflocPaginated";
+import { getProposalBioflocQueryKey } from "@/features/thematic/api/getProposalBioflocPaginated";
 import ProposalBioflocProgramPage from "@/features/thematic/pages/ProposalBioflocProgramPage";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -58,7 +58,7 @@ export default async function ThematicProposalPage({
       search: "",
     };
     await queryClient.prefetchQuery({
-      queryKey: proposalBioflocQueryKey(defaultParams),
+      queryKey: getProposalBioflocQueryKey(defaultParams),
       queryFn: () => getProposalBioflocPaginated(defaultParams),
     });
   }

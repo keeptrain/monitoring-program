@@ -51,12 +51,12 @@ export default function ProposalSubmissionTableActions({
       )}
 
       {/* Potensial (Convert) hanya untuk PMO dan status approved */}
-      {/* {data.status === "approved" && isPmo && onAction && (
+      {data.status === "approved" && isPmo && onAction && (
         <ConvertProposalButton
           proposalId={data.id}
           proposalName={data.kdmp_entities.name}
         />
-      )} */}
+      )}
 
       {/* Download untuk semua yang login */}
       <ProposalDownloadButton id={data.id} />

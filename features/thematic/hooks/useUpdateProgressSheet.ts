@@ -9,9 +9,12 @@ import {
   UpdateProgressFormValues,
 } from "../forms/update-progress-schema";
 import { BioflocProgramListItem } from "../types/thematic";
-import { updateThematicProgramProgress } from "../actions/biofloc";
+import { updateThematicProgramProgress } from "../actions/biofloc-actions";
 
-type UpdateProgressRow = Pick<BioflocProgramListItem, "id" | "progress_percent">;
+type UpdateProgressRow = Pick<
+  BioflocProgramListItem,
+  "id" | "progress_percent"
+>;
 
 export function useUpdateProgressSheet() {
   const [sheetOpen, setSheetOpen] = useState(false);

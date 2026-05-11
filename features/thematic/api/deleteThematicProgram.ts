@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteThematicProgram } from "../actions/biofloc";
+import { deleteThematicProgram } from "../actions/biofloc-actions";
 import { getBioflocProgramsPaginatedQueryKey } from "./getBioflocProgramsPaginated";
 
 export function useDeleteThematicProgram() {

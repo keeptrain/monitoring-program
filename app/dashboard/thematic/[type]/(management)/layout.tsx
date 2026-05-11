@@ -1,11 +1,16 @@
 import { ReactNode } from "react";
 import { ThematicProgramTabs } from "@/features/thematic/components/ThematicProgramTabs";
-import Link from "next/link";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
 
 const PAGE_CONFIG: Record<string, { label: string }> = {
   biofloc: { label: "Bioflok" },
   minapadi: { label: "Minapadi" },
 };
+
+const breadcrumbItems = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Tematik Bioflok", href: "/dashboard/thematic/biofloc" },
+];
 
 export default async function ThematicTypeLayout({
   children,
@@ -20,15 +25,7 @@ export default async function ThematicTypeLayout({
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-6 space-y-2">
-        <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
-          <Link
-            href="/dashboard"
-            className="underline-offset-2 hover:underline"
-          >
-            Dashboard
-          </Link>{" "}
-          / Tematik / {config.label}
-        </p>
+        <BreadcrumbHeader items={breadcrumbItems} />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-foreground text-2xl font-semibold tracking-tight">

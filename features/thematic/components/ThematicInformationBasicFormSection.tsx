@@ -12,6 +12,7 @@ import {
   BioflocProgramFormInput,
   BioflocProgramFormValues,
 } from "../forms/biofloc-program-schema";
+import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
 
 interface ThematicFormProps {
   form: UseFormReturn<
@@ -29,26 +30,19 @@ export default function ThematicInformationBasicFormSection({
     formState: { errors },
   } = form;
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-      <Field>
-        <FieldLabel htmlFor="name">Nama Program (KDMP)</FieldLabel>
-        <Input
-          {...register("name")}
-          aria-invalid={!!errors.name}
-          placeholder="Contoh: Infrastruktur Jalan"
-        />
-        <FieldError>{errors.name?.message}</FieldError>
-      </Field>
+    <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
       <Field>
         <FieldLabel htmlFor="progress_percent">
           Persentase Pengerjaan (%)
         </FieldLabel>
         <Input
-          {...register("progress_percent", {
-            maxLength: 3,
+          {...form.register("progress_percent", {
+            onChange: handleInputNumberValueChange,
           })}
+          maxLength={3}
+          onKeyDown={handleNumberKeyDown}
+          inputMode="numeric"
           aria-invalid={!!errors.progress_percent}
-          type="number"
           placeholder="0-100"
         />
         <FieldDescription>
@@ -108,34 +102,15 @@ export default function ThematicInformationBasicFormSection({
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="total_management">Jumlah Pengurus</FieldLabel>
-        <Input
-          {...register("total_management")}
-          aria-invalid={!!errors.total_management}
-          type="number"
-          placeholder="0"
-        />
-        <FieldError>{errors.total_management?.message}</FieldError>
-      </Field>
-
-      <Field>
-        <FieldLabel htmlFor="total_members">Jumlah Anggota</FieldLabel>
-        <Input
-          {...register("total_members")}
-          aria-invalid={!!errors.total_members}
-          type="number"
-          placeholder="0"
-        />
-        <FieldError>{errors.total_members?.message}</FieldError>
-      </Field>
-
-      <Field>
         <FieldLabel htmlFor="distribution_amount">Jumlah Distribusi</FieldLabel>
         <Input
-          {...register("distribution_amount")}
+          {...form.register("distribution_amount", {
+            onChange: handleInputNumberValueChange,
+          })}
+          onKeyDown={handleNumberKeyDown}
+          inputMode="numeric"
+          placeholder="Masukkan jumlah distribusi"
           aria-invalid={!!errors.distribution_amount}
-          type="number"
-          placeholder="0"
         />
         <FieldError>{errors.distribution_amount?.message}</FieldError>
       </Field>

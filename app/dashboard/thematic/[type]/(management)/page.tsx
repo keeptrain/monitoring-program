@@ -3,7 +3,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getBioflocProgramsPaginated } from "@/features/thematic/actions/biofloc";
+import { getBioflocProgramsPaginated } from "@/features/thematic/actions/biofloc-actions";
 import { getBioflocProgramsPaginatedQueryKey } from "@/features/thematic/api/getBioflocProgramsPaginated";
 import BioflocProgramPage from "@/features/thematic/BioflocProgramPage";
 import MinapadiProgramPage from "@/features/thematic/MinapadiProgramPage";

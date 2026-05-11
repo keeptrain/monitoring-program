@@ -235,7 +235,7 @@ function MapTopContent({
       </div>
       <div className="absolute top-3 right-3 z-5 flex items-center gap-2">
         <Button size="lg" variant="secondary" asChild>
-          <Link href="/monitoring/biofloc-thematic">Lihat Data</Link>
+          <Link href="/biofloc-thematic/data">Lihat Data</Link>
         </Button>
       </div>
       <div className="absolute right-3 bottom-7 z-5">

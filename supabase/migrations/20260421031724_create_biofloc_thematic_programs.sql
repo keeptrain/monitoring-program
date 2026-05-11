@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS biofloc_thematic_programs (
-  id UUID PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   entity_id BIGINT NOT NULL REFERENCES kdmp_entities(id),
   location_id BIGINT REFERENCES available_locations(id),
   proposal_id UUID REFERENCES proposal_biofloc_thematic_programs(id),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS biofloc_thematic_programs (
   distribution_amount INTEGER NOT NULL DEFAULT 0,
   production_value TEXT NOT NULL,
   sppg_partner TEXT NOT NULL,
-  address TEXT NOT NULL,
+  address TEXT NOT NULL DEFAULT '',
   s_curve_path TEXT,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),

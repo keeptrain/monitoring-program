@@ -18,20 +18,24 @@ import DistrictSelect from "@/components/shared/DistrictSelect";
 import VillageSelect from "@/components/shared/VillageSelect";
 import { LocationKdmpValues } from "../forms/location-kdmp-schema";
 
-export default function LocationKdmpForm(
-  props: {
-    initialData?: LocationKdmpValues;
-    proposalId?: string;
-  },
-) {
-  const { initialData } = props;
-  const { form, onSubmit } = useLocationKdmpForm(initialData);
+export default function LocationKdmpForm(props: {
+  initialData?: LocationKdmpValues;
+  proposalId?: string;
+  onSubmit?: (data: LocationKdmpValues) => void;
+  hideLandSlope?: boolean;
+}) {
+  const { initialData, onSubmit: onSubmitOverride } = props;
+  const { form, onSubmit: defaultOnSubmit } = useLocationKdmpForm(initialData);
   const {
     formState: { errors },
   } = form;
 
+  const handleSubmit = onSubmitOverride
+    ? form.handleSubmit(onSubmitOverride)
+    : defaultOnSubmit;
+
   return (
-    <form id="step-2-form" onSubmit={onSubmit}>
+    <form id="step-2-form" onSubmit={handleSubmit}>
       <div className="mt-6">
         {/* Map Section */}
         <FieldGroup className="col-span-2">
@@ -180,28 +184,30 @@ export default function LocationKdmpForm(
           </Field>
 
           {/* Land Slope at the bottom */}
-          <Field className="col-span-1">
-            <FieldLabel>
-              Kemiringan Lahan <span className="text-destructive">*</span>
-            </FieldLabel>
-            <FieldContent>
-              <div className="flex items-center gap-2">
-                <Input
-                  {...form.register("landSlope", {
-                    onChange: handleInputNumberValueChange,
-                  })}
-                  onKeyDown={handleNumberKeyDown}
-                  inputMode="numeric"
-                  placeholder="Masukkan kemiringan lahan"
-                  aria-invalid={!!errors.landSlope}
-                />
-                <span className="text-sm font-medium">%</span>
-              </div>
-            </FieldContent>
-            {errors.landSlope && (
-              <FieldError>{errors.landSlope.message}</FieldError>
-            )}
-          </Field>
+          {!props.hideLandSlope && (
+            <Field className="col-span-1">
+              <FieldLabel>
+                Kemiringan Lahan <span className="text-destructive">*</span>
+              </FieldLabel>
+              <FieldContent>
+                <div className="flex items-center gap-2">
+                  <Input
+                    {...form.register("landSlope", {
+                      onChange: handleInputNumberValueChange,
+                    })}
+                    onKeyDown={handleNumberKeyDown}
+                    inputMode="numeric"
+                    placeholder="Masukkan kemiringan lahan"
+                    aria-invalid={!!errors.landSlope}
+                  />
+                  <span className="text-sm font-medium">°</span>
+                </div>
+              </FieldContent>
+              {errors.landSlope && (
+                <FieldError>{errors.landSlope.message}</FieldError>
+              )}
+            </Field>
+          )}
         </div>
       </div>
     </form>
