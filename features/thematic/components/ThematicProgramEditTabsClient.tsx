@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import { getThematicProgramQueryKey } from "../api/getThematicProgram";
+import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 
 export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
   const router = useRouter();
@@ -85,10 +86,20 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
     );
   }
 
+  const handleInvalidateQueries = () => {
+    queryClient.invalidateQueries({
+      queryKey: getThematicProgramQueryKey(id),
+    });
+    queryClient.invalidateQueries({
+      queryKey: getBioflocProgramsPaginatedQueryKey(),
+    });
+  };
+
   const handleIdentitySubmit = (data: IdentifyKdmpFormValues) => {
     startIdentityTransition(async () => {
       try {
         await updateKdmpEntity(program.entity_id, data);
+        handleInvalidateQueries();
         toast.success("Informasi KDMP berhasil diperbarui");
         router.push(`/dashboard/thematic/biofloc`);
       } catch (error) {
@@ -105,9 +116,7 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
           data,
           program.proposal_id ?? undefined,
         );
-        queryClient.invalidateQueries({
-          queryKey: getThematicProgramQueryKey(id),
-        });
+        handleInvalidateQueries();
         toast.success("Lokasi KDMP berhasil diperbarui");
         router.push(`/dashboard/thematic/biofloc`);
       } catch (error) {

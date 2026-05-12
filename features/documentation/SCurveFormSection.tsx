@@ -63,7 +63,6 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
                 aria-invalid={!!errors.s_curve_path}
                 onChange={handleOnChange}
                 disabled={uploading}
-                className={uploading ? "w-1/2 pr-10" : "w-1/2"}
               />
               {uploading && (
                 <div className="absolute top-1/2 left-[45%] -translate-y-1/2">
@@ -72,7 +71,7 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
               )}
             </div>
           ) : (
-            <div className="border-border flex w-1/2 items-center justify-between border bg-zinc-50/50 p-2 text-sm">
+            <div className="border-border flex items-center justify-between border bg-zinc-50/50 px-3 text-sm">
               <div className="flex items-center gap-2 overflow-hidden">
                 <FileIcon className="size-4 shrink-0 text-zinc-400" />
                 <span className="truncate font-medium text-zinc-700">
@@ -84,7 +83,7 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
                 variant="ghost"
                 size="icon-sm"
                 onClick={handleRemove}
-                className="hover:text-destructive h-7 w-7"
+                className="hover:text-destructive size-7"
               >
                 <X className="size-3.5" />
               </Button>
