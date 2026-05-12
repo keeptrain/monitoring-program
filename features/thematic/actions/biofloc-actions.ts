@@ -95,9 +95,10 @@ export async function updateKdmpEntity(
 export async function updateLocation(
   locationId: string | number,
   data: LocationKdmpValues,
+  proposalId?: string,
 ) {
   try {
-    await db.updateLocationService(locationId, data);
+    await db.updateLocationService(locationId, data, proposalId);
   } catch (error) {
     console.error("Error updating location:", error);
     throw error;

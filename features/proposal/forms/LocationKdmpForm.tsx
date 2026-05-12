@@ -25,7 +25,9 @@ export default function LocationKdmpForm(props: {
   hideLandSlope?: boolean;
 }) {
   const { initialData, onSubmit: onSubmitOverride } = props;
-  const { form, onSubmit: defaultOnSubmit } = useLocationKdmpForm(initialData);
+  const { form, onSubmit: defaultOnSubmit } = useLocationKdmpForm(initialData, {
+    disableStore: !!onSubmitOverride,
+  });
   const {
     formState: { errors },
   } = form;
@@ -187,21 +189,18 @@ export default function LocationKdmpForm(props: {
           {!props.hideLandSlope && (
             <Field className="col-span-1">
               <FieldLabel>
-                Kemiringan Lahan <span className="text-destructive">*</span>
+                Kemiringan Lahan ° <span className="text-destructive">*</span>
               </FieldLabel>
               <FieldContent>
-                <div className="flex items-center gap-2">
-                  <Input
-                    {...form.register("landSlope", {
-                      onChange: handleInputNumberValueChange,
-                    })}
-                    onKeyDown={handleNumberKeyDown}
-                    inputMode="numeric"
-                    placeholder="Masukkan kemiringan lahan"
-                    aria-invalid={!!errors.landSlope}
-                  />
-                  <span className="text-sm font-medium">°</span>
-                </div>
+                <Input
+                  {...form.register("landSlope", {
+                    onChange: handleInputNumberValueChange,
+                  })}
+                  onKeyDown={handleNumberKeyDown}
+                  inputMode="numeric"
+                  placeholder="Masukkan kemiringan lahan"
+                  aria-invalid={!!errors.landSlope}
+                />
               </FieldContent>
               {errors.landSlope && (
                 <FieldError>{errors.landSlope.message}</FieldError>

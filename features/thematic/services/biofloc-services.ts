@@ -463,6 +463,7 @@ export async function updateKdmpEntityService(
 export async function updateLocationService(
   locationId: string | number,
   data: LocationKdmpValues,
+  proposalId?: string | null,
 ) {
   const supabase = await createClient();
   const { error } = await supabase
@@ -480,6 +481,18 @@ export async function updateLocationService(
 
   if (error) {
     throw error;
+  }
+
+  if (proposalId && data.landSlope !== undefined) {
+    const { error: proposalError } = await supabase
+      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .update({ land_slope: Number(data.landSlope) || 0 })
+      .eq("id", proposalId);
+
+    if (proposalError) {
+      console.error("Error updating proposal land slope:", proposalError);
+      throw proposalError;
+    }
   }
 }
 

@@ -25,7 +25,10 @@ const CREATE_DEFAULT_VALUES: DefaultValues<LocationKdmpInput> = {
 
 export const useLocationKdmpForm = (
   initialData?: Partial<LocationKdmpInput>,
+  options?: { disableStore?: boolean },
 ) => {
+  const disableStore = options?.disableStore ?? false;
+
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(2).withOptions({
@@ -39,13 +42,19 @@ export const useLocationKdmpForm = (
   const serverErrors = useProposalStore((state) => state.serverErrors);
   const setServerErrors = useProposalStore((state) => state.setServerErrors);
 
+  const mergedDefaults = disableStore
+    ? { ...CREATE_DEFAULT_VALUES, ...initialData }
+    : { ...CREATE_DEFAULT_VALUES, ...initialData, ...step2Data };
+
   const form = useForm<LocationKdmpInput, undefined, LocationKdmpValues>({
-    defaultValues: { ...CREATE_DEFAULT_VALUES, ...initialData, ...step2Data },
+    defaultValues: mergedDefaults,
     resolver: zodResolver(locationKdmpSchema),
   });
 
   // Re-hydrate form from store or initialData on client mount
   useEffect(() => {
+    if (disableStore) return;
+
     const handleHydration = (state: ProposalState) => {
       const storeData = state.step2Data;
       const hasStoreData = storeData && Object.keys(storeData).length > 0;
@@ -64,10 +73,12 @@ export const useLocationKdmpForm = (
 
     const unsub = useProposalStore.persist.onFinishHydration(handleHydration);
     return () => unsub();
-  }, [form, initialData]);
+  }, [form, initialData, disableStore]);
 
   // Subscribe to store changes (e.g. clearDraft) to keep form in sync
   useEffect(() => {
+    if (disableStore) return;
+
     let prevStep2Data = useProposalStore.getState().step2Data;
 
     const unsub = useProposalStore.subscribe((state) => {
@@ -86,20 +97,23 @@ export const useLocationKdmpForm = (
     });
 
     return () => unsub();
-  }, [form, initialData]);
+  }, [form, initialData, disableStore]);
 
   useEffect(() => {
+    if (disableStore) return;
     if (serverErrors && step === 2) {
       Object.entries(serverErrors).forEach(([field, messages]) => {
         form.setError(field as any, { type: "server", message: messages[0] });
       });
       setServerErrors(null);
     }
-  }, [serverErrors, step, form, setServerErrors]);
+  }, [serverErrors, step, form, setServerErrors, disableStore]);
 
   const onSubmit = (data: LocationKdmpValues) => {
-    setStep2Data(data);
-    setStep(step + 1);
+    if (!disableStore) {
+      setStep2Data(data);
+      setStep(step + 1);
+    }
   };
 
   return {
