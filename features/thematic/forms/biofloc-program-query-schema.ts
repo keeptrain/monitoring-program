@@ -9,6 +9,7 @@ export const bioflocProgramsPaginatedSchema = z.object({
   search: z.string().trim().optional().default(""),
   province: z.string().trim().optional().default(""),
   year: z.coerce.number().int().optional(),
+  status: z.string().trim().optional().default(""),
 });
 
 export type BioflocProgramsPaginatedInput = z.input<

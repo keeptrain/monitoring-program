@@ -106,6 +106,7 @@ const PUBLIC_PAGINATED_SELECT = `
   id,
   status,
   commodity_aid,
+  commodity_potential,
   progress_percent,
   distribution_amount,
   created_at,
@@ -126,6 +127,7 @@ type BioflocProgramListRow = {
   id: string;
   status: string;
   commodity_aid: string;
+  commodity_potential?: string | null;
   progress_percent: number;
   distribution_amount: number;
   created_at: string;
@@ -147,7 +149,7 @@ export async function getBioflocProgramsPaginatedService(
   params: BioflocProgramsPaginatedParams,
 ): Promise<BioflocProgramsPaginatedResult> {
   const supabase = await createClient();
-  const { page, pageSize, province, scope, search, year } = params;
+  const { page, pageSize, province, scope, search, year, status } = params;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -170,6 +172,10 @@ export async function getBioflocProgramsPaginatedService(
     query = query.eq("fiscal_year", year);
   }
 
+  if (status && status.length > 0) {
+    query = query.eq("status", status);
+  }
+
   const { data, error, count } = await query
     .order("updated_at", { ascending: false })
     .range(from, to);
@@ -185,6 +191,7 @@ export async function getBioflocProgramsPaginatedService(
     entity_name: row.kdmp_entities?.name ?? "Tidak Diketahui",
     location_name: row.available_locations?.name ?? "-",
     commodity_aid: row.commodity_aid,
+    commodity_potential: row.commodity_potential ?? "",
     progress_percent: row.progress_percent,
     distribution_amount: row.distribution_amount,
     total_management: row.kdmp_entities?.board_member_count ?? 0,

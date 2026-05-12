@@ -25,6 +25,7 @@ import {
 import { BioflocProgramsInternalTableColumns } from "@/features/monitoring/components/biofloc/BioflocProgramsTableColumns";
 import { useURLSearchParams } from "@/hooks/useURLSearchParams";
 import { useDeleteThematicProgram } from "./api/deleteThematicProgram";
+import { ThematicProgramStatus } from "./types/thematic";
 
 const YEAR_OPTIONS = [2026, 2025] as const;
 
@@ -43,6 +44,7 @@ export default function BioflocProgramPage({
     search?: string;
     province?: string;
     year?: string;
+    status?: string;
   }>();
 
   const page = parseInt(params.page as string) || 1;
@@ -50,6 +52,7 @@ export default function BioflocProgramPage({
   const searchQuery = (params.search as string) || "";
   const selectedProvince = (params.province as string) || "";
   const selectedYear = parseInt(params.year as string) || 0;
+  const selectedStatus = (params.status as string) || "";
 
   const debouncedSearchQuery = useDebouncedValue(localSearchQuery, 400);
 
@@ -69,6 +72,7 @@ export default function BioflocProgramPage({
     province: selectedProvince,
     year: selectedYear,
     search: searchQuery,
+    status: selectedStatus,
   });
 
   const pagination: PaginationState = {
@@ -152,8 +156,25 @@ export default function BioflocProgramPage({
                   });
                 }}
                 allLabel="Semua Provinsi"
-                className="w-[220px]"
+                className="w-[150px]"
               />
+              <NativeSelect
+                value={selectedStatus}
+                onChange={(e) => {
+                  setParams({
+                    status: e.target.value,
+                    page: "1",
+                  });
+                }}
+                className="w-[130px]"
+              >
+                <NativeSelectOption value="">Semua Status</NativeSelectOption>
+                {Object.entries(ThematicProgramStatus).map(([key, value]) => (
+                  <NativeSelectOption key={key} value={key}>
+                    {value}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
             </div>
             <div className="ml-auto w-1/4">
               <Input

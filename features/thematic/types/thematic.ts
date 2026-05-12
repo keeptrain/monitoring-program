@@ -105,6 +105,7 @@ export interface BioflocProgramListItem {
   entity_name: string;
   location_name: string;
   commodity_aid: string;
+  commodity_potential: string;
   progress_percent: number;
   distribution_amount: number;
   created_at: string;

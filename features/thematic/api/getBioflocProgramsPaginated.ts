@@ -8,7 +8,7 @@ export const getBioflocProgramsPaginatedQueryKey = (
 ) =>
   params
     ? (["biofloc-thematic-programs-paginated", params] as const)
-    : (["biofloc-thematic-programs-paginated"] as const);
+    : (["biofloc-thematic-programs-paginated"] as const);    
 
 export const useGetBioflocProgramsPaginated = (
   scope: BioflocScope,

@@ -105,7 +105,7 @@ export default function ProposalBioflocProgramPage({
                 setSelectedProvince(val);
                 setPagination((prev) => ({ ...prev, pageIndex: 0 }));
               }}
-              className="mr-2 w-[200px]"
+              className="mr-2 w-[150px]"
             />
             <NativeSelect
               value={table.getColumn("status")?.getFilterValue() as string}
