@@ -4,30 +4,36 @@ import { Label, Pie, PieChart } from "recharts";
 export default function MetrictsSnapshot({
   progressPercent,
   totalWorker,
+  children,
 }: {
   progressPercent: number;
   totalWorker: number;
+  children?: React.ReactNode;
 }) {
   return (
-    <div className="flex w-full items-center gap-12">
+    <div className="flex w-full flex-col gap-8 sm:flex-row sm:items-center sm:gap-12">
       <div className="size-[140px] shrink-0">
         <ZoneProgressChart progress={progressPercent} />
       </div>
 
-      <div className="flex flex-col gap-4">
-        <div className="space-y-3">
-          <p className="text-muted-foreground text-xs font-bold tracking-widest uppercase">
-            Tenaga Kerja
-          </p>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <UsersIcon className="size-6" />
-              <p className="text-xl font-bold">
-                {totalWorker} <span className="text-sm">Orang</span>
-              </p>
+      <div className="flex flex-wrap gap-8 sm:gap-6">
+        <div className="flex flex-col gap-4">
+          <div className="space-y-3">
+            <p className="text-muted-foreground text-xs tracking-widest uppercase">
+              Tenaga Kerja
+            </p>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <UsersIcon className="size-6 text-blue-500" />
+                <p className="text-xl font-bold">
+                  {totalWorker}{" "}
+                  <span className="text-sm font-medium">Orang</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
+        {children}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageOff } from "lucide-react";
 
 export default function MonitoringDocumentationCarousel({
   images = [],
@@ -20,10 +21,8 @@ export default function MonitoringDocumentationCarousel({
 
   if (images.length === 0) {
     return (
-      <div className="bg-muted/20 flex aspect-4/3 w-84 items-center justify-center rounded-sm border border-dashed border-zinc-200">
-        <p className="text-muted-foreground text-xs font-medium">
-          Belum ada dokumentasi terbaru
-        </p>
+      <div className="bg-muted/20 flex aspect-4/3 w-84 items-center justify-center border">
+        <ImageOff className="size-16 text-zinc-300" />
       </div>
     );
   }

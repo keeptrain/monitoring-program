@@ -5,7 +5,15 @@ import MetrictsSnapshot from "../shared/MetrictsSnapshot";
 import { SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowRightIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  PackageIcon,
+  ScaleIcon,
+  MapPinIcon,
+  DownloadIcon,
+  FileImageIcon,
+} from "lucide-react";
+import { toPreviewUrl } from "@/lib/utils";
 
 export default function RevitalizationDetailSheet({
   data,
@@ -14,10 +22,10 @@ export default function RevitalizationDetailSheet({
   data: RevitalizationAreaType;
   areaSlug: string;
 }) {
-  console.log(data.total_worker);
   return (
-    <>
-      <div className="mx-4 space-y-6">
+    <div className="flex h-full flex-col overflow-scroll">
+      {/* Scrollable Content */}
+      <div className="flex-1 space-y-6 overflow-y-auto px-4 pb-8">
         {/* Last Update & Date Picker */}
         <LastUpdateStatus
           areaId={data.area_id}
@@ -28,7 +36,86 @@ export default function RevitalizationDetailSheet({
         <MetrictsSnapshot
           progressPercent={data.progress_percent}
           totalWorker={data.total_worker}
-        />
+        >
+          <div className="flex flex-col">
+            <div className="space-y-3">
+              <p className="text-muted-foreground text-xs tracking-widest uppercase">
+                Produksi
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <PackageIcon className="size-6 text-emerald-500" />
+                  <div>
+                    <p className="text-xl font-bold">{data.production}</p>
+                    {data.total_production_value > 0 && (
+                      <p className="text-muted-foreground text-xs">
+                        {new Intl.NumberFormat("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                        }).format(data.total_production_value)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="space-y-3">
+              <p className="text-muted-foreground text-xs tracking-widest uppercase">
+                Pemasangan Pal Batas
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <ScaleIcon className="size-6 text-indigo-500" />
+                  <p className="text-xl font-bold">
+                    {data.limit_pal}{" "}
+                    <span className="text-sm font-medium">Titik</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </MetrictsSnapshot>
+
+        <div className="border border-zinc-100 bg-white p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <MapPinIcon className="size-4 text-rose-500" />
+            <p className="text-muted-foreground text-xs tracking-widest uppercase">
+              Pengukuran Titik Batas
+            </p>
+          </div>
+          <p className="text-sm leading-relaxed">
+            {data.limit_point_measurement}
+          </p>
+        </div>
+
+        <div className="border border-zinc-100 bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileImageIcon className="size-4 text-blue-500" />
+              <p className="text-muted-foreground text-xs tracking-widest uppercase">
+                File Desain
+              </p>
+            </div>
+            {data.design_path ? (
+              <Button variant="link" size="sm" className="h-auto p-0" asChild>
+                <a
+                  href={toPreviewUrl(data.design_path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <DownloadIcon className="mr-1 size-3.5" /> Unduh Dokumen
+                </a>
+              </Button>
+            ) : (
+              <p className="text-muted-foreground text-xs italic">
+                Belum diunggah
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Documentation Gallery */}
         <DocumentationCarouselGallery type="revitalization" id={data.id} />
@@ -41,7 +128,7 @@ export default function RevitalizationDetailSheet({
           </Link>
         </Button>
       </SheetFooter>
-    </>
+    </div>
   );
 }
 

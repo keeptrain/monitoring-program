@@ -14,6 +14,7 @@ export function WeekDetailInfo({ data }: { data: any }) {
   const {
     provider_name,
     production,
+    total_production_value,
     intervention,
     outcome,
     constraints,
@@ -39,7 +40,7 @@ export function WeekDetailInfo({ data }: { data: any }) {
         </div>
 
         <div className="group relative flex items-center gap-4 border border-zinc-100 bg-white p-4 transition-all hover:bg-zinc-50/50">
-          <div className="flex size-10 items-center justify-center bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
+          <div className="flex size-10 shrink-0 items-center justify-center bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
             <TrendingUpIcon className="size-5" />
           </div>
           <div>
@@ -49,6 +50,14 @@ export function WeekDetailInfo({ data }: { data: any }) {
             <p className="leading-tight font-semibold text-zinc-900">
               {production}
             </p>
+            {total_production_value > 0 && (
+              <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(total_production_value)}
+              </p>
+            )}
           </div>
         </div>
       </div>
