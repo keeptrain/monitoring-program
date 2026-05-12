@@ -4,6 +4,7 @@ import {
   MapPinIcon,
   ShieldCheckIcon,
   ChartAreaIcon,
+  FileXIcon,
 } from "lucide-react";
 import { ThematicProgramDetailComponent as Component } from "@/features/thematic/components/ThematicProgramDetail";
 import { CycleDataDetail } from "@/features/thematic/components/biofloc-detail/CycleDataDetail";
@@ -11,7 +12,6 @@ import { InformationDetail } from "@/features/thematic/components/biofloc-detail
 import { getThematicProgramById } from "@/features/thematic/actions/biofloc-actions";
 import { ThematicProgramDetail } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
-import { LinkBackButton } from "@/components/shared/LinkBackButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
@@ -56,12 +56,9 @@ export default async function BioflocDetailPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <BreadcrumbHeader items={breadcrumbItems} />
-          <div className="flex items-center gap-1">
-            <LinkBackButton href={`/dashboard/thematic/${type}`} />
-            <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
-              {program.name}
-            </h1>
-          </div>
+          <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
+            {program.name}
+          </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
             <span className="flex items-start gap-2">
               <MapPinIcon className="size-4" />
@@ -122,16 +119,17 @@ export default async function BioflocDetailPage({
                   <SCurveDownloadButton id={program.id} />
                 </div>
               ) : (
-                <div className="flex h-20 items-center justify-center rounded-md border border-dashed">
-                  <p className="text-muted-foreground text-sm italic">
-                    Kurva S belum diunggah
+                <div className="bg-muted/20 flex h-15 items-center justify-center gap-2 border">
+                  <FileXIcon className="text-muted-foreground size-4" />
+                  <p className="text-muted-foreground text-xs italic">
+                    Belum diunggah
                   </p>
                 </div>
               )}
             </CardContent>
           </Card>
         </div>
-        <div className="col-span-2 space-y-6">
+        <div className="col-span-2 space-y-4">
           <Component
             documentations={program.documentations}
             location={{

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
+import { ImageOff } from "lucide-react";
 
 const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") || "";
@@ -84,8 +85,11 @@ export function DocumentationGallery({
         </div>
       ))}
       {(!documentations || documentations.length === 0) && (
-        <div className="text-muted-foreground py-10 text-center text-sm italic">
-          Belum ada dokumentasi visual untuk laporan ini.
+        <div className="bg-muted/20 flex flex-col items-center justify-center gap-2 border p-8 text-center">
+          <ImageOff className="size-8 text-zinc-300" />
+          <p className="text-muted-foreground text-xs italic">
+            Belum ada dokumentasi
+          </p>
         </div>
       )}
     </div>

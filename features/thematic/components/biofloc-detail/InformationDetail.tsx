@@ -23,11 +23,13 @@ export function InformationDetail({ data }: InformationDetailProps) {
           <DetailItem
             icon={LeafIcon}
             label="Komoditas Bantuan"
+            className="capitalize"
             value={data.commodity_aid}
           />
           <DetailItem
             icon={LeafIcon}
             label="Komoditas Potensi"
+            className="capitalize"
             value={data.commodity_potential || "-"}
           />
           <DetailItem
