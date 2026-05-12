@@ -41,9 +41,11 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
   {
-    header: "Komoditas",
+    header: "Komoditas Bantuan",
     accessorKey: "commodity_aid",
-    cell: ({ row }) => row.original.commodity_aid,
+    cell: ({ row }) => (
+      <span className="capitalize">{row.original.commodity_aid}</span>
+    ),
   },
   {
     header: "Capaian (%)",
@@ -65,7 +67,18 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
 ];
 
 export const BioflocProgramsPublicTableColumns =
-  (): ColumnDef<BioflocProgramListItem>[] => BASE_COLUMNS;
+  (): ColumnDef<BioflocProgramListItem>[] => [
+    ...BASE_COLUMNS,
+    {
+      header: "Komoditas Potensial",
+      accessorKey: "commodity_potential",
+      cell: ({ row }) => (
+        <span className="capitalize">
+          {row.original.commodity_potential || "-"}
+        </span>
+      ),
+    },
+  ];
 
 export const BioflocProgramsInternalTableColumns = (opts: {
   onOpenProgress?: (row: BioflocProgramListItem) => void;

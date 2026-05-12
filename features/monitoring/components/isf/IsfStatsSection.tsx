@@ -12,7 +12,7 @@ import ProgressChart from "../shared/ProgressChart";
 
 export default function IsfStatsSection() {
   const { ref, isInView } = useInViewOnce<HTMLDivElement>({
-    threshold: 0.1,
+    threshold: 0.8,
   });
 
   const stats = useGetIsfStats(isInView);
