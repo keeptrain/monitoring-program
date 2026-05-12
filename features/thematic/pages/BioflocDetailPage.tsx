@@ -114,7 +114,7 @@ export default async function BioflocDetailPage({
               {program.s_curve_path ? (
                 <div className="flex flex-col gap-2">
                   <p className="text-muted-foreground text-sm">
-                    Berkas Kurva S tersedia untuk diunduh.
+                    Berkas tersedia untuk diunduh.
                   </p>
                   <SCurveDownloadButton id={program.id} />
                 </div>
