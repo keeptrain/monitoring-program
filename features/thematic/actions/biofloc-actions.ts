@@ -85,7 +85,7 @@ export async function updateKdmpEntity(
 ) {
   try {
     await db.updateKdmpEntityService(entityId, data);
-    revalidatePath("/dashboard/thematic");
+    revalidatePath("/dashboard/thematic/biofloc");
   } catch (error) {
     console.error("Error updating KDMP entity:", error);
     throw error;
@@ -99,6 +99,7 @@ export async function updateLocation(
 ) {
   try {
     await db.updateLocationService(locationId, data, proposalId);
+    revalidatePath("/dashboard/thematic/biofloc");
   } catch (error) {
     console.error("Error updating location:", error);
     throw error;

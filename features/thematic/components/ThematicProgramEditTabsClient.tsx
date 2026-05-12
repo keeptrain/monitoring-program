@@ -20,18 +20,14 @@ import { toast } from "sonner";
 import { ProposalBioflocDetailContent } from "@/features/proposal/components/ProposalBioflocDetailContent";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
-import { getThematicProgramQueryKey } from "../api/getThematicProgram";
-import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 
 export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { data: program, isLoading } = useGetThematicProgram(id);
   const [activeTab, setActiveTab] = useState(0);
-  const [isIdentityPending, startIdentityTransition] = useTransition();
-  const [isLocationPending, startLocationTransition] = useTransition();
+  const [isIdentitySubmitting, setIsIdentitySubmitting] = useState(false);
+  const [isLocationSubmitting, setIsLocationSubmitting] = useState(false);
   const [isTabPending, startTabTransition] = useTransition();
 
   const {
@@ -86,43 +82,34 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
     );
   }
 
-  const handleInvalidateQueries = () => {
-    queryClient.invalidateQueries({
-      queryKey: getThematicProgramQueryKey(id),
-    });
-    queryClient.invalidateQueries({
-      queryKey: getBioflocProgramsPaginatedQueryKey(),
-    });
+  const handleIdentitySubmit = async (data: IdentifyKdmpFormValues) => {
+    setIsIdentitySubmitting(true);
+    try {
+      await updateKdmpEntity(program.entity_id, data);
+      toast.success("Informasi KDMP berhasil diperbarui");
+      router.push(`/dashboard/thematic/biofloc`);
+    } catch (error) {
+      toast.error("Gagal memperbarui informasi KDMP");
+    } finally {
+      setIsIdentitySubmitting(false);
+    }
   };
 
-  const handleIdentitySubmit = (data: IdentifyKdmpFormValues) => {
-    startIdentityTransition(async () => {
-      try {
-        await updateKdmpEntity(program.entity_id, data);
-        handleInvalidateQueries();
-        toast.success("Informasi KDMP berhasil diperbarui");
-        router.push(`/dashboard/thematic/biofloc`);
-      } catch (error) {
-        toast.error("Gagal memperbarui informasi KDMP");
-      }
-    });
-  };
-
-  const handleLocationSubmit = (data: LocationKdmpValues) => {
-    startLocationTransition(async () => {
-      try {
-        await updateLocation(
-          program.location_id,
-          data,
-          program.proposal_id ?? undefined,
-        );
-        handleInvalidateQueries();
-        toast.success("Lokasi KDMP berhasil diperbarui");
-        router.push(`/dashboard/thematic/biofloc`);
-      } catch (error) {
-        toast.error("Gagal memperbarui lokasi KDMP");
-      }
-    });
+  const handleLocationSubmit = async (data: LocationKdmpValues) => {
+    setIsLocationSubmitting(true);
+    try {
+      await updateLocation(
+        program.location_id,
+        data,
+        program.proposal_id ?? undefined,
+      );
+      toast.success("Lokasi KDMP berhasil diperbarui");
+      router.push(`/dashboard/thematic/biofloc`);
+    } catch (error) {
+      toast.error("Gagal memperbarui lokasi KDMP");
+    } finally {
+      setIsLocationSubmitting(false);
+    }
   };
 
   const TABS = [
@@ -177,9 +164,9 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
             <Button
               type="submit"
               form="step-1-form"
-              disabled={isIdentityPending}
+              disabled={isIdentitySubmitting}
             >
-              {isIdentityPending ? "Menyimpan..." : "Simpan Informasi KDMP"}
+              {isIdentitySubmitting ? "Menyimpan..." : "Simpan Informasi KDMP"}
             </Button>
           </CardFooter>
         </Card>
@@ -204,9 +191,11 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
             <Button
               type="submit"
               form="step-2-form"
-              disabled={isLocationPending}
+              disabled={isLocationSubmitting}
             >
-              {isLocationPending ? "Menyimpan..." : "Simpan Perubahan Lokasi"}
+              {isLocationSubmitting
+                ? "Menyimpan..."
+                : "Simpan Perubahan Lokasi"}
             </Button>
           </CardFooter>
         </Card>
