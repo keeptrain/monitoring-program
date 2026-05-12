@@ -63,6 +63,7 @@ export type ProposalBioflocPaginationParams = {
   pageSize: number;
   search?: string;
   province?: string;
+  status?: string;
 };
 
 export type PaginatedProposalBioflocResult = {

@@ -11,6 +11,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { UserRole } from "@/features/auth/types/user";
 import { ProposalSubmissionTableColumns } from "./ProposalSubmissionTableColumns";
 import { ProposalBioflocThematicProgram } from "@/features/proposal/types/proposal-biofloc";
+import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
 
 export default function ProposalSubmissionTable({
   enabled = true,
@@ -21,6 +22,7 @@ export default function ProposalSubmissionTable({
 }) {
   const router = useRouter();
   const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -35,6 +37,7 @@ export default function ProposalSubmissionTable({
       pageSize: pagination.pageSize,
       province: selectedProvince,
       search: debouncedSearchQuery,
+      status: selectedStatus,
     },
     enabled,
   );
@@ -65,6 +68,14 @@ export default function ProposalSubmissionTable({
               setPagination((prev) => ({ ...prev, pageIndex: 0 })); // Reset page
             }}
             className="w-[200px]"
+          />
+          <ProposalStatusSelect
+            value={selectedStatus}
+            onChange={(event) => {
+              setSelectedStatus(event.target.value);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            className="ml-2 w-[150px]"
           />
           <div className="ml-auto w-1/4">
             <Input

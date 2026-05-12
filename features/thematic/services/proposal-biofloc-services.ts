@@ -26,7 +26,7 @@ export async function getProposalBioflocPaginatedService(
 ): Promise<PaginatedProposalBioflocResult> {
   const supabase = await createClient();
 
-  const { page, pageSize, search, province } = params;
+  const { page, pageSize, search, province, status } = params;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -65,6 +65,10 @@ export async function getProposalBioflocPaginatedService(
   // Province filter (now using province_code from available_locations)
   if (province && province.trim().length > 0) {
     query = query.eq("available_locations.province_code", province);
+  }
+
+  if (status && status.trim().length > 0) {
+    query = query.eq("status", status.trim());
   }
 
   const { data, error, count } = await query

@@ -10,10 +10,7 @@ import { ProposalSubmissionTableColumns } from "@/features/proposal/components/t
 import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
 import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
 import { useRouter } from "next/navigation";
 import {
   Sheet,
@@ -49,6 +46,7 @@ export default function ProposalBioflocProgramPage({
     useState<ProposalBioflocThematicProgram | null>(null);
 
   const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -61,6 +59,7 @@ export default function ProposalBioflocProgramPage({
     pageSize: pagination.pageSize,
     province: selectedProvince,
     search: debouncedSearchQuery,
+    status: selectedStatus,
   });
 
   // Action Handlers
@@ -107,19 +106,13 @@ export default function ProposalBioflocProgramPage({
               }}
               className="mr-2 w-[150px]"
             />
-            <NativeSelect
-              value={table.getColumn("status")?.getFilterValue() as string}
+            <ProposalStatusSelect
+              value={selectedStatus}
               onChange={(event) => {
-                table.getColumn("status")?.setFilterValue(event.target.value);
+                setSelectedStatus(event.target.value);
+                setPagination((prev) => ({ ...prev, pageIndex: 0 }));
               }}
-            >
-              <NativeSelectOption value="">Semua Status</NativeSelectOption>
-              <NativeSelectOption value="pending">Menunggu</NativeSelectOption>
-              <NativeSelectOption value="approved">
-                Disetujui
-              </NativeSelectOption>
-              <NativeSelectOption value="rejected">Ditolak</NativeSelectOption>
-            </NativeSelect>
+            />
             <div className="ml-auto w-1/4">
               <Input
                 placeholder="Cari kelompok kdmp..."
