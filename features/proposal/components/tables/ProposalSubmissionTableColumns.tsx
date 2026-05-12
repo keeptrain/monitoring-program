@@ -67,7 +67,7 @@ export const ProposalSubmissionTableColumns = (
       ),
     },
     {
-      header: "Komoditas Potensial",
+      header: "Komoditas potensial",
       accessorKey: "commodity_potentials",
       cell: ({ row: { original } }) => (
         <p className="capitalize">{original.commodity_potentials.join(", ")}</p>

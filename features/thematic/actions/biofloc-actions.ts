@@ -95,7 +95,7 @@ export async function updateKdmpEntity(
 export async function updateLocation(
   locationId: string | number,
   data: LocationKdmpValues,
-  proposalId?: string,
+  proposalId?: string | null,
 ) {
   try {
     await db.updateLocationService(locationId, data, proposalId);
