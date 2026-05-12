@@ -87,9 +87,13 @@ function toDbPayload(data: RevitalizationReportFormValues) {
     production: data.production,
     intervention: data.intervention,
     total_worker: data.total_worker,
+    total_production_value: data.total_production_value,
+    limit_point_measurement: data.limit_point_measurement,
+    limit_pal: data.limit_pal,
     outcome: data.outcome,
     constraints: data.constraints,
     follow_up: data.follow_up,
+    design_path: data.design_path,
   };
 }
 

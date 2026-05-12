@@ -11,11 +11,14 @@ import { Button } from "@/components/ui/button";
 import { useRevitalizationReportForm } from "../hooks/useRevitalizationReportForm";
 import RevitalizationInformationBasicFormSection from "../components/RevitalizationInformationBasicFormSection";
 import RevitalizationDetailRingkasanFormSection from "../components/RevitalizationDetailRingkasanFormSection";
+import RevitalizationProductionAndMeasurementFormSection from "../components/RevitalizationProductionAndMeasurementFormSection";
 import { Loader2 } from "lucide-react";
 import { RevitalizationProgramLog } from "../types/revitalization";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 import { useIsMutating } from "@tanstack/react-query";
 import { getDocumentationsUploadMutationKey } from "@/features/documentation/hooks/useDocumentationsUpload";
+import { REVITALIZATION_BREADCRUMBS } from "../constants/revitalization-breadcrumbs";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
 
 /**
  * Komponen formulir untuk membuat atau mengubah laporan revitalisasi.
@@ -41,13 +44,20 @@ export default function RevitalizationReportForm({
 
   const areaName = ["", "Bekasi", "Karawang", "Subang", "Indramayu"][areaId];
 
+  const breadcrumbItems = [
+    REVITALIZATION_BREADCRUMBS.DASHBOARD,
+    REVITALIZATION_BREADCRUMBS.REVITALISASI,
+    {
+      label: areaName,
+      href: `/dashboard/revitalisasi/${areaName.toLowerCase()}`,
+    },
+    { label: "Buat laporan" },
+  ];
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-6 space-y-1">
-        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-          Dashboard / Revitalisasi / {areaName} / Laporan /{" "}
-          {isEdit ? "Ubah" : "Buat"}
-        </p>
+        <BreadcrumbHeader items={breadcrumbItems} />
         <h2 className="text-foreground text-2xl font-semibold tracking-tight">
           {isEdit
             ? `Ubah Laporan Area ${areaName}`
@@ -72,6 +82,18 @@ export default function RevitalizationReportForm({
               form={form}
               isEdit={isEdit}
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Produksi & Batas Pengukuran</CardTitle>
+            <CardDescription>
+              Masukkan rincian kuantitas dan nilai produksi, batas pal, serta batas ukur koordinat
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RevitalizationProductionAndMeasurementFormSection form={form} />
           </CardContent>
         </Card>
 

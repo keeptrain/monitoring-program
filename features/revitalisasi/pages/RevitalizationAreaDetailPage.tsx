@@ -11,11 +11,16 @@ import {
   GoalIcon,
   AlertTriangleIcon,
   RefreshCcwIcon,
+  ScaleIcon,
+  MapPinIcon,
+  FileTextIcon,
+  DownloadIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { RevitalizationProgramLog } from "@/features/revitalisasi/types/revitalization";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, toPreviewUrl } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 
 /**
  * Komponen halaman detail untuk satu entri laporan revitalisasi.
@@ -118,7 +123,7 @@ function TimelineInfo({ data }: { data: RevitalizationProgramLog }) {
 }
 
 function Overview({ data }: { data: RevitalizationProgramLog }) {
-  const { provider_name, production } = data;
+  const { provider_name, production, total_production_value } = data;
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div className="group relative flex items-center gap-4 border border-zinc-100 bg-white p-4 transition-all hover:bg-zinc-50/50">
@@ -136,7 +141,7 @@ function Overview({ data }: { data: RevitalizationProgramLog }) {
       </div>
 
       <div className="group relative flex items-center gap-4 border border-zinc-100 bg-white p-4 transition-all hover:bg-zinc-50/50">
-        <div className="flex size-10 items-center justify-center bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
+        <div className="flex size-10 shrink-0 items-center justify-center bg-emerald-50 text-emerald-600 transition-colors group-hover:bg-emerald-100">
           <TrendingUpIcon className="size-5" />
         </div>
         <div>
@@ -146,6 +151,14 @@ function Overview({ data }: { data: RevitalizationProgramLog }) {
           <p className="leading-tight font-semibold text-zinc-900">
             {production}
           </p>
+          {total_production_value > 0 && (
+            <p className="text-muted-foreground mt-0.5 text-xs font-medium">
+              {new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR",
+              }).format(total_production_value)}
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -153,7 +166,15 @@ function Overview({ data }: { data: RevitalizationProgramLog }) {
 }
 
 function Narrative({ data }: { data: RevitalizationProgramLog }) {
-  const { outcome, constraints, follow_up, intervention } = data;
+  const {
+    outcome,
+    constraints,
+    follow_up,
+    intervention,
+    limit_pal,
+    limit_point_measurement,
+    design_path,
+  } = data;
   const items = [
     {
       label: "Outcome",
@@ -209,6 +230,58 @@ function Narrative({ data }: { data: RevitalizationProgramLog }) {
             </p>
           </div>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="border border-zinc-100 bg-white p-5">
+          <div className="mb-2 flex items-center gap-2">
+            <ScaleIcon className="size-4 text-indigo-500" />
+            <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+              Pemasangan Pal Batas
+            </p>
+          </div>
+          <p className="leading-tight font-semibold text-zinc-900">
+            {limit_pal} Titik
+          </p>
+        </div>
+
+        <div className="border border-zinc-100 bg-white p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileTextIcon className="size-4 text-blue-500" />
+              <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                File Desain
+              </p>
+            </div>
+            {design_path ? (
+              <Button variant="link" size="sm" className="h-auto p-0" asChild>
+                <a
+                  href={toPreviewUrl(design_path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <DownloadIcon className="mr-1 size-3.5" /> Unduh Dokumen
+                </a>
+              </Button>
+            ) : (
+              <p className="text-muted-foreground text-xs italic">
+                Belum diunggah
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="border border-zinc-100 bg-white p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <MapPinIcon className="size-4 text-rose-500" />
+          <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+            Pengukuran Titik Batas
+          </p>
+        </div>
+        <p className="text-sm leading-relaxed text-zinc-600">
+          {limit_point_measurement}
+        </p>
       </div>
     </div>
   );

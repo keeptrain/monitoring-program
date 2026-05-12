@@ -106,18 +106,6 @@ export default function RevitalizationInformationBasicFormSection({
           </FieldError>
         </Field>
         <Field>
-          <FieldLabel>Produksi</FieldLabel>
-          <Input
-            {...form.register("production")}
-            placeholder="Contoh: 1.2 Ton"
-            aria-invalid={!!form.formState.errors.production}
-          />
-          <FieldError>{form.formState.errors.production?.message}</FieldError>
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Field>
           <FieldLabel>Intervensi</FieldLabel>
           <Input
             {...form.register("intervention")}
@@ -126,6 +114,9 @@ export default function RevitalizationInformationBasicFormSection({
           />
           <FieldError>{form.formState.errors.intervention?.message}</FieldError>
         </Field>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field>
           <FieldLabel>Tenaga Kerja</FieldLabel>
           <Input

@@ -15,9 +15,15 @@ const revitalizationReportBaseSchema = z.object({
   total_worker: z.coerce
     .number()
     .min(1, "Jumlah serapan tenaga kerja harus diisi"),
+  total_production_value: z.coerce
+    .number()
+    .min(1, "Nilai total produksi harus diisi"),
+  limit_point_measurement: z.string().min(1, "Batas ukur titik/koordinat harus diisi"),
+  limit_pal: z.coerce.number().min(1, "Batas pal harus diisi"),
   outcome: z.string().min(1, "Outcome harus diisi"),
   constraints: z.string().optional().default(""),
   follow_up: z.string().optional().default(""),
+  design_path: z.string().nullable().optional().default(null),
 });
 
 export const revitalizationReportSchema = revitalizationReportBaseSchema.extend(

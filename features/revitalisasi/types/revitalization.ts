@@ -10,10 +10,13 @@ export interface RevitalizationProgramLog {
   production: string;
   intervention: string;
   total_worker: number;
+  total_production_value: number;
+  limit_point_measurement: string;
+  limit_pal: number;
   outcome: string;
   constraints: string;
   follow_up: string;
-  s_curve_path: string | null;
+  design_path: string | null;
   created_at: string;
   updated_at: string;
 }

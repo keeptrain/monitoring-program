@@ -59,6 +59,11 @@ export type RevitalizationDetailSheet = {
   progress_percent: number;
   progress_date: string;
   total_worker: number;
+  production: string;
+  total_production_value: number;
+  limit_point_measurement: string;
+  limit_pal: number;
+  design_path: string | null;
   status: string;
   updated_at: string;
 };

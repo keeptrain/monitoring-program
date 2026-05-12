@@ -7,7 +7,6 @@ import {
   RevitalizationDetailSheet,
 } from "../types/monitoring-types";
 import { TABLES } from "@/lib/constants/tables";
-
 import { toPreviewUrl } from "@/lib/utils";
 
 /**
@@ -43,7 +42,7 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
     .in("program_id", reportIds);
 
   const { data: allWorkersData } = await supabase
-    .from("revitalization_program_logs")
+    .from(TABLES.REVITALIZATION_LOGS)
     .select("total_worker");
 
   const totalWorkers =
@@ -66,10 +65,15 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
         id: row.id,
         area_id: row.area_id,
         area_name: REVITALIZATION_AREAS[idx].name,
+        status: row.status,
         progress_percent: row.progress_percent,
         progress_date: row.progress_date,
         total_worker: row.total_worker,
-        status: row.status,
+        production: row.production,
+        total_production_value: row.total_production_value,
+        limit_point_measurement: row.limit_point_measurement,
+        limit_pal: row.limit_pal,
+        design_path: row.design_path,
         updated_at: row.updated_at,
         beforeUrls,
         afterUrls,
@@ -106,9 +110,9 @@ export async function getMonitoringRevitalization(): Promise<MonitoringRevitaliz
 export async function getRevitalizationPerMonthByArea(areaId: number) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("revitalization_program_logs")
+    .from(TABLES.REVITALIZATION_LOGS)
     .select(
-      "id, name, progress_date, progress_percent, reporting_week, status, provider_name, production, intervention, total_worker, outcome, constraints, follow_up",
+      "id, name, progress_date, progress_percent, reporting_week, status, provider_name, production, intervention, total_worker, outcome, constraints, follow_up, total_production_value, limit_point_measurement, limit_pal, design_path",
     )
     .eq("area_id", areaId)
     .order("progress_date", { ascending: false });
@@ -131,6 +135,10 @@ export async function getRevitalizationPerMonthByArea(areaId: number) {
       production: row.production,
       intervention: row.intervention,
       total_worker: row.total_worker,
+      total_production_value: row.total_production_value,
+      limit_point_measurement: row.limit_point_measurement,
+      limit_pal: row.limit_pal,
+      design_path: row.design_path,
       outcome: row.outcome,
       constraints: row.constraints,
       follow_up: row.follow_up,
@@ -183,7 +191,7 @@ export async function getRevitalizationAvailableDatesByMonth(
   const endDate = new Date(year, month, 0);
 
   const { data, error } = await supabase
-    .from("revitalization_program_logs")
+    .from(TABLES.REVITALIZATION_LOGS)
     .select("id, progress_date")
     .eq("area_id", areaId)
     .gte("progress_date", startDate.toLocaleDateString("en-CA"))
