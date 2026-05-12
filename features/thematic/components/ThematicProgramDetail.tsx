@@ -39,7 +39,7 @@ export function ThematicProgramDetailComponent({
         <CameraIcon className="size-4" />
         <h1 className="font-semibold">Dokumentasi</h1>
       </div>
-      <div ref={galleryRef} className="min-h-[200px]">
+      <div ref={galleryRef}>
         {galleryInView ? (
           <DocumentationGallery documentations={documentations} />
         ) : (

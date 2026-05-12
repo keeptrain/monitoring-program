@@ -39,15 +39,17 @@ export default function ProposalDetailClient({
       <div className="space-y-2">
         <span className="flex items-center gap-2">
           <CameraIcon className="size-4" />
-          <h2 className="text-base font-semibold">Dokumentasi Proposal</h2>
+          <h2 className="text-base font-semibold">Dokumentasi</h2>
         </span>
         {isPending ? (
-          <div className="h-40 w-full animate-pulse rounded-lg bg-zinc-100" />
+          <div className="h-40 max-w-md animate-pulse rounded-lg bg-zinc-100" />
         ) : (
-          <CarouselDApiDemo
-            images={proposalImages.map((src) => ({ src }))}
-            emptyLabel="Dokumentasi Proposal"
-          />
+          <div className="max-w-md">
+            <CarouselDApiDemo
+              images={proposalImages.map((src) => ({ src }))}
+              emptyLabel="Dokumentasi Proposal"
+            />
+          </div>
         )}
       </div>
       <span className="flex items-center gap-2">
