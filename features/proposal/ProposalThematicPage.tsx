@@ -1,9 +1,15 @@
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { XIcon } from "lucide-react";
 import { getSessionCached } from "@/features/auth/session";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import dynamic from "next/dynamic";
 import React from "react";
 import StepNavigation from "@/features/proposal/components/StepNavigation";
@@ -113,7 +119,7 @@ export default async function ProposalThematicPage({
         title={pageHeaderTitle}
         programType={programType}
       />
-      <div className="mx-auto max-w-6xl space-y-4">
+      <div className="mx-auto max-w-6xl space-y-4 pb-4">
         {initialData && (
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
             <AlertTriangleIcon className="size-4" />
@@ -139,11 +145,11 @@ export default async function ProposalThematicPage({
           </div>
         </div>
         <Card>
-          <CardContent>
+          <CardHeader>
             <CardTitle>{pageConfig.title}</CardTitle>
-            <div className="min-h-[300px]">
-              <Component initialData={stepData} proposalId={proposalId} />
-            </div>
+          </CardHeader>
+          <CardContent>
+            <Component initialData={stepData} proposalId={proposalId} />
           </CardContent>
           <CardFooter className="justify-end gap-4">
             <StepNavigation totalSteps={3} backHref={basePath} />
