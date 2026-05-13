@@ -13,7 +13,10 @@ export const useUpdateBioflocProgramQuota = () => {
 
   return useMutation({
     mutationFn: (payload: UpdateQuotaPayload) =>
-      upsertBioflocProgramQuota(payload),
+      upsertBioflocProgramQuota({
+        ...payload,
+        program_type: "biofloc_thematic",
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: getBioflocProgramQuotasQueryKey(),

@@ -7,7 +7,7 @@ export const getBioflocProgramQuotasQueryKey = () =>
 export const useGetBioflocProgramQuotas = () =>
   useQuery({
     queryKey: getBioflocProgramQuotasQueryKey(),
-    queryFn: getBioflocProgramQuotas,
+    queryFn: () => getBioflocProgramQuotas("biofloc_thematic"),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });
