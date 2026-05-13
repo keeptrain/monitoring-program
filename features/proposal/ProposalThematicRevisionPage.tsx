@@ -8,9 +8,13 @@ const uuidV7Schema = z.uuidv7();
 export default async function ProposalThematicRevisionPage({
   params,
   searchParams,
+  programType = "biofloc_thematic",
+  basePath = "/biofloc-thematic",
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  programType?: string;
+  basePath?: string;
 }) {
   const { id } = await params;
 
@@ -24,7 +28,7 @@ export default async function ProposalThematicRevisionPage({
   const proposal = await getRevisionProposal(result.data);
 
   if (!proposal.success) {
-    redirect("/biofloc-thematic");
+    redirect(basePath);
   }
 
   return (
@@ -32,6 +36,8 @@ export default async function ProposalThematicRevisionPage({
       searchParams={searchParams}
       initialData={proposal.data}
       proposalId={id}
+      programType={programType}
+      basePath={basePath}
     />
   );
 }

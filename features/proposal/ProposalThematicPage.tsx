@@ -73,10 +73,14 @@ export default async function ProposalThematicPage({
   searchParams,
   initialData,
   proposalId,
+  programType = "biofloc_thematic",
+  basePath = "/biofloc-thematic",
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   initialData?: RevisionProposalData;
   proposalId?: string;
+  programType?: string;
+  basePath?: string;
 }) {
   const params = await searchParams;
 
@@ -84,7 +88,7 @@ export default async function ProposalThematicPage({
   const pageConfig = PAGE_CONFIG[currentStep];
 
   if (!pageConfig) {
-    redirect("/biofloc-thematic/proposal?step=1");
+    redirect(`${basePath}/proposal?step=1`);
   }
 
   const { isLoggedIn, role } = await getSessionCached();
@@ -100,13 +104,15 @@ export default async function ProposalThematicPage({
     ? initialData[`step${currentStep}Data` as keyof typeof initialData]
     : undefined;
 
-  const pageHeaderTitle = initialData
-    ? `Perbaiki proposal tematik bioflok`
-    : `Buat proposal tematik bioflok`;
+  const pageHeaderTitle = initialData ? `Perbaiki proposal` : `Buat proposal`;
 
   return (
     <>
-      <PublicPageHeader label="Proposal" title={pageHeaderTitle} />
+      <PublicPageHeader
+        label="Proposal"
+        title={pageHeaderTitle}
+        programType={programType}
+      />
       <div className="mx-auto max-w-6xl space-y-4">
         {initialData && (
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
@@ -121,7 +127,7 @@ export default async function ProposalThematicPage({
         <DraftHandler />
         <div className="mx-4 flex items-center justify-between sm:mx-0">
           <Button variant="outline" asChild>
-            <Link href="/biofloc-thematic">
+            <Link href={basePath}>
               <XIcon className="size-4" />
               Batal
             </Link>
@@ -140,7 +146,7 @@ export default async function ProposalThematicPage({
             </div>
           </CardContent>
           <CardFooter className="justify-end gap-4">
-            <StepNavigation totalSteps={3} backHref="/biofloc-thematic" />
+            <StepNavigation totalSteps={3} backHref={basePath} />
           </CardFooter>
         </Card>
       </div>
