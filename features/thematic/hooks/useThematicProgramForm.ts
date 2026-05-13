@@ -15,7 +15,7 @@ import { convertProposalToProgram } from "../actions/proposal-biofloc-internal-a
 import { getThematicProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 import { getThematicProgramQueryKey } from "../api/getThematicProgram";
 import { toast } from "sonner";
-import { getProposalBioflocQueryKey } from "../api/getProposalBioflocPaginated";
+import { getProposalThematicQueryKey } from "../api/getProposalThematicPaginated";
 
 const getDefaultValues = (
   initialData: Partial<ThematicProgramDetail> | undefined,
@@ -92,7 +92,7 @@ export const useThematicProgramForm = (
               queryKey: getThematicProgramsPaginatedQueryKey(),
             });
             queryClient.invalidateQueries({
-              queryKey: getProposalBioflocQueryKey(),
+              queryKey: getProposalThematicQueryKey(),
             });
             toast.success(message);
             router.push("/dashboard/thematic/biofloc");

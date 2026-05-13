@@ -3,36 +3,11 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getProposalBioflocPaginated } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
-import { getProposalBioflocQueryKey } from "@/features/thematic/api/getProposalBioflocPaginated";
-import ProposalBioflocProgramPage from "@/features/thematic/pages/ProposalBioflocProgramPage";
+import { getProposalThematicPaginated } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
+import { getProposalThematicQueryKey } from "@/features/thematic/api/getProposalThematicPaginated";
+import ProposalProgramPage from "@/features/thematic/pages/ProposalProgramPage";
 import { notFound } from "next/navigation";
-import React from "react";
 import { getSessionCached } from "@/features/auth/session";
-import { UserRole } from "@/features/auth/types/user";
-
-const PAGE_CONFIG: Record<
-  string,
-  {
-    label: string;
-    Component: React.ComponentType<{ role: UserRole }>;
-  }
-> = {
-  biofloc: {
-    label: "Program Tematik Bioflok",
-    Component: ProposalBioflocProgramPage,
-  },
-  minapadi: {
-    label: "Program Tematik Minapadi",
-    Component: () => (
-      <div className="bg-muted flex h-40 items-center justify-center rounded-lg border border-dashed">
-        <p className="text-muted-foreground text-sm italic">
-          Halaman proposal Minapadi sedang dalam pengembangan.
-        </p>
-      </div>
-    ),
-  },
-};
 
 export default async function ThematicProposalPage({
   params,
@@ -47,29 +22,34 @@ export default async function ThematicProposalPage({
 
   const { role } = await getSessionCached();
 
+  const programType =
+    type === "minapadi" ? "minapadi_thematic" : "biofloc_thematic";
+  const basePath =
+    type === "minapadi" ? "/minapadi-thematic" : "/biofloc-thematic";
+
   const queryClient = new QueryClient();
 
-  // Prefetch only if biofloc for now
-  if (type === "biofloc") {
-    const defaultParams = {
-      page: 1,
-      pageSize: 20,
-      province: "",
-      search: "",
-    };
-    await queryClient.prefetchQuery({
-      queryKey: getProposalBioflocQueryKey(defaultParams),
-      queryFn: () => getProposalBioflocPaginated(defaultParams),
-    });
-  }
+  const defaultParams = {
+    page: 1,
+    pageSize: 20,
+    province: "",
+    search: "",
+    programType: programType,
+  };
 
-  const config = PAGE_CONFIG[type];
-  const ComponentPage = config.Component;
+  await queryClient.prefetchQuery({
+    queryKey: getProposalThematicQueryKey(defaultParams),
+    queryFn: () => getProposalThematicPaginated(defaultParams),
+  });
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ComponentPage role={role} />
+        <ProposalProgramPage
+          role={role}
+          basePath={basePath}
+          programType={programType}
+        />
       </HydrationBoundary>
     </div>
   );

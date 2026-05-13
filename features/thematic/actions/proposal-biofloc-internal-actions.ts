@@ -11,7 +11,7 @@ import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
 
-export async function getProposalBioflocPaginated(
+export async function getProposalThematicPaginated(
   params: ProposalBioflocPaginationParams,
 ) {
   const { sub, role, isLoggedIn } = await getSession();

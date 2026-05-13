@@ -1,17 +1,5 @@
 "use client";
 
-import Datatable from "@/components/datatable/datatable";
-import { useCallback, useMemo, useState } from "react";
-import ProvinceSelect from "@/components/shared/ProvinceSelect";
-import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
-import { Input } from "@/components/ui/input";
-import { PaginationState } from "@tanstack/react-table";
-import { ProposalSubmissionTableColumns } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
-import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
-import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
-import { useRouter } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -20,24 +8,40 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   ProposalBioflocStatus,
   ProposalBioflocThematicProgram,
 } from "@/features/proposal/types/proposal-biofloc";
+import Datatable from "@/components/datatable/datatable";
+import { useCallback, useMemo, useState } from "react";
+import ProvinceSelect from "@/components/shared/ProvinceSelect";
+import { useGetProposalThematicPaginated } from "@/features/thematic/api/getProposalThematicPaginated";
+import { Input } from "@/components/ui/input";
+import { PaginationState } from "@tanstack/react-table";
+import { ProposalSubmissionTableColumns } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
+import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
+import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangleIcon, Loader2Icon } from "lucide-react";
 import { UserRole } from "@/features/auth/types/user";
 
-export default function ProposalBioflocProgramPage({
+export default function ProposalProgramPage({
   role = undefined,
+  basePath = "/biofloc-thematic",
+  programType = "biofloc_thematic",
 }: {
   role?: UserRole | undefined;
+  basePath?: string;
+  programType?: string;
 }) {
   const router = useRouter();
 
@@ -54,12 +58,13 @@ export default function ProposalBioflocProgramPage({
   });
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
 
-  const { data, isPending } = useGetProposalBioflocPaginated({
+  const { data, isPending } = useGetProposalThematicPaginated({
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     province: selectedProvince,
     search: debouncedSearchQuery,
     status: selectedStatus,
+    programType: programType,
   });
 
   // Action Handlers
@@ -82,7 +87,7 @@ export default function ProposalBioflocProgramPage({
   );
 
   const handleRowClick = (id: string) =>
-    router.push(`/biofloc-thematic/proposal/${id}/detail`);
+    router.push(`${basePath}/proposal/${id}/detail`);
 
   return (
     <>
@@ -96,7 +101,7 @@ export default function ProposalBioflocProgramPage({
         pagination={pagination}
         onPaginationChange={setPagination}
         onRowClick={({ id }) => handleRowClick(id)}
-        topContent={(table) => (
+        topContent={() => (
           <>
             <ProvinceSelect
               value={selectedProvince}

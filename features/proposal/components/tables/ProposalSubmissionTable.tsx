@@ -4,7 +4,7 @@ import Datatable from "@/components/datatable/datatable";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
-import { useGetProposalBioflocPaginated } from "@/features/thematic/api/getProposalBioflocPaginated";
+import { useGetProposalThematicPaginated } from "@/features/thematic/api/getProposalThematicPaginated";
 import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -33,7 +33,7 @@ export default function ProposalSubmissionTable({
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
 
-  const { data, isPending } = useGetProposalBioflocPaginated(
+  const { data, isPending } = useGetProposalThematicPaginated(
     {
       page: pagination.pageIndex + 1, // TanStack table is 0-indexed, our API is 1-indexed
       pageSize: pagination.pageSize,
