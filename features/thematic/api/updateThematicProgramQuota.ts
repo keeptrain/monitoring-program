@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { upsertBioflocProgramQuota } from "../actions/program-quotas";
-import { getBioflocProgramQuotasQueryKey } from "./getBioflocProgramQuotas";
+import { getThematicProgramQuotasQueryKey } from "./getThematicProgramQuotas";
+import { ThematicType } from "../constants/filter-state";
 
 type UpdateQuotaPayload = {
   province_code: string;
@@ -8,18 +9,20 @@ type UpdateQuotaPayload = {
   quota_limit: number;
 };
 
-export const useUpdateBioflocProgramQuota = () => {
+export const useUpdateThematicProgramQuota = (
+  programType: ThematicType = "biofloc_thematic",
+) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload: UpdateQuotaPayload) =>
       upsertBioflocProgramQuota({
         ...payload,
-        program_type: "biofloc_thematic",
+        program_type: programType,
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: getBioflocProgramQuotasQueryKey(),
+        queryKey: getThematicProgramQuotasQueryKey(programType),
       });
     },
   });

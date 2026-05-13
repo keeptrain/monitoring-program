@@ -11,29 +11,33 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import Datatable from "@/components/datatable/datatable";
-
-import { BioflocProgramQuotaTableColumns } from "../components/biofloc/BioflocProgramQuotaTableColumns";
-import UpdateProgramQuotaSheet from "../components/biofloc/UpdateProgramQuotaSheet";
-import { PROGRAM_QUOTA_YEAR } from "../forms/program-quota-schema";
-import { useGetBioflocProgramQuotas } from "../api/getBioflocProgramQuotas";
-import { useUpdateBioflocProgramQuota } from "../api/updateBioflocProgramQuota";
-import { ProgramQuotaView } from "../actions/program-quotas";
 import {
   ProgramQuotaUpdateInput,
   ProgramQuotaUpdateValues,
   programQuotaUpdateSchema,
 } from "../forms/program-quota-schema";
+import Datatable from "@/components/datatable/datatable";
+import { BioflocProgramQuotaTableColumns } from "../components/biofloc/BioflocProgramQuotaTableColumns";
+import UpdateProgramQuotaSheet from "../components/biofloc/UpdateProgramQuotaSheet";
+import { PROGRAM_QUOTA_YEAR } from "../forms/program-quota-schema";
+import { useGetThematicProgramQuotas } from "../api/getThematicProgramQuotas";
+import { useUpdateThematicProgramQuota } from "../api/updateThematicProgramQuota";
+import { ProgramQuotaView } from "../actions/program-quotas";
+import { ThematicType } from "../constants/filter-state";
 
-export default function ManagementQuotaPage() {
+export default function ManagementQuotaPage({
+  programType = "biofloc_thematic",
+}: {
+  programType?: ThematicType;
+}) {
   const [quotaSheetOpen, setQuotaSheetOpen] = useState(false);
   const [selectedQuotaRow, setSelectedQuotaRow] =
     useState<ProgramQuotaView | null>(null);
   const [submitQuotaError, setSubmitQuotaError] = useState<string | null>(null);
 
   const { data: quotaResponse, isLoading: isLoadingQuotas } =
-    useGetBioflocProgramQuotas();
-  const updateQuotaMutation = useUpdateBioflocProgramQuota();
+    useGetThematicProgramQuotas(programType);
+  const updateQuotaMutation = useUpdateThematicProgramQuota(programType);
 
   const quotaForm = useForm<
     ProgramQuotaUpdateInput,
