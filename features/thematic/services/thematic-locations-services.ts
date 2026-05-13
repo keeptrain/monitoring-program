@@ -3,14 +3,20 @@ import { createClient } from "@/utils/supabase";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
 
-async function getBioflocLocationsByStatus(
+async function getThematicLocationsByStatus(
   status: "active" | "potential",
   supabase?: SupabaseClient,
+  type: string = "biofloc_thematic",
 ): Promise<PublicAvailableLocation[]> {
   const _supabase = supabase ?? (await createClient());
 
+  const programTable =
+    type === "minapadi_thematic"
+      ? TABLES.MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.BIOFLOC_THEMATIC_PROGRAMS;
+
   const { data, error } = await _supabase
-    .from("available_locations")
+    .from(TABLES.AVAILABLE_LOCATIONS)
     .select(
       `
       id,
@@ -19,19 +25,19 @@ async function getBioflocLocationsByStatus(
       name,
       latitude,
       longitude,
-      ${TABLES.BIOFLOC_THEMATIC_PROGRAMS}!inner (
+      ${programTable}!inner (
         id,
         status,
         progress_percent
       )
     `,
     )
-    .eq("type", "biofloc_thematic")
-    .eq(`${TABLES.BIOFLOC_THEMATIC_PROGRAMS}.status`, status)
+    .eq("type", type)
+    .eq(`${programTable}.status`, status)
     .limit(process.env.NODE_ENV === "development" ? 10 : 100); // Increased limit as requested/needed
 
   if (error) {
-    console.error(`Error fetching ${status} biofloc locations:`, error);
+    console.error(`Error fetching ${status} locations for ${type}:`, error);
     return [];
   }
 
@@ -45,9 +51,9 @@ async function getBioflocLocationsByStatus(
   } & Record<string, any>;
 
   return ((data as unknown as LocationRow[]) ?? []).map((item) => {
-    const program = Array.isArray(item[TABLES.BIOFLOC_THEMATIC_PROGRAMS])
-      ? item[TABLES.BIOFLOC_THEMATIC_PROGRAMS][0]
-      : item[TABLES.BIOFLOC_THEMATIC_PROGRAMS];
+    const program = Array.isArray(item[programTable])
+      ? item[programTable][0]
+      : item[programTable];
 
     return {
       id: program?.id ?? item.id,
@@ -62,10 +68,16 @@ async function getBioflocLocationsByStatus(
   });
 }
 
-export async function getActiveLocationsService(supabase?: SupabaseClient) {
-  return getBioflocLocationsByStatus("active", supabase);
+export async function getActiveLocationsService(
+  supabase?: SupabaseClient,
+  type?: string,
+) {
+  return getThematicLocationsByStatus("active", supabase, type);
 }
 
-export async function getPotentialLocationsService(supabase?: SupabaseClient) {
-  return getBioflocLocationsByStatus("potential", supabase);
+export async function getPotentialLocationsService(
+  supabase?: SupabaseClient,
+  type?: string,
+) {
+  return getThematicLocationsByStatus("potential", supabase, type);
 }

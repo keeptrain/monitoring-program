@@ -11,7 +11,7 @@ import { cookies } from "next/headers";
 import {
   getActiveLocationsService,
   getPotentialLocationsService,
-} from "@/features/thematic/services/biofloc-locations-services";
+} from "@/features/thematic/services/thematic-locations-services";
 
 export interface AvailableLocation {
   id: number;
@@ -62,12 +62,11 @@ export async function getAvailableLocationsByType(
     }
   }
 
-  // Only handle biofloc_thematic for now
-  if (type === "biofloc_thematic") {
+  if (type === "biofloc_thematic" || type === "minapadi_thematic") {
     const results =
       status === "active"
-        ? await getActiveLocationsService()
-        : await getPotentialLocationsService();
+        ? await getActiveLocationsService(undefined, type)
+        : await getPotentialLocationsService(undefined, type);
 
     return {
       success: true,
