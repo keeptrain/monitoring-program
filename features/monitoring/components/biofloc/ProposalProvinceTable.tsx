@@ -2,9 +2,8 @@
 
 import Datatable from "@/components/datatable/datatable";
 import { useMemo } from "react";
-import getProposalProvinceTableColumns, {
-  ProposalProvinceRow,
-} from "./ProposalProvinceTableColumns";
+import getProposalProvinceTableColumns from "./ProposalProvinceTableColumns";
+import { useGetThematicProgramQuotas } from "@/features/monitoring/api/getBioflocProgramQuotas";
 
 const TableOptions = {
   defaultPageSize: 5,
@@ -13,19 +12,19 @@ const TableOptions = {
 } as const;
 
 export default function ProposalProvinceTable({
-  data,
+  thematicType = "biofloc_thematic",
 }: {
-  data: ProposalProvinceRow[];
-}) {
+  thematicType?: "biofloc_thematic" | "minapadi_thematic";
+} = {}) {
+  const { data, isPending } = useGetThematicProgramQuotas(thematicType);
   const columns = useMemo(() => getProposalProvinceTableColumns(), []);
 
   return (
     <Datatable
       columns={columns}
-      data={data}
-      isPending={false}
+      data={data?.data ?? []}
+      isPending={isPending}
       options={TableOptions}
     />
   );
 }
-

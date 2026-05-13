@@ -20,14 +20,22 @@ const LazyTableComponent = dynamic(
 
 export default function LazyThematicProposalTable({
   role = undefined,
+  programType,
 }: {
   role?: UserRole | undefined;
+  programType: string;
 }) {
   const { ref, isInView } = useInViewOnce<HTMLDivElement>(IN_VIEW_OPTIONS);
 
   return (
     <div ref={ref} className="mb-6">
-      {isInView && <LazyTableComponent enabled={isInView} role={role} />}
+      {isInView && (
+        <LazyTableComponent
+          enabled={isInView}
+          role={role}
+          programType={programType}
+        />
+      )}
     </div>
   );
 }

@@ -49,7 +49,7 @@ export default async function ThematicQuotaPage({
   if (type === "biofloc") {
     await queryClient.prefetchQuery({
       queryKey: getBioflocProgramQuotasQueryKey(),
-      queryFn: getBioflocProgramQuotas,
+      queryFn: () => getBioflocProgramQuotas("biofloc_thematic"),
     });
   }
 

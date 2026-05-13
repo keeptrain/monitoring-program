@@ -16,9 +16,11 @@ import { ProposalStatusSelect } from "@/features/proposal/components/ProposalSta
 export default function ProposalSubmissionTable({
   enabled = true,
   role = undefined,
+  programType,
 }: {
   enabled?: boolean;
   role?: UserRole | undefined;
+  programType: string;
 }) {
   const router = useRouter();
   const [selectedProvince, setSelectedProvince] = useState<string>("");
@@ -38,6 +40,7 @@ export default function ProposalSubmissionTable({
       province: selectedProvince,
       search: debouncedSearchQuery,
       status: selectedStatus,
+      programType,
     },
     enabled,
   );
@@ -55,7 +58,9 @@ export default function ProposalSubmissionTable({
       pagination={pagination}
       onRowClick={(row: ProposalBioflocThematicProgram) =>
         role
-          ? router.push(`/biofloc-thematic/proposal/${row.id}/detail`)
+          ? router.push(
+              `/${programType === "minapadi_thematic" ? "minapadi-thematic" : "biofloc-thematic"}/proposal/${row.id}/detail`,
+            )
           : undefined
       }
       onPaginationChange={setPagination}

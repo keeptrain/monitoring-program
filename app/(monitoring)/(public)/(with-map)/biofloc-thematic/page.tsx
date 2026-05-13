@@ -13,27 +13,29 @@ import { getSessionCached } from "@/features/auth/session";
 
 export default async function MonitoringBioflocThematicPage() {
   const type: ThematicType = "biofloc_thematic";
-  const queryClient = new QueryClient();
   const { role } = await getSessionCached();
 
-  const { data, proposal_total } = await queryClient.fetchQuery(
-    getThematicProgramQuotasQueryOptions("biofloc_thematic"),
-  );
+  const queryClient = new QueryClient();
+  const options = getThematicProgramQuotasQueryOptions(type);
+  await queryClient.prefetchQuery(options);
+
+  const cachedData = queryClient.getQueryData(options.queryKey);
+  const proposal_total = cachedData?.proposal_total ?? 0;
 
   return (
     <>
       <MonitoringThematicHeader thematicType={type} />
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
-          <TotalIncomingProposals value={proposal_total} />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
+        <TotalIncomingProposals value={proposal_total} />
+        <HydrationBoundary state={dehydrate(queryClient)}>
           <div className="lg:col-span-4">
-            <ProposalProvinceTable data={data} />
+            <ProposalProvinceTable thematicType={type} />
           </div>
-          <div className="lg:col-span-6">
-            <LazyThematicProposalTable role={role} />
-          </div>
+        </HydrationBoundary>
+        <div className="lg:col-span-6">
+          <LazyThematicProposalTable role={role} programType={type} />
         </div>
-      </HydrationBoundary>
+      </div>
     </>
   );
 }
