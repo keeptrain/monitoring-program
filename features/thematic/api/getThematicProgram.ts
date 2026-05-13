@@ -1,5 +1,5 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { getThematicProgramById } from "../actions/biofloc-actions";
+import { getThematicProgramById } from "../actions/thematic-actions";
 
 export const getThematicProgramQueryKey = (id: string) => [
   "thematic-program",

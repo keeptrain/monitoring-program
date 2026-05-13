@@ -11,15 +11,16 @@ import {
   bioflocProgramsPaginatedSchema,
 } from "../forms/biofloc-program-query-schema";
 
-export async function getBioflocProgramsPaginated(
+export async function getThematicProgramsPaginated(
+  thematicType: string,
   input: BioflocProgramsPaginatedInput,
 ) {
   const parsed = bioflocProgramsPaginatedSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Error("Parameter daftar program bioflok tidak valid.");
+    throw new Error("Parameter daftar program tematik tidak valid.");
   }
 
-  return db.getBioflocProgramsPaginatedService(parsed.data);
+  return db.getThematicProgramsPaginatedService(thematicType, parsed.data);
 }
 
 export async function getThematicProgramById(id: string) {

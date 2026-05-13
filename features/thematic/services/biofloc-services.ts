@@ -145,7 +145,8 @@ type BioflocProgramListRow = {
   } | null;
 };
 
-export async function getBioflocProgramsPaginatedService(
+export async function getThematicProgramsPaginatedService(
+  thematicType: string,
   params: BioflocProgramsPaginatedParams,
 ): Promise<BioflocProgramsPaginatedResult> {
   const supabase = await createClient();
@@ -156,9 +157,12 @@ export async function getBioflocProgramsPaginatedService(
   const selectColumns =
     scope === "internal" ? INTERNAL_PAGINATED_SELECT : PUBLIC_PAGINATED_SELECT;
 
-  let query = supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
-    .select(selectColumns, { count: "exact" });
+  const table =
+    thematicType === "minapadi"
+      ? TABLES.MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.BIOFLOC_THEMATIC_PROGRAMS;
+
+  let query = supabase.from(table).select(selectColumns, { count: "exact" });
 
   if (search.length > 0) {
     query = query.ilike("kdmp_entities.name", `%${search}%`);

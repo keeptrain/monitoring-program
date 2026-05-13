@@ -1,3 +1,5 @@
+export type ThematicProgramType = "biofloc" | "minapadi";
+
 export const ThematicProgramStatus: Record<string, string> = {
   potential: "Potensial",
   active: "Aktif",

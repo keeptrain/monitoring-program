@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteThematicProgram } from "../actions/biofloc-actions";
-import { getBioflocProgramsPaginatedQueryKey } from "./getBioflocProgramsPaginated";
+import { deleteThematicProgram } from "../actions/thematic-actions";
+import { getThematicProgramsPaginatedQueryKey } from "./getBioflocProgramsPaginated";
 
 export function useDeleteThematicProgram() {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useDeleteThematicProgram() {
     },
     onSuccess: () =>
       queryClient.invalidateQueries({
-        queryKey: getBioflocProgramsPaginatedQueryKey(),
+        queryKey: getThematicProgramsPaginatedQueryKey(),
       }),
   });
 }
