@@ -1,6 +1,5 @@
 import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
-import { PROGRAM_QUOTA_TYPE } from "../forms/program-quota-schema";
 import { getProposalBioflocProvinceSummary } from "./proposal-biofloc-services";
 
 export type ProgramQuotaRow = {
@@ -18,7 +17,7 @@ export type ProgramQuotaViewRow = {
   id: number | null;
   province_code: string;
   region_name: string;
-  program_type: "biofloc_thematic";
+  program_type: string;
   year: number;
   quota_limit: number;
   proposal_count: number;
@@ -30,17 +29,21 @@ type ProgramQuotaResult = {
   proposal_total: number;
 };
 
-export async function getProgramQuotasByTypeAndYear(year: number) {
+export async function getProgramQuotasByTypeAndYear(
+  programType: string,
+  year: number,
+) {
   const supabase = await createClient();
   const [quotaResult, proposalSummary] = await Promise.all([
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
       .select("id, province_code, province_name, quota_limit")
-      .eq("program_type", PROGRAM_QUOTA_TYPE)
+      .eq("program_type", programType)
       .eq("year", year)
       .order("province_code", { ascending: true }),
-    getProposalBioflocProvinceSummary(supabase),
+    getProposalBioflocProvinceSummary(supabase, programType),
   ]);
+
   const { data, error } = quotaResult;
 
   if (error) {
@@ -49,6 +52,7 @@ export async function getProgramQuotasByTypeAndYear(year: number) {
 
   return {
     data: mapProgramQuotaRows({
+      programType,
       year,
       rows: (data ?? []) as ProgramQuotaRow[],
       proposalCountByProvince: proposalSummary.proposal_count_by_province,
@@ -58,6 +62,7 @@ export async function getProgramQuotasByTypeAndYear(year: number) {
 }
 
 export async function getProgramQuotasByTypeAndYearWithMinQuota(
+  programType: string,
   year: number,
   minQuota: number,
 ) {
@@ -66,11 +71,11 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
     supabase
       .from(TABLES.PROGRAM_QUOTAS)
       .select("id, province_code, province_name, quota_limit")
-      .eq("program_type", PROGRAM_QUOTA_TYPE)
+      .eq("program_type", programType)
       .eq("year", year)
       .gt("quota_limit", minQuota)
       .order("province_code", { ascending: true }),
-    getProposalBioflocProvinceSummary(supabase),
+    getProposalBioflocProvinceSummary(supabase, programType),
   ]);
   const { data, error } = quotaResult;
 
@@ -80,6 +85,7 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
 
   return {
     data: mapProgramQuotaRows({
+      programType,
       year,
       rows: (data ?? []) as ProgramQuotaRow[],
       proposalCountByProvince: proposalSummary.proposal_count_by_province,
@@ -91,6 +97,7 @@ export async function getProgramQuotasByTypeAndYearWithMinQuota(
 export async function upsertProgramQuotaByProvince(input: {
   province_code: string;
   province_name: string;
+  program_type: string;
   year: number;
   quota_limit: number;
 }) {
@@ -101,7 +108,7 @@ export async function upsertProgramQuotaByProvince(input: {
       {
         province_code: input.province_code,
         province_name: input.province_name,
-        program_type: PROGRAM_QUOTA_TYPE,
+        program_type: input.program_type,
         year: input.year,
         quota_limit: input.quota_limit,
         updated_at: new Date().toISOString(),
@@ -121,6 +128,7 @@ export async function upsertProgramQuotaByProvince(input: {
 }
 
 function mapProgramQuotaRows(input: {
+  programType: string;
   year: number;
   rows: ProgramQuotaRow[];
   proposalCountByProvince: Record<string, number>;
@@ -131,7 +139,7 @@ function mapProgramQuotaRows(input: {
       id: row.id ?? null,
       province_code: row.province_code,
       region_name: row.province_name,
-      program_type: "biofloc_thematic",
+      program_type: input.programType,
       year: input.year,
       quota_limit: row.quota_limit,
       proposal_count:

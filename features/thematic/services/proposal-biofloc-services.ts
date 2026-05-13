@@ -30,7 +30,12 @@ export async function getProposalBioflocPaginatedService(
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  let query = supabase.from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS).select(
+  const targetTable =
+    params.programType === "minapadi_thematic"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+
+  let query = supabase.from(targetTable).select(
     `
       id, 
       status, 
@@ -114,10 +119,14 @@ export async function getProposalBioflocTotal(
 
 export async function getProposalBioflocProvinceSummary(
   supabase: SupabaseClient,
+  programType?: string,
 ): Promise<ProposalBioflocProvinceSummary> {
-  const { data, error } = await supabase.from(
-    TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS,
-  ).select(`
+  const table =
+    programType === "minapadi_thematic" || programType === "minapadi"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+
+  const { data, error } = await supabase.from(table).select(`
       available_locations!inner(
         ref_provinces!inner(
           name

@@ -7,25 +7,34 @@ import {
 } from "../forms/program-quota-schema";
 import * as db from "../services/program-quota-services";
 import type { ProgramQuotaViewRow } from "../services/program-quota-services";
+import { ThematicType } from "../constants/filter-state";
 
 export type ProgramQuotaView = ProgramQuotaViewRow;
 
-export async function getBioflocProgramQuotas(): Promise<{
+export async function getBioflocProgramQuotas(
+  programType: ThematicType,
+): Promise<{
   data: ProgramQuotaView[];
   proposal_total: number;
 }> {
-  const existing = await db.getProgramQuotasByTypeAndYear(PROGRAM_QUOTA_YEAR);
+  const existing = await db.getProgramQuotasByTypeAndYear(
+    programType,
+    PROGRAM_QUOTA_YEAR,
+  );
   return {
     data: existing.data,
     proposal_total: existing.proposal_total,
   };
 }
 
-export async function getBioflocProgramQuotasPublic(): Promise<{
+export async function getBioflocProgramQuotasPublic(
+  programType: ThematicType,
+): Promise<{
   data: ProgramQuotaView[];
   proposal_total: number;
 }> {
   const existing = await db.getProgramQuotasByTypeAndYearWithMinQuota(
+    programType,
     PROGRAM_QUOTA_YEAR,
     0,
   );
@@ -37,6 +46,7 @@ export async function getBioflocProgramQuotasPublic(): Promise<{
 }
 
 export async function upsertBioflocProgramQuota(input: {
+  program_type: string;
   province_code: string;
   province_name: string;
   quota_limit: number;
@@ -48,17 +58,19 @@ export async function upsertBioflocProgramQuota(input: {
   const row = await db.upsertProgramQuotaByProvince({
     province_code: input.province_code,
     province_name: input.province_name,
+    program_type: input.program_type,
     year: PROGRAM_QUOTA_YEAR,
     quota_limit: parsed.quota_limit,
   });
 
   revalidatePath("/dashboard/thematic/biofloc");
+  revalidatePath("/dashboard/thematic/minapadi");
 
   return {
     id: row.id,
     province_code: row.province_code,
     region_name: row.province_name,
-    program_type: "biofloc_thematic" as const,
+    program_type: input.program_type,
     year: row.year,
     quota_limit: row.quota_limit,
     proposal_count: 0,
