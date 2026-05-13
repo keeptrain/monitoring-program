@@ -15,7 +15,7 @@ import IdentityKdmpForm from "@/features/proposal/forms/IdentityKdmpForm";
 import LocationKdmpForm from "@/features/proposal/forms/LocationKdmpForm";
 import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
 import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
-import { updateKdmpEntity, updateLocation } from "../actions/biofloc-actions";
+import { updateKdmpEntity, updateLocation } from "../actions/thematic-actions";
 import { toast } from "sonner";
 import { ProposalBioflocDetailContent } from "@/features/proposal/components/ProposalBioflocDetailContent";
 import ThematicProgramForm from "../forms/ThematicProgramForm";

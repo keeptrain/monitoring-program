@@ -3,29 +3,18 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getBioflocProgramsPaginated } from "@/features/thematic/actions/biofloc-actions";
-import { getBioflocProgramsPaginatedQueryKey } from "@/features/thematic/api/getBioflocProgramsPaginated";
-import BioflocProgramPage from "@/features/thematic/BioflocProgramPage";
-import MinapadiProgramPage from "@/features/thematic/MinapadiProgramPage";
+import { getThematicProgramsPaginatedQueryOptions } from "@/features/thematic/api/getBioflocProgramsPaginated";
 import { notFound } from "next/navigation";
-import React from "react";
 import { BioflocProgramsPaginatedInput } from "@/features/thematic/forms/biofloc-program-query-schema";
+import ThematicProgramPage from "@/features/thematic/ThematicProgramPage";
 
-const PAGE_CONFIG: Record<
-  string,
-  {
-    label: string;
-    Component: React.ComponentType;
-  }
-> = {
-  biofloc: {
-    label: "Program Tematik Bioflok",
-    Component: BioflocProgramPage,
-  },
-  minapadi: {
-    label: "Program Tematik Minapadi",
-    Component: MinapadiProgramPage,
-  },
+const DEFAULT_QUERY_PARAMS: Omit<BioflocProgramsPaginatedInput, "scope"> = {
+  page: 1,
+  pageSize: 10,
+  search: "",
+  province: "",
+  year: undefined,
+  status: "",
 };
 
 export default async function ThematicProgramTypePage({
@@ -39,27 +28,18 @@ export default async function ThematicProgramTypePage({
     return notFound();
   }
 
-  const scope = "internal";
-  const defaultQueryParams: BioflocProgramsPaginatedInput = {
-    scope,
-    page: 1,
-    pageSize: 10,
-    search: "",
-    province: "",
-    year: 2026,
-  };
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: getBioflocProgramsPaginatedQueryKey(defaultQueryParams),
-    queryFn: () => getBioflocProgramsPaginated(defaultQueryParams),
-  });
-
-  const config = PAGE_CONFIG[type];
-  const ComponentPage = config.Component;
+  await queryClient.prefetchQuery(
+    getThematicProgramsPaginatedQueryOptions(
+      type,
+      DEFAULT_QUERY_PARAMS,
+      "internal",
+    ),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ComponentPage />
+      <ThematicProgramPage programType={type} />
     </HydrationBoundary>
   );
 }

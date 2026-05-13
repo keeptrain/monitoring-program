@@ -9,7 +9,7 @@ import {
   UpdateProgressFormValues,
 } from "../forms/update-progress-schema";
 import { BioflocProgramListItem } from "../types/thematic";
-import { updateThematicProgramProgress } from "../actions/biofloc-actions";
+import { updateThematicProgramProgress } from "../actions/thematic-actions";
 
 type UpdateProgressRow = Pick<
   BioflocProgramListItem,

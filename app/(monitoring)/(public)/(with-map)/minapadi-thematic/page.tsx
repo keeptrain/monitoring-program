@@ -12,10 +12,10 @@ import { ThematicType } from "@/features/thematic/constants/filter-state";
 
 export default async function MonitoringMinapadiThematicPage() {
   const type: ThematicType = "minapadi_thematic";
-  const queryClient = new QueryClient();
 
+  const queryClient = new QueryClient();
   const { data, proposal_total } = await queryClient.fetchQuery(
-    getThematicProgramQuotasQueryOptions("biofloc_thematic"),
+    getThematicProgramQuotasQueryOptions("minapadi_thematic"),
   );
 
   return (

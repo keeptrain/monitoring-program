@@ -7,6 +7,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from "@/components/ui/native-select";
 import Datatable from "@/components/datatable/datatable";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,44 +19,42 @@ import { useUpdateProgressSheet } from "./hooks/useUpdateProgressSheet";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { Input } from "@/components/ui/input";
-import { useGetBioflocProgramsPaginated } from "./api/getBioflocProgramsPaginated";
+import { useGetThematicProgramsPaginated } from "./api/getBioflocProgramsPaginated";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { PaginationState } from "@tanstack/react-table";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
 import { BioflocProgramsInternalTableColumns } from "@/features/monitoring/components/biofloc/BioflocProgramsTableColumns";
-import { useURLSearchParams } from "@/hooks/useURLSearchParams";
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useDeleteThematicProgram } from "./api/deleteThematicProgram";
-import { ThematicProgramStatus } from "./types/thematic";
+import { ThematicProgramStatus, ThematicProgramType } from "./types/thematic";
 
 const YEAR_OPTIONS = [2026, 2025] as const;
 
-export default function BioflocProgramPage({
-  programType = "biofloc",
+export default function ThematicProgramPage({
+  programType,
 }: {
-  programType?: "biofloc" | "minapadi";
+  programType: ThematicProgramType;
 }) {
   const router = useRouter();
   const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   // URL-based state management
-  const { params, setParams } = useURLSearchParams<{
-    page?: string;
-    pageSize?: string;
-    search?: string;
-    province?: string;
-    year?: string;
-    status?: string;
-  }>();
+  const [params, setParams] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    pageSize: parseAsInteger.withDefault(10),
+    search: parseAsString.withDefault(""),
+    province: parseAsString.withDefault(""),
+    year: parseAsString.withDefault(""),
+    status: parseAsString.withDefault(""),
+  });
 
-  const page = parseInt(params.page as string) || 1;
-  const pageSize = parseInt(params.pageSize as string) || 10;
-  const searchQuery = (params.search as string) || "";
-  const selectedProvince = (params.province as string) || "";
-  const selectedYear = parseInt(params.year as string) || 0;
-  const selectedStatus = (params.status as string) || "";
+  const {
+    page,
+    pageSize,
+    search: searchQuery,
+    province: selectedProvince,
+    year: selectedYear,
+    status: selectedStatus,
+  } = params;
 
   const debouncedSearchQuery = useDebouncedValue(localSearchQuery, 400);
 
@@ -61,19 +63,23 @@ export default function BioflocProgramPage({
     if (debouncedSearchQuery !== searchQuery) {
       setParams({
         search: debouncedSearchQuery,
-        page: "1",
+        page: 1,
       });
     }
   }, [debouncedSearchQuery, searchQuery, setParams]);
 
-  const { data, isPending } = useGetBioflocProgramsPaginated("internal", {
-    page,
-    pageSize,
-    province: selectedProvince,
-    year: selectedYear,
-    search: searchQuery,
-    status: selectedStatus,
-  });
+  const { data, isPending } = useGetThematicProgramsPaginated(
+    programType,
+    "internal",
+    {
+      page,
+      pageSize,
+      province: selectedProvince,
+      year: selectedYear ? parseInt(selectedYear) : undefined,
+      search: searchQuery,
+      status: selectedStatus,
+    },
+  );
 
   const pagination: PaginationState = {
     pageIndex: page - 1,
@@ -124,23 +130,23 @@ export default function BioflocProgramPage({
           const newState =
             typeof updater === "function" ? updater(pagination) : updater;
           setParams({
-            page: String(newState.pageIndex + 1),
-            pageSize: String(newState.pageSize),
+            page: newState.pageIndex + 1,
+            pageSize: newState.pageSize,
           });
         }}
         topContent={() => (
           <>
             <div className="flex items-center gap-2">
               <NativeSelect
-                value={String(selectedYear)}
+                value={selectedYear}
                 onChange={(event) => {
                   setParams({
                     year: event.target.value,
-                    page: "1",
+                    page: 1,
                   });
                 }}
               >
-                <NativeSelectOption value="0">Semua Tahun</NativeSelectOption>
+                <NativeSelectOption value="">Semua Tahun</NativeSelectOption>
                 {YEAR_OPTIONS.map((year) => (
                   <NativeSelectOption key={year} value={String(year)}>
                     {year}
@@ -152,7 +158,7 @@ export default function BioflocProgramPage({
                 onChange={(value) => {
                   setParams({
                     province: value,
-                    page: "1",
+                    page: 1,
                   });
                 }}
                 allLabel="Semua Provinsi"
@@ -163,7 +169,7 @@ export default function BioflocProgramPage({
                 onChange={(e) => {
                   setParams({
                     status: e.target.value,
-                    page: "1",
+                    page: 1,
                   });
                 }}
                 className="w-[130px]"

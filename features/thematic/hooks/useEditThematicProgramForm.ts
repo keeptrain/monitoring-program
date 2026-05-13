@@ -8,13 +8,13 @@ import {
 import {
   createThematicProgram,
   updateThematicProgram,
-} from "../actions/biofloc-actions";
+} from "../actions/thematic-actions";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
 import { convertProposalToProgram } from "../actions/proposal-biofloc-internal-actions";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
+import { getThematicProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 
 const CREATE_DEFAULT_VALUES: BioflocProgramFormInput = {
   name: "",
@@ -120,7 +120,7 @@ export function useEditThematicProgramForm(
           if (success) {
             router.push("/dashboard/thematic/biofloc");
             queryClient.invalidateQueries({
-              queryKey: getBioflocProgramsPaginatedQueryKey(),
+              queryKey: getThematicProgramsPaginatedQueryKey(),
             });
           }
         } else {
@@ -128,7 +128,7 @@ export function useEditThematicProgramForm(
           if (success) {
             router.push("/dashboard/thematic/biofloc");
             queryClient.invalidateQueries({
-              queryKey: getBioflocProgramsPaginatedQueryKey(),
+              queryKey: getThematicProgramsPaginatedQueryKey(),
             });
           }
         }

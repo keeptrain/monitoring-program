@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { downloadSCurveFile } from "@/features/thematic/actions/biofloc-actions";
+import { downloadSCurveFile } from "@/features/thematic/actions/thematic-actions";
 import { useMutation } from "@tanstack/react-query";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";

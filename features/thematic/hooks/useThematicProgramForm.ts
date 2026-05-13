@@ -10,9 +10,9 @@ import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { updateThematicProgram } from "../actions/biofloc-actions";
+import { updateThematicProgram } from "../actions/thematic-actions";
 import { convertProposalToProgram } from "../actions/proposal-biofloc-internal-actions";
-import { getBioflocProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
+import { getThematicProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
 import { getThematicProgramQueryKey } from "../api/getThematicProgram";
 import { toast } from "sonner";
 import { getProposalBioflocQueryKey } from "../api/getProposalBioflocPaginated";
@@ -74,7 +74,7 @@ export const useThematicProgramForm = (
           if (success) {
             toast.success(message);
             queryClient.invalidateQueries({
-              queryKey: getBioflocProgramsPaginatedQueryKey(),
+              queryKey: getThematicProgramsPaginatedQueryKey(),
             });
             queryClient.invalidateQueries({
               queryKey: getThematicProgramQueryKey(initialData.id),
@@ -89,7 +89,7 @@ export const useThematicProgramForm = (
           );
           if (success) {
             queryClient.removeQueries({
-              queryKey: getBioflocProgramsPaginatedQueryKey(),
+              queryKey: getThematicProgramsPaginatedQueryKey(),
             });
             queryClient.invalidateQueries({
               queryKey: getProposalBioflocQueryKey(),

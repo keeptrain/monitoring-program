@@ -9,7 +9,7 @@ import {
 import { ThematicProgramDetailComponent as Component } from "@/features/thematic/components/ThematicProgramDetail";
 import { CycleDataDetail } from "@/features/thematic/components/biofloc-detail/CycleDataDetail";
 import { InformationDetail } from "@/features/thematic/components/biofloc-detail/InformationDetail";
-import { getThematicProgramById } from "@/features/thematic/actions/biofloc-actions";
+import { getThematicProgramById } from "@/features/thematic/actions/thematic-actions";
 import { ThematicProgramDetail } from "@/features/thematic/types/thematic";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
