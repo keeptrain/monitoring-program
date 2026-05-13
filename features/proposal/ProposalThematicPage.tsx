@@ -73,14 +73,14 @@ export default async function ProposalThematicPage({
   searchParams,
   initialData,
   proposalId,
-  programType = "biofloc_thematic",
-  basePath = "/biofloc-thematic",
+  programType,
+  basePath,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   initialData?: RevisionProposalData;
   proposalId?: string;
-  programType?: string;
-  basePath?: string;
+  programType: string;
+  basePath: string;
 }) {
   const params = await searchParams;
 

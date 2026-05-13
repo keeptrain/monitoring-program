@@ -8,13 +8,13 @@ const uuidV7Schema = z.uuidv7();
 export default async function ProposalThematicRevisionPage({
   params,
   searchParams,
-  programType = "biofloc_thematic",
-  basePath = "/biofloc-thematic",
+  programType,
+  basePath,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  programType?: string;
-  basePath?: string;
+  programType: string;
+  basePath: string;
 }) {
   const { id } = await params;
 
