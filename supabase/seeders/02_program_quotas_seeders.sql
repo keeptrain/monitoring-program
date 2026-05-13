@@ -44,3 +44,14 @@ VALUES
   ('96', 'Papua Barat Daya', 'biofloc_thematic', 2026, 5)
 ON CONFLICT (province_code, program_type, year) 
 DO UPDATE SET quota_limit = EXCLUDED.quota_limit, province_name = EXCLUDED.province_name;
+
+-- Program Type: minapadi_thematic
+INSERT INTO program_quotas (province_code, province_name, program_type, year, quota_limit)
+VALUES
+  ('32', 'Jawa Barat', 'minapadi_thematic', 2026, 20),
+  ('33', 'Jawa Tengah', 'minapadi_thematic', 2026, 15),
+  ('34', 'Daerah Istimewa Yogyakarta', 'minapadi_thematic', 2026, 8),
+  ('35', 'Jawa Timur', 'minapadi_thematic', 2026, 20),
+  ('36', 'Banten', 'minapadi_thematic', 2026, 10)
+ON CONFLICT (province_code, program_type, year) 
+DO UPDATE SET quota_limit = EXCLUDED.quota_limit, province_name = EXCLUDED.province_name;
