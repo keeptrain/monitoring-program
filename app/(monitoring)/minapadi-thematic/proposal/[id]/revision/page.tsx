@@ -1,6 +1,6 @@
 import ProposalThematicRevisionPage from "@/features/proposal/ProposalThematicRevisionPage";
 
-export default async function BioflocProposalRevisionRoute({
+export default async function MinapadiProposalRevisionRoute({
   params,
   searchParams,
 }: {
@@ -11,8 +11,8 @@ export default async function BioflocProposalRevisionRoute({
     <ProposalThematicRevisionPage
       params={params}
       searchParams={searchParams}
-      programType="biofloc_thematic"
-      basePath="/biofloc-thematic"
+      programType="minapadi_thematic"
+      basePath="/minapadi-thematic"
     />
   );
 }

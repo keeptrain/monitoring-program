@@ -1,6 +1,6 @@
 import ProposalThematicPage from "@/features/proposal/ProposalThematicPage";
 
-export default async function BioflocProposalRoute({
+export default async function MinapadiProposalRoute({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -8,8 +8,8 @@ export default async function BioflocProposalRoute({
   return (
     <ProposalThematicPage
       searchParams={searchParams}
-      programType="biofloc_thematic"
-      basePath="/biofloc-thematic"
+      programType="minapadi_thematic"
+      basePath="/minapadi-thematic"
     />
   );
 }
