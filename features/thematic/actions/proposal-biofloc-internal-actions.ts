@@ -26,11 +26,11 @@ export async function getProposalThematicPaginated(
   return db.getProposalBioflocPaginatedService(params, userIdFilter);
 }
 
-export async function verifyProposalBiofloc(
+export async function verifyProposalThematic(
   id: string,
   values: ProposalVerificationFormValues,
 ) {
-  const { role, sub } = await getSession();
+  const { role, sub, programScope } = await getSession();
 
   if (role !== "pmo") {
     throw new Error("Anda tidak memiliki akses untuk memverifikasi proposal");
@@ -42,10 +42,15 @@ export async function verifyProposalBiofloc(
     throw new Error("Status proposal tidak valid");
   }
 
-  const result = await db.verifyProposalBioflocService(
+  const programType = programScope?.includes("minapadi")
+    ? "minapadi_thematic"
+    : "biofloc_thematic";
+
+  const result = await db.verifyProposalThematicService(
     id,
     sub,
     validateStatus.data,
+    programType,
   );
 
   return result;

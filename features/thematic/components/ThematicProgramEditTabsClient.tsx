@@ -158,6 +158,8 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
             <IdentityKdmpForm
               initialData={identityData}
               onSubmit={handleIdentitySubmit}
+              programType="biofloc_thematic"
+              basePath="/biofloc-thematic"
             />
           </CardContent>
           <CardFooter className="justify-end">
@@ -185,6 +187,8 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
               initialData={locationData}
               onSubmit={handleLocationSubmit}
               hideLandSlope={!program.proposal_id}
+              programType="biofloc_thematic"
+              basePath="/biofloc-thematic"
             />
           </CardContent>
           <CardFooter className="justify-end">

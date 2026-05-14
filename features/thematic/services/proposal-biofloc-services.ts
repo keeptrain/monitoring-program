@@ -168,17 +168,22 @@ export async function getProposalBioflocProvinceSummary(
 }
 
 /** Update proposal status (admin action) with smart metadata handling */
-export async function verifyProposalBioflocService(
+export async function verifyProposalThematicService(
   id: string,
   verifierId: string,
   data: ProposalVerificationFormValues,
+  programType: string,
 ) {
   const supabase = await createClient();
+  const targetTable =
+    programType === "minapadi_thematic"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
 
   // Get current data proposal
   const { data: existingProposal, error: errorExistingProposal } =
     await supabase
-      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .from(targetTable)
       .select("reviewed_at, rejection_reason")
       .eq("id", id)
       .single();
@@ -208,7 +213,7 @@ export async function verifyProposalBioflocService(
   };
 
   const { error } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(targetTable)
     .update(updatePayload)
     .eq("id", id);
 
@@ -220,6 +225,7 @@ export async function verifyProposalBioflocService(
   return {
     success: true,
     message: "Verifikasi proposal berhasil disimpan",
+    programType,
   };
 }
 
