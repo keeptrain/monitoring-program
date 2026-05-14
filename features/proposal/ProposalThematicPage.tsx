@@ -67,6 +67,8 @@ const PAGE_CONFIG: Record<
       // TODO: Replace any with actual type
       initialData?: any;
       proposalId?: string;
+      programType: string;
+      basePath: string;
     }>;
   }
 > = {
@@ -149,7 +151,12 @@ export default async function ProposalThematicPage({
             <CardTitle>{pageConfig.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <Component initialData={stepData} proposalId={proposalId} />
+            <Component
+              initialData={stepData}
+              proposalId={proposalId}
+              programType={programType}
+              basePath={basePath}
+            />
           </CardContent>
           <CardFooter className="justify-end gap-4">
             <StepNavigation totalSteps={3} backHref={basePath} />
