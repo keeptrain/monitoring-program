@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
 import { ProposalSubmissionTableColumns } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
 import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
-import { useVerificationProposalBiofloc } from "@/features/thematic/api/useVerificationProposalBiofloc";
+import { useVerificationProposalThematic } from "@/features/thematic/api/verificationProposalThematic";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
 import { useRouter } from "next/navigation";
@@ -36,12 +36,12 @@ import { UserRole } from "@/features/auth/types/user";
 
 export default function ProposalProgramPage({
   role = undefined,
-  basePath = "/biofloc-thematic",
-  programType = "biofloc_thematic",
+  basePath,
+  programType,
 }: {
   role?: UserRole | undefined;
-  basePath?: string;
-  programType?: string;
+  basePath: string;
+  programType: string;
 }) {
   const router = useRouter();
 
@@ -82,8 +82,8 @@ export default function ProposalProgramPage({
   );
 
   const columns = useMemo(
-    () => ProposalSubmissionTableColumns(role, handleAction),
-    [handleAction, role],
+    () => ProposalSubmissionTableColumns(basePath, role, handleAction),
+    [basePath, role, handleAction],
   );
 
   const handleRowClick = (id: string) =>
@@ -167,7 +167,7 @@ function VerificationForm({
   onCloseSheet: () => void;
 }) {
   const [status, setStatus] = useState<ProposalBioflocStatus | null>(null);
-  const { mutate, isPending } = useVerificationProposalBiofloc();
+  const { mutate, isPending } = useVerificationProposalThematic();
 
   const handleSubmit = async (formData: FormData) => {
     if (!id) return;

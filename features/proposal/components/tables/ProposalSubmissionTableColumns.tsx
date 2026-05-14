@@ -41,57 +41,61 @@ const ActionButtons = dynamic(
 );
 
 export const ProposalSubmissionTableColumns = (
+  basePath: string,
   role: UserRole | undefined = undefined,
   onAction?: (
     data: ProposalBioflocThematicProgram,
     action: "verify" | "convert",
   ) => void,
-): ColumnDef<ProposalBioflocThematicProgram>[] => {
-  return [
-    {
-      header: "Nama KDMP",
-      accessorKey: "kdmp_entities.name",
-      cell: ({ row: { original } }) => original.kdmp_entities.name,
-    },
-    {
-      header: "Kelurahan / Desa",
-      accessorKey: "available_locations.ref_villages.name",
-      cell: ({ row: { original } }) =>
-        original.available_locations.ref_villages?.name || "-",
-    },
-    {
-      header: "Komoditas diusulkan",
-      accessorKey: "proposed_commodity",
-      cell: ({ row: { original } }) => (
-        <p className="capitalize">{original.proposed_commodity}</p>
-      ),
-    },
-    {
-      header: "Komoditas potensial",
-      accessorKey: "commodity_potentials",
-      cell: ({ row: { original } }) => (
-        <p className="capitalize">{original.commodity_potentials.join(", ")}</p>
-      ),
-    },
-    {
-      header: "Status Proposal",
-      accessorKey: "status",
-      cell: ({ row: { original } }) => <StatusBadge status={original.status} />,
-    },
-    ...(role
-      ? [
-          {
-            id: "actions",
-            header: "Aksi",
-            cell: ({
-              row: { original },
-            }: {
-              row: { original: ProposalBioflocThematicProgram };
-            }) => (
-              <ActionButtons data={original} role={role} onAction={onAction} />
-            ),
-          },
-        ]
-      : []),
-  ];
-};
+): ColumnDef<ProposalBioflocThematicProgram>[] => [
+  {
+    header: "Nama KDMP",
+    accessorKey: "kdmp_entities.name",
+    cell: ({ row: { original } }) => original.kdmp_entities.name,
+  },
+  {
+    header: "Kelurahan / Desa",
+    accessorKey: "available_locations.ref_villages.name",
+    cell: ({ row: { original } }) =>
+      original.available_locations.ref_villages?.name || "-",
+  },
+  {
+    header: "Komoditas diusulkan",
+    accessorKey: "proposed_commodity",
+    cell: ({ row: { original } }) => (
+      <p className="capitalize">{original.proposed_commodity}</p>
+    ),
+  },
+  {
+    header: "Komoditas potensial",
+    accessorKey: "commodity_potentials",
+    cell: ({ row: { original } }) => (
+      <p className="capitalize">{original.commodity_potentials.join(", ")}</p>
+    ),
+  },
+  {
+    header: "Status Proposal",
+    accessorKey: "status",
+    cell: ({ row: { original } }) => <StatusBadge status={original.status} />,
+  },
+  ...(role
+    ? [
+        {
+          id: "actions",
+          header: "Aksi",
+          cell: ({
+            row: { original },
+          }: {
+            row: { original: ProposalBioflocThematicProgram };
+          }) => (
+            <ActionButtons
+              data={original}
+              role={role}
+              onAction={onAction}
+              basePath={basePath}
+            />
+          ),
+        },
+      ]
+    : []),
+];

@@ -45,7 +45,15 @@ export default function ProposalSubmissionTable({
     enabled,
   );
 
-  const columns = useMemo(() => ProposalSubmissionTableColumns(role), [role]);
+  const basePath =
+    programType === "minapadi_thematic"
+      ? "/minapadi-thematic"
+      : "/biofloc-thematic";
+
+  const columns = useMemo(
+    () => ProposalSubmissionTableColumns(basePath, role),
+    [basePath, role],
+  );
 
   return (
     <Datatable
@@ -84,7 +92,7 @@ export default function ProposalSubmissionTable({
           />
           <div className="ml-auto w-1/4">
             <Input
-              placeholder="Cari kelompok kdmp..."
+              placeholder={`Cari kelompok ${programType === "minapadi_thematic" ? "pokdaka" : "kdmp"}...`}
               value={searchQuery}
               onChange={(event) => {
                 setSearchQuery(event.target.value);

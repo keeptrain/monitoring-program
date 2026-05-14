@@ -9,10 +9,12 @@ import { ProposalDownloadButton } from "./ProposalDownloadButton";
 export default function ProposalSubmissionTableActions({
   data,
   role,
+  basePath,
   onAction,
 }: {
   data: ProposalBioflocThematicProgram;
   role?: UserRole;
+  basePath: string;
   onAction?: (
     data: ProposalBioflocThematicProgram,
     action: "verify" | "convert",
@@ -42,7 +44,7 @@ export default function ProposalSubmissionTableActions({
       {data.status === "rejected" && role === "officer" && (
         <Button asChild size="sm" variant="outline">
           <Link
-            href={`/biofloc-thematic/proposal/${data.id}/revision`}
+            href={`${basePath}/proposal/${data.id}/revision`}
             onClick={(e) => e.stopPropagation()}
           >
             Perbaiki
