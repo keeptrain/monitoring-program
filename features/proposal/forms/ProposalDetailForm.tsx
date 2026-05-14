@@ -24,11 +24,19 @@ import {} from "../forms/proposal-detail-schema";
 export default function ProposalDetailForm({
   initialData,
   proposalId,
+  programType,
+  basePath,
 }: {
   initialData?: ProposalDetailFormValues;
   proposalId?: string;
+  programType: string;
+  basePath: string;
 }) {
-  const { form, onSubmit } = useProposalDetailForm(initialData, proposalId);
+  const { form, onSubmit } = useProposalDetailForm(
+    initialData,
+    proposalId,
+    basePath,
+  );
 
   const otherCommodityPotentialError =
     form.formState.errors.other_commodity_potential?.message;
@@ -175,7 +183,7 @@ export default function ProposalDetailForm({
                 form={form}
                 mode="create"
                 documentationType="proposal_before"
-                storageBasePath="documentations/proposal-biofloc-thematic"
+                storageBasePath={`documentations/${programType === "minapadi_thematic" ? "proposal-minapadi-thematic" : "proposal-biofloc-thematic"}`}
               />
             </FieldContent>
           </Field>
@@ -253,7 +261,11 @@ export default function ProposalDetailForm({
                   <FileUploadField
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    basePath="proposal-biofloc-thematic"
+                    basePath={
+                      programType === "minapadi_thematic"
+                        ? "proposal-minapadi-thematic"
+                        : "proposal-biofloc-thematic"
+                    }
                     accept=".pdf,.doc,.docx"
                     error={fieldState.error?.message}
                   />

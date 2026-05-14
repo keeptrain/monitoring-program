@@ -21,6 +21,8 @@ import { LocationKdmpValues } from "../forms/location-kdmp-schema";
 export default function LocationKdmpForm(props: {
   initialData?: LocationKdmpValues;
   proposalId?: string;
+  programType: string;
+  basePath: string;
   onSubmit?: (data: LocationKdmpValues) => void;
   hideLandSlope?: boolean;
 }) {

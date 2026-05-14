@@ -12,8 +12,12 @@ import {
   getFormDataFromStore,
   ProposalState,
 } from "../api/proposal-store";
-import { createProposal, updateRevisionProposal } from "../api/proposal-actions";
+import {
+  createProposal,
+  updateRevisionProposal,
+} from "../api/proposal-actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
   has_letter_of_land_preparation_and_use: undefined,
@@ -26,9 +30,11 @@ const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
 };
 
 export const useProposalDetailForm = (
-  initialData?: Partial<ProposalDetailFormInput>,
-  proposalId?: string,
+  initialData: Partial<ProposalDetailFormInput> | undefined,
+  proposalId: string | undefined,
+  basePath: string,
 ) => {
+  const router = useRouter();
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(3).withOptions({
@@ -84,8 +90,7 @@ export const useProposalDetailForm = (
       if (newStep3Data === prevStep3Data) return;
       prevStep3Data = newStep3Data;
 
-      const hasStoreData =
-        newStep3Data && Object.keys(newStep3Data).length > 0;
+      const hasStoreData = newStep3Data && Object.keys(newStep3Data).length > 0;
 
       form.reset({
         ...CREATE_DEFAULT_VALUES,
@@ -125,7 +130,7 @@ export const useProposalDetailForm = (
       } else {
         toast.success(result.message);
         clearDraft();
-        window.location.href = "/biofloc-thematic";
+        router.push(basePath);
       }
     });
   };

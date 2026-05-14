@@ -15,6 +15,8 @@ import { useIdentifyKdmpForm } from "../hooks/useIdentifyKdmpForm";
 export default function IdentityKdmpForm(props: {
   initialData?: IdentifyKdmpFormValues;
   proposalId?: string;
+  programType: string;
+  basePath: string;
   onSubmit?: (data: IdentifyKdmpFormValues) => void;
 }) {
   const { initialData, onSubmit: onSubmitOverride } = props;
