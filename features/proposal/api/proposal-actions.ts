@@ -83,7 +83,7 @@ function validateProposalDetail(formData: FormData) {
 }
 
 export async function createProposal(formData: FormData) {
-  const { sub, isLoggedIn, role } = await getSession();
+  const { sub, isLoggedIn, role, programScope } = await getSession();
 
   if (!isLoggedIn || role !== "officer") {
     return {
@@ -127,12 +127,17 @@ export async function createProposal(formData: FormData) {
     };
   }
 
+  const programType = programScope?.includes("minapadi")
+    ? "minapadi_thematic"
+    : "biofloc_thematic";
+
   // Insert to db
   const result = await createProposalWithDocumentations(
     sub,
     identifyResult.data,
     locationResult.data,
     detailResult.data,
+    programType,
   );
 
   if (!result.success) {
@@ -154,7 +159,7 @@ export interface RevisionProposalData {
 }
 
 export async function getRevisionProposal(id: string) {
-  const { sub, isLoggedIn, role } = await getSession();
+  const { sub, isLoggedIn, role, programScope } = await getSession();
 
   if (!isLoggedIn || role !== "officer") {
     return {
@@ -165,9 +170,25 @@ export async function getRevisionProposal(id: string) {
     };
   }
 
+  const programType = programScope?.includes("minapadi")
+    ? "minapadi_thematic"
+    : "biofloc_thematic";
+  const targetTable =
+    programType === "minapadi_thematic"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+  const docType =
+    programType === "minapadi_thematic"
+      ? "proposal_minapadi_thematic"
+      : "proposal_biofloc_thematic";
+  const basePath =
+    programType === "minapadi_thematic"
+      ? "/minapadi-thematic"
+      : "/biofloc-thematic";
+
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(targetTable)
     .select(
       `
       *,
@@ -190,7 +211,7 @@ export async function getRevisionProposal(id: string) {
   }
 
   if (!data || data.status !== "rejected") {
-    redirect(`/biofloc-thematic`);
+    redirect(basePath);
   }
 
   // Fetch documentations separately (Polymorphic relationship)
@@ -198,7 +219,7 @@ export async function getRevisionProposal(id: string) {
     .from("documentations")
     .select("*")
     .eq("program_id", id)
-    .eq("program_type", "proposal_biofloc_thematic");
+    .eq("program_type", docType);
 
   // Group documentations by group_id
   const documentationGroups: Record<string, any> = {};
@@ -273,7 +294,7 @@ export async function getRevisionProposal(id: string) {
 }
 
 export async function updateRevisionProposal(id: string, formData: FormData) {
-  const { sub, isLoggedIn, role } = await getSession();
+  const { sub, isLoggedIn, role, programScope } = await getSession();
 
   if (!isLoggedIn || role !== "officer") {
     return {
@@ -317,6 +338,10 @@ export async function updateRevisionProposal(id: string, formData: FormData) {
     };
   }
 
+  const programType = programScope?.includes("minapadi")
+    ? "minapadi_thematic"
+    : "biofloc_thematic";
+
   // Update existing proposal
   const result = await updateProposalWithDocumentations(
     id,
@@ -324,6 +349,7 @@ export async function updateRevisionProposal(id: string, formData: FormData) {
     identifyResult.data,
     locationResult.data,
     detailResult.data,
+    programType,
   );
 
   if (!result.success) {

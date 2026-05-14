@@ -16,7 +16,16 @@ export async function createProposalWithDocumentations(
   identify: IdentifyKdmpFormValues,
   location: LocationKdmpValues,
   detail: ProposalDetailFormValues,
+  programType: string,
 ) {
+  const targetTable =
+    programType === "minapadi_thematic"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+  const docType =
+    programType === "minapadi_thematic"
+      ? "proposal_minapadi_thematic"
+      : "proposal_biofloc_thematic";
   const supabase = await createClient();
   const proposalId = uuidv7();
   const fiscalYear = 2026;
@@ -66,7 +75,7 @@ export async function createProposalWithDocumentations(
       village_code: location.village_code,
       latitude: location.latitude,
       longitude: location.longitude,
-      type: "biofloc_thematic", // Hardcoded for this specific thematic program
+      type: programType,
     })
     .select("id")
     .single();
@@ -87,24 +96,21 @@ export async function createProposalWithDocumentations(
   }
 
   // 3. Insert Proposal
-  const { error: proposalError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .insert({
-      id: proposalId,
-      entity_id: kdmpData.id,
-      location_id: locationData.id,
-      user_id: userId,
-      status: "pending",
-      land_slope: location.landSlope,
-      has_land_preparation_letter:
-        detail.has_letter_of_land_preparation_and_use,
-      proposed_commodity: detail.proposed_commodity,
-      has_experienced_member: detail.has_member_with_experience,
-      commodity_potentials: detail.commodity_potentials,
-      other_commodity_potential: detail.other_commodity_potential || null,
-      proposal_path: detail.proposal_path,
-      fiscal_year: fiscalYear,
-    });
+  const { error: proposalError } = await supabase.from(targetTable).insert({
+    id: proposalId,
+    entity_id: kdmpData.id,
+    location_id: locationData.id,
+    user_id: userId,
+    status: "pending",
+    land_slope: location.landSlope,
+    has_land_preparation_letter: detail.has_letter_of_land_preparation_and_use,
+    proposed_commodity: detail.proposed_commodity,
+    has_experienced_member: detail.has_member_with_experience,
+    commodity_potentials: detail.commodity_potentials,
+    other_commodity_potential: detail.other_commodity_potential || null,
+    proposal_path: detail.proposal_path,
+    fiscal_year: fiscalYear,
+  });
 
   if (proposalError) {
     console.error("Proposal Insert Error:", proposalError);
@@ -118,7 +124,7 @@ export async function createProposalWithDocumentations(
   const docsResult = await saveDocumentationsAction(
     supabase,
     proposalId,
-    "proposal_biofloc_thematic",
+    docType,
     detail.documentations,
   );
 
@@ -141,12 +147,21 @@ export async function updateProposalWithDocumentations(
   identify: IdentifyKdmpFormValues,
   location: LocationKdmpValues,
   detail: ProposalDetailFormValues,
+  programType: string,
 ) {
+  const targetTable =
+    programType === "minapadi_thematic"
+      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
+      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+  const docType =
+    programType === "minapadi_thematic"
+      ? "proposal_minapadi_thematic"
+      : "proposal_biofloc_thematic";
   const supabase = await createClient();
 
   // 1. Fetch existing proposal
   const { data: existingProposal, error: fetchError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(targetTable)
     .select("entity_id, location_id, rejection_reason")
     .eq("id", proposalId)
     .eq("user_id", userId)
@@ -211,7 +226,7 @@ export async function updateProposalWithDocumentations(
 
   // 4. Update Proposal — preserve rejection_reason for audit trail
   const { error: proposalError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(targetTable)
     .update({
       status: "pending",
       land_slope: location.landSlope,
@@ -238,7 +253,7 @@ export async function updateProposalWithDocumentations(
   // 5. Upsert Documentations (delete old + insert new)
   const docsResult = await upsertDocumentations(
     proposalId,
-    "proposal_biofloc_thematic",
+    docType,
     detail.documentations,
   );
 
