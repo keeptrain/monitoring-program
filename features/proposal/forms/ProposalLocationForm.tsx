@@ -8,7 +8,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useLocationKdmpForm } from "../hooks/useLocationKdmpForm";
+import { useProposalLocationForm } from "../hooks/useProposalLocationForm";
 import ProposalLocationFormSection from "../components/ProposalLocationFormSection";
 import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
 import { Controller } from "react-hook-form";
@@ -16,18 +16,18 @@ import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import RegencySelect from "@/components/shared/RegencySelect";
 import DistrictSelect from "@/components/shared/DistrictSelect";
 import VillageSelect from "@/components/shared/VillageSelect";
-import { LocationKdmpValues } from "../forms/location-kdmp-schema";
+import { ProposalLocationValues } from "../forms/proposal-location-schema";
 
-export default function LocationKdmpForm(props: {
-  initialData?: LocationKdmpValues;
+export default function ProposalLocationForm(props: {
+  initialData?: ProposalLocationValues;
   proposalId?: string;
   programType: string;
   basePath: string;
-  onSubmit?: (data: LocationKdmpValues) => void;
+  onSubmit?: (data: ProposalLocationValues) => void;
   hideLandSlope?: boolean;
 }) {
   const { initialData, onSubmit: onSubmitOverride } = props;
-  const { form, onSubmit: defaultOnSubmit } = useLocationKdmpForm(initialData, {
+  const { form, onSubmit: defaultOnSubmit } = useProposalLocationForm(initialData, {
     disableStore: !!onSubmitOverride,
   });
   const {

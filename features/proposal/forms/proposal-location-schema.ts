@@ -1,7 +1,7 @@
 import { locationCoordinateSchema } from "@/components/shared/location-schema";
 import z from "zod";
 
-export const locationKdmpSchema = z.object({
+export const proposalLocationSchema = z.object({
   latitude: z.preprocess(
     (v) => (v === "" ? undefined : v),
     locationCoordinateSchema.shape.latitude,
@@ -25,5 +25,5 @@ export const locationKdmpSchema = z.object({
   village_name: z.string().optional(),
 });
 
-export type LocationKdmpInput = z.input<typeof locationKdmpSchema>;
-export type LocationKdmpValues = z.infer<typeof locationKdmpSchema>;
+export type ProposalLocationInput = z.input<typeof proposalLocationSchema>;
+export type ProposalLocationValues = z.infer<typeof proposalLocationSchema>;

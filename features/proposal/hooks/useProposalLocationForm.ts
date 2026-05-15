@@ -1,18 +1,18 @@
 import { useForm, DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  LocationKdmpInput,
-  LocationKdmpValues,
-  locationKdmpSchema,
-} from "../forms/location-kdmp-schema";
+  ProposalLocationInput,
+  ProposalLocationValues,
+  proposalLocationSchema,
+} from "../forms/proposal-location-schema";
 import { useEffect } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { ProposalState, useProposalStore } from "../api/proposal-store";
 
-const CREATE_DEFAULT_VALUES: DefaultValues<LocationKdmpInput> = {
-  latitude: "",
-  longitude: "",
-  landSlope: "",
+const CREATE_DEFAULT_VALUES: DefaultValues<ProposalLocationInput> = {
+  latitude: "" as any,
+  longitude: "" as any,
+  landSlope: "" as any,
   province_code: "",
   province_name: "",
   regency_code: "",
@@ -23,8 +23,8 @@ const CREATE_DEFAULT_VALUES: DefaultValues<LocationKdmpInput> = {
   village_name: "",
 };
 
-export const useLocationKdmpForm = (
-  initialData?: Partial<LocationKdmpInput>,
+export const useProposalLocationForm = (
+  initialData?: Partial<ProposalLocationInput>,
   options?: { disableStore?: boolean },
 ) => {
   const disableStore = options?.disableStore ?? false;
@@ -46,9 +46,9 @@ export const useLocationKdmpForm = (
     ? { ...CREATE_DEFAULT_VALUES, ...initialData }
     : { ...CREATE_DEFAULT_VALUES, ...initialData, ...step2Data };
 
-  const form = useForm<LocationKdmpInput, undefined, LocationKdmpValues>({
+  const form = useForm<ProposalLocationInput, undefined, ProposalLocationValues>({
     defaultValues: mergedDefaults,
-    resolver: zodResolver(locationKdmpSchema),
+    resolver: zodResolver(proposalLocationSchema),
   });
 
   // Re-hydrate form from store or initialData on client mount
@@ -109,7 +109,7 @@ export const useLocationKdmpForm = (
     }
   }, [serverErrors, step, form, setServerErrors, disableStore]);
 
-  const onSubmit = (data: LocationKdmpValues) => {
+  const onSubmit = (data: ProposalLocationValues) => {
     if (!disableStore) {
       setStep2Data(data);
       setStep(step + 1);
