@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "./session";
 import { ProgramScope, UserRole } from "./types/user";
 
-const SCOPE_TO_PATH: Record<string, string> = {
+export const SCOPE_TO_PATH: Record<string, string> = {
   biofloc: "biofloc-thematic",
   minapadi: "minapadi-thematic",
   isf: "isf",

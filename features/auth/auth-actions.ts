@@ -7,7 +7,7 @@ import { getIronSession } from "iron-session";
 import { SessionData, sessionOptions } from "@/lib/session";
 import * as db from "@/features/auth/services/login-services";
 import { buildSession } from "./session";
-import { getRedirectPath } from "./utils";
+import { getRedirectPath, SCOPE_TO_PATH } from "./utils";
 
 export type ActionState = {
   success: boolean;
@@ -81,5 +81,13 @@ export async function logout() {
     sessionOptions,
   );
 
+  const redirectPath = SCOPE_TO_PATH[session.programScope];
   session.destroy();
+  
+  return {
+    success: true,
+    data: {
+      href: redirectPath,
+    },
+  };
 }

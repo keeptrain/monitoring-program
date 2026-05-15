@@ -26,9 +26,9 @@ export function UserDropdown() {
     startTransition(async () => {
       await setStatuses(null);
       queryClient.clear();
-      await logout();
-      if (pathname !== "/") {
-        router.push("/biofloc-thematic");
+      const result = await logout();
+      if (pathname.startsWith("/dashboard")) {
+        router.push(result.data.href);
       } else {
         router.refresh();
       }
