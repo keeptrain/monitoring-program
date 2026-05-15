@@ -16,7 +16,7 @@ export default async function PublicLayout({
 
   return (
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr]">
-      <PublicPageHeader label="Monitoring" title="Dashboard Program Prioritas">
+      <PublicPageHeader label="Monitoring" title="Dashboard Program Prioritas" >
         {!isLoggedIn ? (
           <MenuDashboardTriggerClient
             isAuthenticated={isLoggedIn}

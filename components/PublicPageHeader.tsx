@@ -1,3 +1,5 @@
+import { FILTER_STATE } from "@/features/thematic/constants/filter-state";
+
 interface PublicPageHeaderProps {
   label: string;
   title: string;
@@ -11,7 +13,8 @@ export default function PublicPageHeader({
   programType,
   children,
 }: PublicPageHeaderProps) {
-  const programTypeLabel = programType?.replace("_", " ");
+  const programTypeLabel = programType ? FILTER_STATE[programType].label : "";
+
   return (
     <div className="bg-backdrop-blur-sm z-5 bg-white/80">
       <div className="mx-auto flex max-w-6xl items-center justify-between p-4 sm:px-0">
