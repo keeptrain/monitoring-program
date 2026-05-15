@@ -20,8 +20,8 @@ import PublicPageHeader from "@/components/PublicPageHeader";
 import { AlertTriangleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-const IdentityKdmpForm = dynamic(
-  () => import("@/features/proposal/forms/IdentityKdmpForm"),
+const ProposalIdentityForm = dynamic(
+  () => import("@/features/proposal/forms/ProposalIdentityForm"),
   {
     loading: () => (
       <div className="space-y-4">
@@ -32,8 +32,9 @@ const IdentityKdmpForm = dynamic(
     ),
   },
 );
-const LocationKdmpForm = dynamic(
-  () => import("@/features/proposal/forms/LocationKdmpForm"),
+
+const ProposalLocationForm = dynamic(
+  () => import("@/features/proposal/forms/ProposalLocationForm"),
   {
     loading: () => (
       <div className="space-y-4">
@@ -46,6 +47,7 @@ const LocationKdmpForm = dynamic(
     ),
   },
 );
+
 const ProposalDetailForm = dynamic(
   () => import("@/features/proposal/forms/ProposalDetailForm"),
   {
@@ -72,12 +74,12 @@ const PAGE_CONFIG: Record<
     }>;
   }
 > = {
-  1: { title: "Identitas KDMP", Component: IdentityKdmpForm },
-  2: { title: "Informasi Wilayah KDMP", Component: LocationKdmpForm },
+  1: { title: "Identitas", Component: ProposalIdentityForm },
+  2: { title: "Informasi Wilayah", Component: ProposalLocationForm },
   3: { title: "Detail Proposal", Component: ProposalDetailForm },
 };
 
-export default async function ProposalThematicPage({
+export default async function ProposalThematicFormPage({
   searchParams,
   initialData,
   proposalId,
@@ -112,7 +114,8 @@ export default async function ProposalThematicPage({
     ? initialData[`step${currentStep}Data` as keyof typeof initialData]
     : undefined;
 
-  const pageHeaderTitle = initialData ? `Perbaiki proposal` : `Buat proposal`;
+  const pageHeaderTitle = initialData ? `Perbaiki Proposal` : `Buat Proposal`;
+
 
   return (
     <>
@@ -159,7 +162,7 @@ export default async function ProposalThematicPage({
             />
           </CardContent>
           <CardFooter className="justify-end gap-4">
-            <StepNavigation totalSteps={3} backHref={basePath} />
+            <StepNavigation totalSteps={3} />
           </CardFooter>
         </Card>
       </div>

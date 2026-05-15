@@ -1,13 +1,16 @@
-import ProposalThematicPage from "@/features/proposal/ProposalThematicPage";
+import ProposalThematicFormPage from "@/features/proposal/ProposalThematicFormPage";
 
-export default async function BioflocProposalRoute({
-  searchParams,
-}: {
+/**
+ * (monitoring)/biofloc-thematic/proposal
+ * @param props
+ * @returns
+ */
+export default function Page(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   return (
-    <ProposalThematicPage
-      searchParams={searchParams}
+    <ProposalThematicFormPage
+      searchParams={props.searchParams}
       programType="biofloc_thematic"
       basePath="/biofloc-thematic"
     />

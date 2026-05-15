@@ -1,7 +1,7 @@
 import z from "zod";
 import { getRevisionProposal } from "./api/proposal-actions";
 import { redirect } from "next/navigation";
-import ProposalThematicPage from "./ProposalThematicPage";
+import ProposalThematicFormPage from "./ProposalThematicFormPage";
 
 const uuidV7Schema = z.uuidv7();
 
@@ -32,7 +32,7 @@ export default async function ProposalThematicRevisionPage({
   }
 
   return (
-    <ProposalThematicPage
+    <ProposalThematicFormPage
       searchParams={searchParams}
       initialData={proposal.data}
       proposalId={id}
