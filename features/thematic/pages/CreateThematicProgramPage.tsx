@@ -4,7 +4,7 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { getProposalBioflocDetailQueryOptions } from "../api/getProposalBioflocDetail";
+import { getProposalThematicQueryOptions } from "../api/getProposalThematic";
 import CreateThematicProgramClientPage from "./CreateThematicProgramClientPage";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
@@ -40,7 +40,7 @@ export default async function CreateThematicProgramPage({
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery(
-    getProposalBioflocDetailQueryOptions(proposalId),
+    getProposalThematicQueryOptions(proposalId),
   );
 
   const dehydratedState = dehydrate(queryClient);

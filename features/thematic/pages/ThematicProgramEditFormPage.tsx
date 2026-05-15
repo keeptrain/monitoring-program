@@ -29,11 +29,14 @@ export default async function ThematicProgramEditFormPage({
   queryClient.prefetchQuery(getThematicProgramQueryOptions(id));
   const dehydratedState = dehydrate(queryClient);
 
+  const programType =
+    type === "biofloc" ? "biofloc_thematic" : "minapadi_thematic";
+
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <BreadcrumbHeader items={breadcrumbItems} />
       <HydrationBoundary state={dehydratedState}>
-        <ThematicProgramEditTabsClient id={id} />
+        <ThematicProgramEditTabsClient id={id} programType={programType} />
       </HydrationBoundary>
     </div>
   );

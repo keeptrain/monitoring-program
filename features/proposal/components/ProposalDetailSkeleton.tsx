@@ -1,9 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-export default function Loading() {
+export function ProposalDetailSkeleton() {
   return (
-    <div className="mx-auto mt-8 mb-4 max-w-6xl space-y-6">
+    <div className="space-y-6">
       {/* Header Skeleton */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
@@ -36,8 +36,8 @@ export default function Loading() {
 
       {/* Client Area Skeleton (Map/Docs) */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Skeleton className="h-[300px] w-full rounded-xl" />
-        <Skeleton className="h-[300px] w-full rounded-xl" />
+        <Skeleton className="h-[350px] w-full rounded-xl" />
+        <Skeleton className="h-[350px] w-full rounded-xl" />
       </div>
     </div>
   );

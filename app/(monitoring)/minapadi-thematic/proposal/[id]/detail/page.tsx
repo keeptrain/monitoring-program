@@ -1,9 +1,6 @@
 import ProposalThematicDetailPage from "@/features/proposal/ProposalThematicDetailPage";
 
-/**
- * (public)/biofloc-thematic/proposal/[id]/detail/page.tsx
- */
-export default async function ProposalDetailPage({
+export default async function MinapadiProposalDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -11,7 +8,7 @@ export default async function ProposalDetailPage({
   return (
     <ProposalThematicDetailPage
       params={params}
-      programType="biofloc_thematic"
+      programType="minapadi_thematic"
     />
   );
 }

@@ -81,7 +81,7 @@ export async function getProposalBioflocPaginatedService(
     .range(from, to);
 
   if (error) {
-    throw error;
+    throw new Error("Failed to fetch proposals");
   }
 
   const total = count ?? 0;
@@ -104,7 +104,7 @@ export async function getProposalBioflocThematicProgramsService() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw error;
+    throw new Error("Failed to fetch program data");
   }
 
   return (data ?? []) as ProposalBioflocThematicProgram[];
@@ -135,7 +135,7 @@ export async function getProposalBioflocProvinceSummary(
     `);
 
   if (error) {
-    throw error;
+    throw new Error("Failed to fetch province summary");
   }
 
   // Define the expected shape of the response
@@ -229,52 +229,55 @@ export async function verifyProposalThematicService(
   };
 }
 
-export async function createSignedUrl(id: string) {
+export async function getProposalThematicFileService(id: string, targetTable: string) {
   const supabase = await createClient();
-  const { data: proposalBiofloc, error: proposalBioflocError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+  
+  const { data: proposal, error: proposalError } = await supabase
+    .from(targetTable)
     .select("proposal_path")
     .eq("id", id)
     .single();
 
-  if (proposalBioflocError) {
-    throw new Error(
-      `Error failed signed url for proposal biofloc: ${proposalBioflocError.message}`,
-    );
+  if (proposalError) {
+    throw new Error(`Failed to retrieve proposal record: ${proposalError.message}`);
   }
 
-  if (!proposalBiofloc?.proposal_path) {
-    throw new Error("Proposal tidak ditemukan.");
+  if (!proposal?.proposal_path) {
+    throw new Error("The requested proposal document path could not be found.");
   }
 
-  const { data: blob, error } = await supabase.storage
+  const { data: blob, error: downloadError } = await supabase.storage
     .from("demo")
-    .download(proposalBiofloc.proposal_path);
+    .download(proposal.proposal_path);
 
-  if (error) {
-    throw new Error(
-      `Error failed signed url for proposal biofloc: ${error.message}`,
-    );
+  if (downloadError) {
+    throw new Error(`Failed to download the document from storage: ${downloadError.message}`);
   }
 
-  return { blob, originalPath: proposalBiofloc.proposal_path };
+  if (!blob || blob.size === 0) {
+    throw new Error("The downloaded document appears to be empty or corrupted.");
+  }
+
+  return { blob, originalPath: proposal.proposal_path };
 }
 
 /**
  * Get single proposal detail with location info (lat/lng)
  */
-export async function getProposalBioflocDetailService(
+export async function getProposalThematicService(
   id: string,
+  targetTable: string,
 ): Promise<ProposalBioflocDetail> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(targetTable)
     .select(
       `
       id,
-      status,
+      user_id,
       entity_id,
       location_id,
+      status,
       land_slope,
       has_land_preparation_letter,
       proposed_commodity,
@@ -313,11 +316,11 @@ export async function getProposalBioflocDetailService(
     .single();
 
   if (error) {
-    throw error;
+    throw new Error("Failed to fetch proposal thematic detail");
   }
 
   if (!data) {
-    throw new Error("Proposal tidak ditemukan.");
+    throw new Error("Proposal thematic not found");
   }
 
   return data as unknown as ProposalBioflocDetail;

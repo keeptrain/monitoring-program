@@ -17,18 +17,26 @@ import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-
 import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
 import { updateKdmpEntity, updateLocation } from "../actions/thematic-actions";
 import { toast } from "sonner";
-import { ProposalBioflocDetailContent } from "@/features/proposal/components/ProposalBioflocDetailContent";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useRouter } from "next/navigation";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
+import { ProposalThematicDetailClient } from "@/features/proposal/components/ProposalThematicDetailClient";
 
-export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
+export default function ThematicProgramEditTabsClient({
+  id,
+  programType,
+}: {
+  id: string;
+  programType: string;
+}) {
   const router = useRouter();
-  const { data: program, isLoading } = useGetThematicProgram(id);
+
   const [activeTab, setActiveTab] = useState(0);
   const [isIdentitySubmitting, setIsIdentitySubmitting] = useState(false);
   const [isLocationSubmitting, setIsLocationSubmitting] = useState(false);
   const [isTabPending, startTabTransition] = useTransition();
+
+  const { data: program, isLoading } = useGetThematicProgram(id);
 
   const {
     form: editForm,
@@ -206,7 +214,10 @@ export default function ThematicProgramEditTabsClient({ id }: { id: string }) {
       )}
 
       {activeTab === 3 && program.proposal_id && (
-        <ProposalBioflocDetailContent id={program.proposal_id} />
+        <ProposalThematicDetailClient
+          id={program.proposal_id}
+          programType={programType}
+        />
       )}
     </div>
   );

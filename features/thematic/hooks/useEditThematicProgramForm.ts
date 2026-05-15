@@ -11,7 +11,7 @@ import {
 } from "../actions/thematic-actions";
 import { ThematicProgramDetail } from "../types/thematic";
 import { useTransition } from "react";
-import { convertProposalToProgram } from "../actions/proposal-biofloc-internal-actions";
+import { convertProposalToProgram } from "../actions/proposal-thematic-internal-actions";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getThematicProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";

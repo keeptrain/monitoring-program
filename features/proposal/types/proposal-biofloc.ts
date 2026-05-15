@@ -43,6 +43,7 @@ export type ProposalBioflocThematicProgram = {
 };
 
 export type ProposalBioflocDetail = ProposalBioflocThematicProgram & {
+  user_id?: string;
   available_locations: {
     latitude: number;
     longitude: number;

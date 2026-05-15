@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { getProposalThematicPaginated } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
 import { ProposalBioflocPaginationParams } from "@/features/proposal/types/proposal-biofloc";
+import { getProposalThematicPaginated } from "../actions/proposal-thematic-internal-actions";
 
 export const getProposalThematicQueryKey = (
   params?: Partial<ProposalBioflocPaginationParams>,

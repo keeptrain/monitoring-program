@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { verifyProposalThematic } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
+import { verifyProposalThematic } from "@/features/thematic/actions/proposal-thematic-internal-actions";
 import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
 
 import { getProposalThematicQueryKey } from "./getProposalThematicPaginated";

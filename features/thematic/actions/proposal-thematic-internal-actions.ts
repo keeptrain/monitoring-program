@@ -7,9 +7,8 @@ import {
   ProposalVerificationFormValues,
   proposalVerificationSchema,
 } from "../forms/proposal-verification-schema";
-import { createClient } from "@/utils/supabase";
-import { TABLES } from "@/lib/constants/tables";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
+import { resolveThematicMetadata } from "../utils/thematic-resolver";
 
 export async function getProposalThematicPaginated(
   params: ProposalBioflocPaginationParams,
@@ -56,10 +55,35 @@ export async function verifyProposalThematic(
   return result;
 }
 
-export async function createSignedUrlForProposalBiofloc(id: string) {
-  const { blob, originalPath } = await db.createSignedUrl(id);
-  const fileName = originalPath.split("/").pop();
-  return { blob, fileName };
+export async function downloadProposalThematic(id: string) {
+  const { isLoggedIn, programScope } = await getSession();
+
+  if (!isLoggedIn) {
+    return { success: false, message: "Unauthenticated" };
+  }
+
+  const { proposalTable } = resolveThematicMetadata(programScope);
+
+  try {
+    const { blob, originalPath } = await db.getProposalThematicFileService(
+      id,
+      proposalTable,
+    );
+
+    const fileName = originalPath.split("/").pop() || "proposal.pdf";
+
+    return {
+      success: true,
+      message: "Berhasil mengunduh proposal",
+      data: { blob, fileName },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Gagal mengunduh proposal",
+    };
+  }
 }
 
 /**
@@ -67,62 +91,41 @@ export async function createSignedUrlForProposalBiofloc(id: string) {
  * - PMO and Admin can view any proposal
  * - Officers can only view their own proposals (based on sub)
  */
-export async function getProposalBioflocDetail(id: string) {
-  const { sub, role, isLoggedIn } = await getSession();
+export async function getProposalThematic(id: string) {
+  const { sub, role, programScope, isLoggedIn } = await getSession();
 
   if (!isLoggedIn || !sub) {
     return {
       success: false,
-      message: "Unauthorized",
+      message: "Unauthenticated",
       data: null,
     };
   }
 
+  const { proposalTable } = resolveThematicMetadata(programScope);
+
   try {
-    const data = await db.getProposalBioflocDetailService(id);
+    const data = await db.getProposalThematicService(id, proposalTable);
 
-    // PMO and Admin can view any proposal
-    if (role === "pmo" || role === "admin") {
-      return {
-        success: true,
-        message: "Berhasil mendapatkan detail proposal",
-        data,
-      };
-    }
-
-    // Officers can only view their own proposals
-    const supabase = await createClient();
-    const { data: proposal, error } = await supabase
-      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-      .select("user_id")
-      .eq("id", id)
-      .single();
-
-    if (error || !proposal) {
-      return {
-        success: false,
-        message: "Proposal tidak ditemukan",
-        data: null,
-      };
-    }
-
-    if (proposal.user_id !== sub) {
-      return {
-        success: false,
-        message: "Anda tidak memiliki akses ke proposal ini",
-        data: null,
-      };
+    // Authorization check for officer role
+    if (role === "officer") {
+      if (data.user_id !== sub) {
+        throw new Error("Unauthorized");
+      }
     }
 
     return {
       success: true,
-      message: "Berhasil mendapatkan detail proposal",
+      message: "Successfully fetched proposal thematic detail",
       data,
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Terjadi kesalahan",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch proposal thematic detail",
       data: null,
     };
   }

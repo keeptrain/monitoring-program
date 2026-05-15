@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useGetProposalBioflocDetail } from "../api/getProposalBioflocDetail";
+import { useGetProposalThematic } from "../api/getProposalThematic";
 import { ProposalBioflocDetail } from "@/features/proposal/types/proposal-biofloc";
 import { Loader2 } from "lucide-react";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
@@ -13,10 +13,7 @@ export default function CreateThematicProgramClientPage({
 }: {
   proposalId: string;
 }) {
-  const { data: result, isLoading } = useGetProposalBioflocDetail(
-    proposalId,
-    !!proposalId,
-  );
+  const { data: result, isLoading } = useGetProposalThematic(proposalId);
 
   const proposal = result?.data as ProposalBioflocDetail | undefined;
 

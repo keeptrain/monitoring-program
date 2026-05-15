@@ -1,27 +1,28 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { MapPinIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeftIcon, MapPinIcon } from "lucide-react";
 import { formatDateWithTime } from "@/lib/utils";
 import { StatusBadge } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DetailItem } from "@/components/shared/DetailItem";
 import { ProposalBioflocDetail } from "@/features/proposal/types/proposal-biofloc";
 import ProposalDetailClient from "../../thematic/components/biofloc/ProposalDetailClient";
-import { useGetProposalBioflocDetail } from "@/features/thematic/api/getProposalBioflocDetail";
-import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
+import { useGetProposalThematic } from "@/features/thematic/api/getProposalThematic";
+import { ProposalDownloadButton } from "./tables/ProposalDownloadButton";
+import { Button } from "@/components/ui/button";
 
-export function ProposalBioflocDetailContent({ id }: { id: string }) {
-  const pathname = usePathname() || "";
-  const isDashboard = pathname.startsWith("/dashboard");
+export function ProposalThematicDetailClient({
+  id,
+  programType,
+}: {
+  id: string;
+  programType: string;
+}) {
+  const router = useRouter();
 
-  const { data: result } = useGetProposalBioflocDetail(id, !!id);
+  const { data } = useGetProposalThematic(id);
 
-  if (!result?.data) {
-    return null;
-  }
-
-  const data = result.data as ProposalBioflocDetail;
   const {
     id: proposalId,
     status,
@@ -37,7 +38,7 @@ export function ProposalBioflocDetailContent({ id }: { id: string }) {
     other_commodity_potential,
     fiscal_year,
     rejection_reason,
-  } = data;
+  } = data?.data as ProposalBioflocDetail;
 
   const locationParts = [
     available_locations?.ref_provinces?.name,
@@ -45,25 +46,17 @@ export function ProposalBioflocDetailContent({ id }: { id: string }) {
     available_locations.ref_districts?.name,
     available_locations?.ref_villages?.name,
   ].filter(Boolean);
+
   const fullLocation =
     locationParts.length > 0 ? locationParts.join(", ") : "-";
-
-  const breadcrumbItems = isDashboard
-    ? [
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Detail Proposal Tematik Bioflok" },
-      ]
-    : [
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Tematik Bioflok", href: "/dashboard/thematic/biofloc" },
-        { label: "Proposal", href: "/dashboard/thematic/biofloc/proposals" },
-        { label: "Detail" },
-      ];
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-col">
-        <BreadcrumbHeader items={breadcrumbItems} />
+        <Button onClick={router.back} variant="link" className="w-fit px-0">
+          <ArrowLeftIcon className="size-4" />
+          Kembali
+        </Button>
         <h1 className="text-foreground mt-2 text-lg font-semibold tracking-tight md:text-xl">
           {kdmp_entities?.name ?? "-"}
         </h1>
@@ -98,6 +91,15 @@ export function ProposalBioflocDetailContent({ id }: { id: string }) {
               <p className="text-sm text-red-700">{rejection_reason}</p>
             </div>
           )}
+          <DetailItem
+            label="Dokumen Proposal"
+            value={
+              <div className="flex items-center gap-2">
+                <p>Download</p>
+                <ProposalDownloadButton id={id} />
+              </div>
+            }
+          />
         </CardContent>
       </Card>
 
@@ -177,6 +179,7 @@ export function ProposalBioflocDetailContent({ id }: { id: string }) {
 
       <ProposalDetailClient
         id={proposalId}
+        programType={programType}
         locations={{
           latitude: available_locations?.latitude || 0,
           longitude: available_locations?.longitude || 0,

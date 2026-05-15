@@ -4,7 +4,6 @@ import { CameraIcon, MapIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useGetDocumentationGroupsByTypeAndId } from "@/features/documentation/api/getDocumentationGroupsByTypeAndId";
 import { CarouselDApiDemo } from "@/components/shared/DocumentationCarouselGallery";
-import { ProposalDownloadButton } from "@/features/proposal/components/tables/ProposalDownloadButton";
 
 const LazyMap = dynamic(() => import("@/components/shared/MapPinPicker"), {
   ssr: false,
@@ -13,17 +12,18 @@ const LazyMap = dynamic(() => import("@/components/shared/MapPinPicker"), {
   ),
 });
 
-interface ProposalDetailClientProps {
-  id: string;
-  locations: { latitude: number; longitude: number };
-}
-
 export default function ProposalDetailClient({
   id,
+  programType,
   locations,
-}: ProposalDetailClientProps) {
+}: {
+  id: string;
+  programType: string;
+  locations: { latitude: number; longitude: number };
+}) {
+  const documentType = `proposal_${programType}`;
   const { data: groups, isPending } = useGetDocumentationGroupsByTypeAndId(
-    "proposal_biofloc_thematic",
+    documentType,
     id,
   );
 
@@ -32,38 +32,38 @@ export default function ProposalDetailClient({
 
   return (
     <div className="space-y-6 pb-8">
-      <div className="flex items-end gap-2">
-        <p className="text-base font-semibold">Download Dokumen Proposal:</p>
-        <ProposalDownloadButton id={id} />
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="space-y-4">
+          <span className="flex items-center gap-2">
+            <CameraIcon className="size-4" />
+            <h2 className="text-base font-semibold">Dokumentasi</h2>
+          </span>
+          {isPending ? (
+            <div className="h-[350px] max-w-md animate-pulse rounded-lg bg-zinc-100" />
+          ) : (
+            <div className="max-w-md">
+              <CarouselDApiDemo
+                images={proposalImages.map((src) => ({ src }))}
+                emptyLabel="Dokumentasi Proposal"
+              />
+            </div>
+          )}
+        </div>
+        <div className="space-y-4">
+          <span className="flex items-center gap-2">
+            <MapIcon className="size-4" />
+            <h2 className="text-base font-semibold">Lokasi</h2>
+          </span>
+          <LazyMap
+            disabled
+            value={{
+              latitude: locations.latitude,
+              longitude: locations.longitude,
+            }}
+            onChange={() => {}}
+          />
+        </div>
       </div>
-      <div className="space-y-2">
-        <span className="flex items-center gap-2">
-          <CameraIcon className="size-4" />
-          <h2 className="text-base font-semibold">Dokumentasi</h2>
-        </span>
-        {isPending ? (
-          <div className="h-40 max-w-md animate-pulse rounded-lg bg-zinc-100" />
-        ) : (
-          <div className="max-w-md">
-            <CarouselDApiDemo
-              images={proposalImages.map((src) => ({ src }))}
-              emptyLabel="Dokumentasi Proposal"
-            />
-          </div>
-        )}
-      </div>
-      <span className="flex items-center gap-2">
-        <MapIcon className="size-4" />
-        <h2 className="text-base font-semibold">Lokasi</h2>
-      </span>
-      <LazyMap
-        disabled
-        value={{
-          latitude: locations.latitude,
-          longitude: locations.longitude,
-        }}
-        onChange={() => {}}
-      />
     </div>
   );
 }
