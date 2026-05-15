@@ -6,7 +6,7 @@ import { ArrowUpIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const LazyMap = dynamic<{ isAuthenticated: boolean }>(
-  () => import("../MapClient"),
+  () => import("../components/MapClient"),
   {
     ssr: false,
     loading: () => <LoadingLazyMap />,

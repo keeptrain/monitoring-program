@@ -3,58 +3,35 @@
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
   AlertCircleIcon,
   ArrowRightIcon,
   FishIcon,
-  FolderXIcon,
   LocateFixedIcon,
 } from "lucide-react";
-import { MapContainer, Marker, Popup, TileLayer, GeoJSON } from "react-leaflet";
-import type { PublicAvailableLocation } from "../dashboard/actions/public-available-locations";
-import { ProgressPercentage } from "./components/ProgressPercentage";
-import { Button } from "@/components/ui/button";
-import { LocationType } from "../dashboard/actions/available-locations";
-import { MapPin, iconThematic, iconPotential } from "./components/MapPinIcon";
-import { useGetMonitoringLocationByTypeAndId } from "./api/getMonitoringLocationByTypeAndId";
-import BioflocDetailSheet from "./components/biofloc-detail/BioflocDetailSheet";
-import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
-import { MonitoringDetailTypeMap } from "./types/monitoring-types";
-import Link from "next/link";
 import {
-  getLocationsQueryKey,
   useGetMonitoringLocationsByType,
   useGetMonitoringLocationsCombined,
   LocationStatus,
-} from "./api/getMonitoringLocationsByType";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useQueryClient } from "@tanstack/react-query";
-import type { Map as LeafletMap } from "leaflet";
-import { useRef, startTransition, useState } from "react";
-import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
-import { Checkbox } from "@/components/ui/checkbox";
-import { usePathname } from "next/navigation";
+} from "../api/getMonitoringLocationsByType";
 import {
   INDONESIA_BOUNDS,
   INDONESIA_CENTER,
   typeMap,
-} from "./constants/monitoring-map-constants";
-
-const SHEET_CONTENTS: {
-  [K in "biofloc_thematic" | "minapadi_thematic"]: React.ComponentType<{
-    data: MonitoringDetailTypeMap[K];
-    isAuthenticated: boolean;
-  }>;
-} = {
-  biofloc_thematic: BioflocDetailSheet,
-  minapadi_thematic: BioflocDetailSheet,
-};
+} from "../constants/monitoring-map-constants";
+import { MapContainer, Marker, Popup, TileLayer, GeoJSON } from "react-leaflet";
+import type { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
+import { ProgressPercentage } from "./ProgressPercentage";
+import { Button } from "@/components/ui/button";
+import { LocationType } from "../../dashboard/actions/available-locations";
+import { MapPin, iconThematic, iconPotential } from "./MapPinIcon";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { Map as LeafletMap } from "leaflet";
+import { useRef } from "react";
+import MapDetailSheet from "./MapDetailSheet";
+import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { usePathname } from "next/navigation";
 
 export default function MapClient({
   isAuthenticated = false,
@@ -245,96 +222,6 @@ function MapTopContent({
         </Button>
       </div>
     </>
-  );
-}
-
-function MapDetailSheet({
-  type,
-  isAuthenticated,
-}: {
-  type: "biofloc_thematic" | "minapadi_thematic";
-  isAuthenticated: boolean;
-}) {
-  const queryClient = useQueryClient();
-  const [detailIdUrl, setDetailIdUrl] = useQueryState(
-    "detailId",
-    parseAsString,
-  );
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  if (detailIdUrl && (!isOpen || detailIdUrl !== activeId)) {
-    setActiveId(detailIdUrl);
-    setIsOpen(true);
-  } else if (!detailIdUrl && isOpen) {
-    setIsOpen(false);
-  }
-
-  const { data: detailData, isLoading } = useGetMonitoringLocationByTypeAndId(
-    type,
-    activeId ?? "",
-  );
-
-  const activeLocations =
-    queryClient.getQueryData<PublicAvailableLocation[]>(
-      getLocationsQueryKey(type, "active"),
-    ) ?? [];
-
-  const potentialLocations =
-    queryClient.getQueryData<PublicAvailableLocation[]>(
-      getLocationsQueryKey(type, "potential"),
-    ) ?? [];
-
-  const locations = [...activeLocations, ...potentialLocations];
-
-  const selectedLocation = activeId
-    ? locations.find((l) => l.id.toString() === activeId)
-    : null;
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      startTransition(() => {
-        setIsOpen(false);
-        setDetailIdUrl(null, { scroll: false, history: "replace" });
-      });
-    }
-  };
-
-  const DetailSheetContent = SHEET_CONTENTS[type];
-
-  return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetContent side="right" className="data-[side=right]:sm:max-w-[600px]">
-        <SheetHeader className="flex">
-          <SheetTitle
-            className={cn("invisible", !isLoading && "visible text-2xl")}
-          >
-            {selectedLocation && selectedLocation.location_name}
-          </SheetTitle>
-          <SheetDescription
-            className={cn("invisible", !isLoading && "visible text-lg")}
-          >
-            {selectedLocation && selectedLocation.province_name}
-          </SheetDescription>
-        </SheetHeader>
-
-        {isLoading ? (
-          <LoadingPublicMonitoringDetail />
-        ) : selectedLocation || detailData ? (
-          <DetailSheetContent
-            data={detailData!}
-            isAuthenticated={isAuthenticated}
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <div className="flex flex-col items-center gap-2">
-              <FolderXIcon />
-              <p className="text-muted-foreground">Data tidak ditemukan</p>
-            </div>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
   );
 }
 

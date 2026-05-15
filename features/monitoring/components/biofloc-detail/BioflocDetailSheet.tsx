@@ -1,8 +1,5 @@
 import { PublicThematicProgram } from "../../../thematic/actions/public-thematic-programs";
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
-import { Button } from "@/components/ui/button";
-import { ArrowRightIcon } from "lucide-react";
-import Link from "next/link";
 import { ProgressPieChartZoneIsf } from "@/features/monitoring/components/isf-detail/ProgressPieChartZoneIsf";
 
 export default function BioflocDetailSheet({
@@ -43,13 +40,6 @@ export default function BioflocDetailSheet({
         </p>
         <ProgressPieChartZoneIsf progress={data.progress_percent} size={192} />
       </div>
-
-      <Button className="w-full" asChild>
-        <Link href={`/biofloc-thematic/${data.id}`}>
-          Data Detail
-          <ArrowRightIcon />
-        </Link>
-      </Button>
 
       {/* Documentation Section - source from `documentations` table */}
       <DocumentationCarouselGallery type="biofloc_thematic" id={data.id} />
