@@ -4,12 +4,14 @@ import dynamic from "next/dynamic";
 import { LoadingLazyMap } from "@/features/monitoring/components/LoadingLazyMap";
 import { ArrowUpIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { PublicMonitoringMapProps } from "../MapClient";
 
-const LazyMap = dynamic<PublicMonitoringMapProps>(() => import("../MapClient"), {
-  ssr: false,
-  loading: () => <LoadingLazyMap />,
-});
+const LazyMap = dynamic<{ isAuthenticated: boolean }>(
+  () => import("../MapClient"),
+  {
+    ssr: false,
+    loading: () => <LoadingLazyMap />,
+  },
+);
 
 export default function MonitoringMapPage({
   isAuthenticated = false,

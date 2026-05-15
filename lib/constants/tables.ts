@@ -9,6 +9,7 @@ export const TABLES = {
   PROGRAM_QUOTAS: "program_quotas",
   LOGS: "monitoring_logs",
   REVITALIZATION_LOGS: "revitalization_program_logs",
+  DOCUMENTATIONS: "documentations",
   KDMP_ENTITIES: "kdmp_entities",
   REF_PROVINCES: "ref_provinces",
   REF_REGENCIES: "ref_regencies",

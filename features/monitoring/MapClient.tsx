@@ -40,12 +40,11 @@ import { useRef, startTransition, useState } from "react";
 import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePathname } from "next/navigation";
-
-const INDONESIA_CENTER: [number, number] = [-1.2, 118] as const;
-const INDONESIA_BOUNDS: [[number, number], [number, number]] = [
-  [-11.5, 94.5],
-  [6.5, 141.5],
-] as const;
+import {
+  INDONESIA_BOUNDS,
+  INDONESIA_CENTER,
+  typeMap,
+} from "./constants/monitoring-map-constants";
 
 const SHEET_CONTENTS: {
   [K in "biofloc_thematic" | "minapadi_thematic"]: React.ComponentType<{
@@ -57,18 +56,11 @@ const SHEET_CONTENTS: {
   minapadi_thematic: BioflocDetailSheet,
 };
 
-const typeMap: Record<string, "biofloc_thematic" | "minapadi_thematic"> = {
-  "/biofloc-thematic": "biofloc_thematic",
-  "/minapadi-thematic": "minapadi_thematic",
-};
-
-export interface PublicMonitoringMapProps {
-  isAuthenticated?: boolean;
-}
-
 export default function MapClient({
   isAuthenticated = false,
-}: PublicMonitoringMapProps) {
+}: {
+  isAuthenticated: boolean;
+}) {
   const pathname = usePathname();
   const type = typeMap[pathname] || "biofloc_thematic";
   const mapRef = useRef<LeafletMap>(null);
@@ -131,6 +123,10 @@ function MapTopContent({
   const showPotential = statuses.includes("potential");
 
   const activeLagendaLabel = type === "biofloc_thematic" ? "KDMP" : "POKDAKA";
+  const hrefData =
+    type === "biofloc_thematic"
+      ? "/biofloc-thematic/data"
+      : "/minapadi-thematic/data";
 
   const handleToggleActive = (checked: boolean) => {
     if (checked) {
@@ -235,7 +231,7 @@ function MapTopContent({
       </div>
       <div className="absolute top-3 right-3 z-5 flex items-center gap-2">
         <Button size="lg" variant="secondary" asChild>
-          <Link href="/biofloc-thematic/data">Lihat Data</Link>
+          <Link href={hrefData}>Lihat Data</Link>
         </Button>
       </div>
       <div className="absolute right-3 bottom-7 z-5">
