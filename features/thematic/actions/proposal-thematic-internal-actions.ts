@@ -8,7 +8,7 @@ import {
   proposalVerificationSchema,
 } from "../forms/proposal-verification-schema";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
-import { resolveThematicMetadata } from "../utils/thematic-resolver";
+import { resolveThematicMetadata } from "../constants/thematic-constants";
 
 export async function getProposalThematicPaginated(
   params: ProposalBioflocPaginationParams,

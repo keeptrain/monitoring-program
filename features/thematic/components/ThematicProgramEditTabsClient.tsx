@@ -11,10 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useGetThematicProgram } from "../api/getThematicProgram";
-import IdentityKdmpForm from "@/features/proposal/forms/IdentityKdmpForm";
-import LocationKdmpForm from "@/features/proposal/forms/LocationKdmpForm";
-import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
-import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
+import ProposalIdentityForm from "@/features/proposal/forms/ProposalIdentityForm";
+import ProposalLocationForm from "@/features/proposal/forms/ProposalLocationForm";
+import { ProposalIdentityFormValues } from "@/features/proposal/forms/proposal-identity-schema";
+import { ProposalLocationValues } from "@/features/proposal/forms/proposal-location-schema";
 import { updateKdmpEntity, updateLocation } from "../actions/thematic-actions";
 import { toast } from "sonner";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
@@ -44,7 +44,7 @@ export default function ThematicProgramEditTabsClient({
     isPending: isEditPending,
   } = useThematicProgramForm(program);
 
-  const identityData = useMemo<IdentifyKdmpFormValues>(
+  const identityData = useMemo<ProposalIdentityFormValues>(
     () =>
       program
         ? {
@@ -59,11 +59,11 @@ export default function ThematicProgramEditTabsClient({
             boardMemberCount: program.total_management,
             memberCount: program.total_members,
           }
-        : ({} as IdentifyKdmpFormValues),
+        : ({} as ProposalIdentityFormValues),
     [program],
   );
 
-  const locationData = useMemo<LocationKdmpValues>(
+  const locationData = useMemo<ProposalLocationValues>(
     () =>
       program
         ? {
@@ -80,7 +80,7 @@ export default function ThematicProgramEditTabsClient({
             landSlope:
               program.proposal_biofloc_thematic_programs?.land_slope || 0,
           }
-        : ({} as LocationKdmpValues),
+        : ({} as ProposalLocationValues),
     [program],
   );
 
@@ -90,20 +90,20 @@ export default function ThematicProgramEditTabsClient({
     );
   }
 
-  const handleIdentitySubmit = async (data: IdentifyKdmpFormValues) => {
+  const handleIdentitySubmit = async (data: ProposalIdentityFormValues) => {
     setIsIdentitySubmitting(true);
     try {
       await updateKdmpEntity(program.entity_id, data);
-      toast.success("Informasi KDMP berhasil diperbarui");
+      toast.success("Informasi Kelompok berhasil diperbarui");
       router.push(`/dashboard/thematic/biofloc`);
     } catch (error) {
-      toast.error("Gagal memperbarui informasi KDMP");
+      toast.error("Gagal memperbarui informasi Kelompok");
     } finally {
       setIsIdentitySubmitting(false);
     }
   };
 
-  const handleLocationSubmit = async (data: LocationKdmpValues) => {
+  const handleLocationSubmit = async (data: ProposalLocationValues) => {
     setIsLocationSubmitting(true);
     try {
       await updateLocation(
@@ -111,10 +111,10 @@ export default function ThematicProgramEditTabsClient({
         data,
         program.proposal_id ?? undefined,
       );
-      toast.success("Lokasi KDMP berhasil diperbarui");
+      toast.success("Lokasi Program berhasil diperbarui");
       router.push(`/dashboard/thematic/biofloc`);
     } catch (error) {
-      toast.error("Gagal memperbarui lokasi KDMP");
+      toast.error("Gagal memperbarui lokasi Program");
     } finally {
       setIsLocationSubmitting(false);
     }
@@ -122,7 +122,7 @@ export default function ThematicProgramEditTabsClient({
 
   const TABS = [
     { label: "Program", id: 0 },
-    { label: "Informasi KDMP", id: 1 },
+    { label: "Informasi Kelompok", id: 1 },
     { label: "Lokasi", id: 2 },
     { label: "Detail Proposal", id: 3, disabled: !program.proposal_id },
   ];
@@ -156,14 +156,14 @@ export default function ThematicProgramEditTabsClient({
       {activeTab === 1 && (
         <Card>
           <CardHeader>
-            <CardTitle>Informasi KDMP</CardTitle>
+            <CardTitle>Informasi Kelompok</CardTitle>
             <CardDescription>
-              Perbarui informasi identitas KDMP yang terhubung dengan program
+              Perbarui informasi identitas kelompok yang terhubung dengan program
               ini
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <IdentityKdmpForm
+            <ProposalIdentityForm
               initialData={identityData}
               onSubmit={handleIdentitySubmit}
               programType="biofloc_thematic"
@@ -176,7 +176,7 @@ export default function ThematicProgramEditTabsClient({
               form="step-1-form"
               disabled={isIdentitySubmitting}
             >
-              {isIdentitySubmitting ? "Menyimpan..." : "Simpan Informasi KDMP"}
+              {isIdentitySubmitting ? "Menyimpan..." : "Simpan Informasi Kelompok"}
             </Button>
           </CardFooter>
         </Card>
@@ -191,7 +191,7 @@ export default function ThematicProgramEditTabsClient({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <LocationKdmpForm
+            <ProposalLocationForm
               initialData={locationData}
               onSubmit={handleLocationSubmit}
               hideLandSlope={!program.proposal_id}

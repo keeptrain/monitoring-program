@@ -10,6 +10,9 @@ import {
   BioflocProgramsPaginatedInput,
   bioflocProgramsPaginatedSchema,
 } from "../forms/biofloc-program-query-schema";
+import { ProposalIdentityFormValues } from "@/features/proposal/forms/proposal-identity-schema";
+import { ProposalLocationValues } from "@/features/proposal/forms/proposal-location-schema";
+import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
 
 export async function getThematicProgramsPaginated(
   thematicType: string,
@@ -76,13 +79,9 @@ export async function updateThematicProgram(
   };
 }
 
-import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
-import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
-import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
-
 export async function updateKdmpEntity(
   entityId: string | number,
-  data: IdentifyKdmpFormValues,
+  data: ProposalIdentityFormValues,
 ) {
   try {
     await db.updateKdmpEntityService(entityId, data);
@@ -95,7 +94,7 @@ export async function updateKdmpEntity(
 
 export async function updateLocation(
   locationId: string | number,
-  data: LocationKdmpValues,
+  data: ProposalLocationValues,
   proposalId?: string | null,
 ) {
   try {

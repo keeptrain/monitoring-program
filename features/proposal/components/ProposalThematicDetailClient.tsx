@@ -11,6 +11,10 @@ import ProposalDetailClient from "../../thematic/components/biofloc/ProposalDeta
 import { useGetProposalThematic } from "@/features/thematic/api/getProposalThematic";
 import { ProposalDownloadButton } from "./tables/ProposalDownloadButton";
 import { Button } from "@/components/ui/button";
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "@/features/thematic/constants/thematic-constants";
 
 export function ProposalThematicDetailClient({
   id,
@@ -20,6 +24,8 @@ export function ProposalThematicDetailClient({
   programType: string;
 }) {
   const router = useRouter();
+  const config = THEMATIC_CONFIG[programType as ThematicProgramType];
+  const groupLabel = config?.groupLabel || "Kelompok";
 
   const { data } = useGetProposalThematic(id);
 
@@ -105,11 +111,11 @@ export function ProposalThematicDetailClient({
 
       <Card>
         <CardHeader>
-          <CardTitle>Identitas KDMP</CardTitle>
+          <CardTitle>Identitas {groupLabel}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <DetailItem
-            label="Nama Kelompok"
+            label={`Nama ${groupLabel}`}
             value={kdmp_entities?.name ?? "-"}
           />
           <DetailItem

@@ -1,18 +1,20 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ProposalDetailFormValues } from "../forms/proposal-detail-schema";
-import { LocationKdmpValues } from "../forms/location-kdmp-schema";
-import { IdentifyKdmpFormValues } from "../forms/identify-kdmp-schema";
+import { ProposalLocationValues } from "../forms/proposal-location-schema";
+import { ProposalIdentityFormValues } from "../forms/proposal-identity-schema";
 
 export interface ProposalState {
-  step1Data: Partial<IdentifyKdmpFormValues>;
-  step2Data: Partial<LocationKdmpValues>;
+  step1Data: Partial<ProposalIdentityFormValues>;
+  step2Data: Partial<ProposalLocationValues>;
   step3Data: Partial<ProposalDetailFormValues>;
   serverErrors: Record<string, string[]> | null;
-  setStep1Data: (data: Partial<IdentifyKdmpFormValues>) => void;
-  setStep2Data: (data: Partial<LocationKdmpValues>) => void;
+  isSubmitting: boolean;
+  setStep1Data: (data: Partial<ProposalIdentityFormValues>) => void;
+  setStep2Data: (data: Partial<ProposalLocationValues>) => void;
   setStep3Data: (data: Partial<ProposalDetailFormValues>) => void;
   setServerErrors: (errors: Record<string, string[]> | null) => void;
+  setIsSubmitting: (val: boolean) => void;
   clearDraft: () => void;
 }
 
@@ -23,6 +25,7 @@ export const useProposalStore = create<ProposalState>()(
       step2Data: {},
       step3Data: {},
       serverErrors: null,
+      isSubmitting: false,
       setStep1Data: (data) =>
         set((state) => ({ step1Data: { ...state.step1Data, ...data } })),
       setStep2Data: (data) =>
@@ -30,12 +33,14 @@ export const useProposalStore = create<ProposalState>()(
       setStep3Data: (data) =>
         set((state) => ({ step3Data: { ...state.step3Data, ...data } })),
       setServerErrors: (errors) => set({ serverErrors: errors }),
+      setIsSubmitting: (val) => set({ isSubmitting: val }),
       clearDraft: () =>
         set({
           step1Data: {},
           step2Data: {},
           step3Data: {},
           serverErrors: null,
+          isSubmitting: false,
         }),
     }),
     {

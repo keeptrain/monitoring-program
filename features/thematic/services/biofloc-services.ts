@@ -9,6 +9,8 @@ import {
 } from "../types/thematic";
 import { BioflocProgramsPaginatedParams } from "../forms/biofloc-program-query-schema";
 import { saveDocumentationsAction } from "@/features/documentation/actions";
+import { ProposalIdentityFormValues } from "@/features/proposal/forms/proposal-identity-schema";
+import { ProposalLocationValues } from "@/features/proposal/forms/proposal-location-schema";
 
 type NormalizedDocumentation = {
   id: string;
@@ -435,12 +437,9 @@ export async function updateBioflocThematicProgramService(
   }
 }
 
-import { IdentifyKdmpFormValues } from "@/features/proposal/forms/identify-kdmp-schema";
-import { LocationKdmpValues } from "@/features/proposal/forms/location-kdmp-schema";
-
 export async function updateKdmpEntityService(
   entityId: string | number,
-  data: IdentifyKdmpFormValues,
+  data: ProposalIdentityFormValues,
 ) {
   const supabase = await createClient();
   const { error } = await supabase
@@ -466,7 +465,7 @@ export async function updateKdmpEntityService(
 
 export async function updateLocationService(
   locationId: string | number,
-  data: LocationKdmpValues,
+  data: ProposalLocationValues,
   proposalId?: string | null,
 ) {
   const supabase = await createClient();

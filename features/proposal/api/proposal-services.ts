@@ -2,8 +2,8 @@
 
 import { uuidv7 } from "uuidv7";
 import { createClient } from "@/utils/supabase";
-import { IdentifyKdmpFormValues } from "../forms/identify-kdmp-schema";
-import { LocationKdmpValues } from "../forms/location-kdmp-schema";
+import { ProposalIdentityFormValues } from "../forms/proposal-identity-schema";
+import { ProposalLocationValues } from "../forms/proposal-location-schema";
 import { ProposalDetailFormValues } from "../forms/proposal-detail-schema";
 import { TABLES } from "@/lib/constants/tables";
 import {
@@ -13,8 +13,8 @@ import {
 
 export async function createProposalWithDocumentations(
   userId: string,
-  identify: IdentifyKdmpFormValues,
-  location: LocationKdmpValues,
+  identify: ProposalIdentityFormValues,
+  location: ProposalLocationValues,
   detail: ProposalDetailFormValues,
   programType: string,
 ) {
@@ -144,8 +144,8 @@ export async function createProposalWithDocumentations(
 export async function updateProposalWithDocumentations(
   proposalId: string,
   userId: string,
-  identify: IdentifyKdmpFormValues,
-  location: LocationKdmpValues,
+  identify: ProposalIdentityFormValues,
+  location: ProposalLocationValues,
   detail: ProposalDetailFormValues,
   programType: string,
 ) {

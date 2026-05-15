@@ -49,7 +49,7 @@ export const ProposalSubmissionTableColumns = (
   ) => void,
 ): ColumnDef<ProposalBioflocThematicProgram>[] => [
   {
-    header: "Nama KDMP",
+    header: "Nama Kelompok",
     accessorKey: "kdmp_entities.name",
     cell: ({ row: { original } }) => original.kdmp_entities.name,
   },

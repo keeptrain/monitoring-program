@@ -6,13 +6,13 @@ import {
   updateProposalWithDocumentations,
 } from "./proposal-services";
 import {
-  identifyKdmpSchema,
-  IdentifyKdmpFormValues,
-} from "../forms/identify-kdmp-schema";
+  proposalIdentitySchema,
+  ProposalIdentityFormValues,
+} from "../forms/proposal-identity-schema";
 import {
-  locationKdmpSchema,
-  LocationKdmpValues,
-} from "../forms/location-kdmp-schema";
+  proposalLocationSchema,
+  ProposalLocationValues,
+} from "../forms/proposal-location-schema";
 import {
   proposalDetailSchema,
   ProposalDetailFormValues,
@@ -23,7 +23,7 @@ import { TABLES } from "@/lib/constants/tables";
 import { redirect } from "next/navigation";
 
 /**
- * Validasi Step 1: Identitas Area / KDMP
+ * Validasi Step 1: Identitas
  */
 function validateIdentifyArea(formData: FormData) {
   const data = {
@@ -38,7 +38,7 @@ function validateIdentifyArea(formData: FormData) {
     boardMemberCount: formData.get("boardMemberCount"),
     memberCount: formData.get("memberCount"),
   };
-  return identifyKdmpSchema.safeParse(data);
+  return proposalIdentitySchema.safeParse(data);
 }
 
 /**
@@ -54,7 +54,7 @@ function validateLocation(formData: FormData) {
     district_code: formData.get("district_code"),
     village_code: formData.get("village_code"),
   };
-  return locationKdmpSchema.safeParse(data);
+  return proposalLocationSchema.safeParse(data);
 }
 
 /**
@@ -94,13 +94,13 @@ export async function createProposal(formData: FormData) {
     };
   }
 
-  // Step 1: Identitas Area
+  // Step 1: Identitas
   const identifyResult = validateIdentifyArea(formData);
   if (!identifyResult.success) {
     return {
       success: false,
       step: 1,
-      message: "Validasi gagal pada Identitas KDMP (Step 1)",
+      message: "Validasi gagal pada Identitas (Step 1)",
       errors: z.flattenError(identifyResult.error).fieldErrors,
     };
   }
@@ -153,8 +153,8 @@ export async function createProposal(formData: FormData) {
 
 export interface RevisionProposalData {
   revisionReason: string | null;
-  step1Data: IdentifyKdmpFormValues;
-  step2Data: LocationKdmpValues;
+  step1Data: ProposalIdentityFormValues;
+  step2Data: ProposalLocationValues;
   step3Data: ProposalDetailFormValues;
 }
 
@@ -305,13 +305,13 @@ export async function updateRevisionProposal(id: string, formData: FormData) {
     };
   }
 
-  // Step 1: Identitas Area
+  // Step 1: Identitas
   const identifyResult = validateIdentifyArea(formData);
   if (!identifyResult.success) {
     return {
       success: false,
       step: 1,
-      message: "Validasi gagal pada Identitas KDMP (Step 1)",
+      message: "Validasi gagal pada Identitas (Step 1)",
       errors: z.flattenError(identifyResult.error).fieldErrors,
     };
   }
