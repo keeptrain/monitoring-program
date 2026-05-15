@@ -10,12 +10,11 @@ export const useGetDocumentationGroupsByTypeAndId = (
   type: string,
   id: string | number,
   enabled: boolean = true,
-) => {
-  return useQuery({
+) =>
+  useQuery({
     queryKey: getDocumentationGroupsByTypeAndIdQueryKey(type, id),
     queryFn: async () => await getDocumentationGroupsByTypeAndId(type, id),
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     enabled: !!type && !!id && enabled,
   });
-};
