@@ -4,14 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { parseAsInteger, useQueryState } from "nuqs";
 import {
-  identifyKdmpSchema,
-  IdentifyKdmpInput,
-  IdentifyKdmpFormValues,
-} from "../forms/identify-kdmp-schema";
+  proposalIdentitySchema,
+  ProposalIdentityInput,
+  ProposalIdentityFormValues,
+} from "../forms/proposal-identity-schema";
 import { useEffect } from "react";
 import { ProposalState, useProposalStore } from "../api/proposal-store";
 
-const CREATE_DEFAULT_VALUES: IdentifyKdmpInput = {
+const CREATE_DEFAULT_VALUES: ProposalIdentityInput = {
   name: "",
   nib: "",
   kusukaNumber: "",
@@ -20,11 +20,13 @@ const CREATE_DEFAULT_VALUES: IdentifyKdmpInput = {
   chairmanPhoneNumber: "",
   companionName: "",
   companionPhoneNumber: "",
-  boardMemberCount: "",
-  memberCount: "",
+  boardMemberCount: "" as any,
+  memberCount: "" as any,
 };
 
-export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
+export function useProposalIdentityForm(
+  initialData?: Partial<ProposalIdentityInput>,
+) {
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(1).withOptions({
@@ -38,8 +40,12 @@ export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
   const serverErrors = useProposalStore((state) => state.serverErrors);
   const setServerErrors = useProposalStore((state) => state.setServerErrors);
 
-  const form = useForm<IdentifyKdmpInput, undefined, IdentifyKdmpFormValues>({
-    resolver: zodResolver(identifyKdmpSchema),
+  const form = useForm<
+    ProposalIdentityInput,
+    undefined,
+    ProposalIdentityFormValues
+  >({
+    resolver: zodResolver(proposalIdentitySchema),
     defaultValues: { ...CREATE_DEFAULT_VALUES, ...initialData, ...step1Data },
   });
 
@@ -75,8 +81,7 @@ export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
       if (newStep1Data === prevStep1Data) return;
       prevStep1Data = newStep1Data;
 
-      const hasStoreData =
-        newStep1Data && Object.keys(newStep1Data).length > 0;
+      const hasStoreData = newStep1Data && Object.keys(newStep1Data).length > 0;
 
       form.reset({
         ...CREATE_DEFAULT_VALUES,
@@ -98,7 +103,7 @@ export function useIdentifyKdmpForm(initialData?: Partial<IdentifyKdmpInput>) {
   }, [serverErrors, step, form, setServerErrors]);
 
   // 3. Handler Submit
-  const onSubmit = (data: IdentifyKdmpFormValues) => {
+  const onSubmit = (data: ProposalIdentityFormValues) => {
     setStep1Data(data);
     setStep(step + 1);
   };

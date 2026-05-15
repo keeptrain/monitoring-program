@@ -9,36 +9,43 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { handleInputNumberValueChange, handleNumberKeyDown } from "@/lib/utils";
-import { IdentifyKdmpFormValues } from "../forms/identify-kdmp-schema";
-import { useIdentifyKdmpForm } from "../hooks/useIdentifyKdmpForm";
+import { ProposalIdentityFormValues } from "../forms/proposal-identity-schema";
+import { useProposalIdentityForm } from "../hooks/useProposalIdentityForm";
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "../../thematic/constants/thematic-constants";
 
-export default function IdentityKdmpForm(props: {
-  initialData?: IdentifyKdmpFormValues;
+export default function ProposalIdentityForm(props: {
+  initialData?: ProposalIdentityFormValues;
   proposalId?: string;
   programType: string;
   basePath: string;
-  onSubmit?: (data: IdentifyKdmpFormValues) => void;
+  onSubmit?: (data: ProposalIdentityFormValues) => void;
 }) {
   const { initialData, onSubmit: onSubmitOverride } = props;
-  const { form, onSubmit: defaultOnSubmit } = useIdentifyKdmpForm(initialData);
+  const { form, onSubmit: defaultOnSubmit } = useProposalIdentityForm(initialData);
   const { errors } = form.formState;
 
   const handleSubmit = onSubmitOverride
     ? form.handleSubmit(onSubmitOverride)
     : defaultOnSubmit;
 
+  const config = THEMATIC_CONFIG[props.programType as ThematicProgramType];
+  const nameLabel = config?.groupLabel || "Nama Kelompok";
+
   return (
     <form id="step-1-form" onSubmit={handleSubmit} className="mt-6">
       <FieldGroup className="grid grid-cols-2">
         <Field>
           <FieldLabel>
-            Nama kdmp
+            {nameLabel}
             <span className="text-destructive">*</span>
           </FieldLabel>
           <FieldContent>
             <Input
               {...form.register("name")}
-              placeholder="Masukkan nama kdmp"
+              placeholder={`Masukkan ${nameLabel}`}
               aria-invalid={!!errors.name}
             />
           </FieldContent>
@@ -109,13 +116,13 @@ export default function IdentityKdmpForm(props: {
 
         <Field>
           <FieldLabel>
-            Nama Ketua KDMP <span className="text-destructive">*</span>
+            Nama Ketua <span className="text-destructive">*</span>
           </FieldLabel>
           <FieldContent>
             <Input
               {...form.register("chairmanName")}
               aria-invalid={!!errors.chairmanName}
-              placeholder="Masukkan nama ketua kdmp"
+              placeholder="Masukkan nama ketua"
             />
           </FieldContent>
           {errors.chairmanName && (
@@ -125,7 +132,7 @@ export default function IdentityKdmpForm(props: {
 
         <Field>
           <FieldLabel>
-            Nomor HP Ketua KDMP <span className="text-destructive">*</span>
+            Nomor HP Ketua <span className="text-destructive">*</span>
           </FieldLabel>
           <FieldContent>
             <Input
@@ -135,7 +142,7 @@ export default function IdentityKdmpForm(props: {
               onKeyDown={handleNumberKeyDown}
               inputMode="numeric"
               aria-invalid={!!errors.chairmanPhoneNumber}
-              placeholder="Masukkan nomor hp ketua kdmp"
+              placeholder="Masukkan nomor hp ketua"
             />
           </FieldContent>
           {errors.chairmanPhoneNumber && (
