@@ -68,18 +68,18 @@ function mapToDocumentationRows(
 ): { rows: DocumentationInsertRow[]; groupIds: number[] } {
   const normalizedProgramType =
     documentationProgramTypeSchema.parse(programType);
-  const beforeType =
-    normalizedProgramType === "proposal_biofloc_thematic"
-      ? "proposal_before"
-      : "before";
+  const isProposalThematic =
+    normalizedProgramType === "proposal_biofloc_thematic" ||
+    normalizedProgramType === "proposal_minapadi_thematic";
+
+  const beforeType = isProposalThematic ? "proposal_before" : "before";
 
   const baseGroupId = Date.now();
   const groupIds: number[] = [];
   const rows = (documentations ?? []).flatMap((documentation, index) => {
-    const row =
-      normalizedProgramType === "proposal_biofloc_thematic"
-        ? proposalDocumentationFormRowSchema.parse(documentation)
-        : documentationFormRowSchema.parse(documentation);
+    const row = isProposalThematic
+      ? proposalDocumentationFormRowSchema.parse(documentation)
+      : documentationFormRowSchema.parse(documentation);
     const groupId = String(baseGroupId + index); // Consistent with schema (string)
     groupIds.push(Number(groupId));
 

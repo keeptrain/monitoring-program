@@ -6,6 +6,7 @@ export const documentationProgramTypeSchema = z.enum([
   "isf",
   "revitalization",
   "proposal_biofloc_thematic",
+  "proposal_minapadi_thematic",
 ]);
 
 export const documentationImageSchema = z.object({
