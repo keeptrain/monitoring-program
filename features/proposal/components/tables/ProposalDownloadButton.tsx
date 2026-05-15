@@ -1,35 +1,47 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { createSignedUrlForProposalBiofloc } from "@/features/thematic/actions/proposal-biofloc-internal-actions";
+import { downloadProposalThematic } from "@/features/thematic/actions/proposal-thematic-internal-actions";
 import { useMutation } from "@tanstack/react-query";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
 
-export function ProposalDownloadButton({ id }: { id: string }) {
-  const { mutate, isPending } = useMutation({
-    mutationFn: () => createSignedUrlForProposalBiofloc(id),
-    onSuccess: (data) => {
-      const url = URL.createObjectURL(data.blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = data.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+const useDownloadProposal = () => {
+  return useMutation({
+    mutationFn: (id: string) => downloadProposalThematic(id),
+    onSuccess: (result) => {
+      if (result.success && result.data) {
+        const { blob, fileName } = result.data;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
     },
     onError: (error) => {
-      console.log(error);
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     },
   });
-  const handleDownload = async (e: React.MouseEvent) => {
+};
+
+export function ProposalDownloadButton({ id }: { id: string }) {
+  const { mutate, isPending } = useDownloadProposal();
+
+  const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
-    mutate();
+    mutate(id);
   };
   return (
     <Button
       variant="outline"
-      size="sm"
+      size="icon-xs"
       onClick={handleDownload}
       title="Download Dokumen"
     >
