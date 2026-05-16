@@ -45,7 +45,11 @@ export async function getMonitoringLocationDetailService(
       available_locations (
         name,
         latitude,
-        longitude
+        longitude,
+        ref_provinces (name),
+        ref_regencies (name),
+        ref_districts (name),
+        ref_villages (name)
       )
       `,
     )
@@ -62,6 +66,20 @@ export async function getMonitoringLocationDetailService(
   if (!data) {
     console.warn(`[NOT FOUND][${tableName}]: ID ${id} not found`);
     throw new Error("Monitoring data not found");
+  }
+
+  // Format full location string
+  if (data.available_locations) {
+    const loc = data.available_locations;
+    const locationParts = [
+      loc.ref_provinces?.name,
+      loc.ref_regencies?.name,
+      loc.ref_districts?.name,
+      loc.ref_villages?.name,
+    ].filter(Boolean);
+
+    data.full_location =
+      locationParts.length > 0 ? locationParts.join(", ") : "-";
   }
 
   return data;

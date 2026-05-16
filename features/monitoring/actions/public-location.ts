@@ -4,12 +4,16 @@ import { STEPS } from "@/features/isf/constants/isf-step";
 import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
-import { MonitoringIsf } from "../types/monitoring-types";
+import { MonitoringIsf, ThematicProgram } from "../types/monitoring-types";
 
 export async function getMonitoringLocationDetail(
   type: LocationType,
   id: string,
-) {
+): Promise<{
+  success: boolean;
+  message: string;
+  data: ThematicProgram | null;
+}> {
   const { isLoggedIn } = await getSession();
 
   const programTableName =
@@ -30,8 +34,7 @@ export async function getMonitoringLocationDetail(
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Internal system error",
+      message: error instanceof Error ? error.message : "Internal system error",
       data: null,
     };
   }

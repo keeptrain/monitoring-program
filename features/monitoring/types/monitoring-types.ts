@@ -86,6 +86,9 @@ export type ThematicProgram = {
   sppg_partner: string;
   s_curve_path: string;
   updated_at: string;
+
+  full_location?: string;
+
   kdmp_entities: {
     name: string;
     kusuka_number: string | null;
@@ -94,16 +97,13 @@ export type ThematicProgram = {
     board_member_count: number | null;
     member_count: number | null;
   } | null;
-  available_locations:
-    | {
-        name: string | null;
-        latitude: number | null;
-        longitude: number | null;
-      }
-    | Array<{
-        name: string | null;
-        latitude: number | null;
-        longitude: number | null;
-      }>
-    | null;
+  available_locations: {
+    name: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    ref_provinces?: { name: string } | null;
+    ref_regencies?: { name: string } | null;
+    ref_districts?: { name: string } | null;
+    ref_villages?: { name: string } | null;
+  } | null;
 };
