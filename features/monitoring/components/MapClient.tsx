@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
 import {
@@ -18,11 +19,11 @@ import {
   INDONESIA_CENTER,
   typeMap,
 } from "../constants/monitoring-map-constants";
-import { MapContainer, Marker, Popup, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import type { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
 import { Button } from "@/components/ui/button";
 import { LocationType } from "../../dashboard/actions/available-locations";
-import { MapPin, iconThematic, iconPotential } from "./MapPinIcon";
+import { MapPin, iconThematic, iconPotential } from "./thematic/map/MapPinIcon";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Map as LeafletMap } from "leaflet";
@@ -32,6 +33,10 @@ import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePathname } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
+
+const HoverIslandArea = dynamic(() => import("./thematic/map/MapIslandHover"), {
+  ssr: false,
+});
 
 export default function MapClient({
   isAuthenticated = false,
@@ -63,14 +68,14 @@ export default function MapClient({
         minZoom={3}
         maxBoundsViscosity={1}
         scrollWheelZoom={true}
-        className="absolute inset-0 z-0 h-full w-full"
+        className="absolute inset-0 z-0"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapMarker type={type} />
-        {/* {isAuthenticated && type === "biofloc_thematic" && <MapIslands />} */}
+        {isAuthenticated && type === "biofloc_thematic" && <HoverIslandArea />}
       </MapContainer>
       <MapDetailSheet type={type} isAuthenticated={isAuthenticated} />
     </>
@@ -143,7 +148,7 @@ function MapTopContent({
                 : "cursor-default",
             )}
           >
-            {isAuthenticated && type === "minapadi_thematic" && (
+            {isAuthenticated && (
               <Checkbox
                 checked={showActive}
                 onCheckedChange={(c) => handleToggleActive(!!c)}
@@ -293,73 +298,3 @@ function MapPopUpContent({
     </div>
   );
 }
-
-// const DUMMY_KALIMANTAN_GEOJSON = {
-//   type: "FeatureCollection",
-//   features: [
-//     {
-//       type: "Feature",
-//       properties: { name: "Kalimantan Barat", total: 5, status: "Aktif" },
-//       geometry: {
-//         type: "Polygon",
-//         coordinates: [
-//           [
-//             [108.8, 2.0],
-//             [112.0, 2.0],
-//             [112.0, -3.0],
-//             [108.8, -3.0],
-//             [108.8, 2.0],
-//           ],
-//         ],
-//       },
-//     },
-//     {
-//       type: "Feature",
-//       properties: { name: "Kalimantan Timur", total: 7, status: "Aktif" },
-//       geometry: {
-//         type: "Polygon",
-//         coordinates: [
-//           [
-//             [114.0, 3.0],
-//             [119.0, 3.0],
-//             [119.0, -2.0],
-//             [114.0, -2.0],
-//             [114.0, 3.0],
-//           ],
-//         ],
-//       },
-//     },
-//   ],
-// } as any;
-
-// function MapIslands() {
-//   const onEachFeature = (feature: any, layer: any) => {
-//     if (feature.properties && feature.properties.name) {
-//       layer.bindTooltip(
-//         `
-//         <div class="p-1 space-y-1">
-//           <p class="text-xs font-bold">${feature.properties.name}</p>
-//           <div class="grid grid-cols-2 gap-x-2 text-[10px]">
-//             <span class="text-zinc-500">Total:</span>
-//             <span class="font-semibold">${feature.properties.total} Lokasi</span>
-//             <span class="text-zinc-500">Status:</span>
-//             <span class="font-semibold text-emerald-600">${feature.properties.status}</span>
-//           </div>
-//         </div>
-//       `,
-//         { sticky: true, direction: "top", opacity: 1 },
-//       );
-//     }
-//   };
-
-//   return (
-//     <GeoJSON
-//       data={DUMMY_KALIMANTAN_GEOJSON}
-//       onEachFeature={onEachFeature}
-//       style={{
-//         stroke: false,
-//         fillColor: "#00000000",
-//       }}
-//     />
-//   );
-// }

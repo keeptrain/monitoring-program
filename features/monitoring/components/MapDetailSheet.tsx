@@ -47,10 +47,6 @@ export default function MapDetailSheet({
     currentId ?? "",
   );
 
-  if (!detailData?.data) {
-    return null;
-  }
-
   const activeLocations =
     queryClient.getQueryData<PublicAvailableLocation[]>(
       getLocationsQueryKey(type, "active"),
@@ -96,7 +92,7 @@ export default function MapDetailSheet({
 
         {isPending ? (
           <LoadingPublicMonitoringDetail />
-        ) : selectedLocation || detailData ? (
+        ) : detailData?.data ? (
           <MonitoringThematicDetailSheet
             isAuthenticated={isAuthenticated}
             type={type}
