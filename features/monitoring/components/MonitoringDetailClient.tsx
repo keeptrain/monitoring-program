@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { WeekDetailInfo } from "./isf-detail/WeekDetailInfo";
 import { LazyDocumentationSection } from "./isf-detail/LazyDocumentationSection";
-import { ProgressPieChartZoneIsf } from "./isf-detail/ProgressPieChartZoneIsf";
+import { ProgressPieChart } from "./shared/ProgressPieChart";
 import { ReportDatePicker } from "@/components/shared/ReportDatePicker";
 import { getIsfProgramLogById } from "@/features/isf/actions/isf-program-logs";
 
@@ -67,7 +67,10 @@ export default function MonitoringDetailClient({
       {/* Konten Detail & Chart */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="flex flex-col items-center gap-4">
-          <ProgressPieChartZoneIsf progress={activeWeekData?.progress || 0} size={176} />
+          <ProgressPieChart
+            progress={activeWeekData?.progress || 0}
+            size={176}
+          />
           {activeWeekData?.hasReport && (
             <div className="mt-4 w-full text-center">
               <p className="text-xs font-bold tracking-widest text-zinc-400 uppercase">

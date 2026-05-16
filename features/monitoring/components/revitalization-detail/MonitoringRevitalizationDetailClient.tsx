@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { WeekDetailInfo } from "../isf-detail/WeekDetailInfo";
 import { LazyDocumentationSection } from "../isf-detail/LazyDocumentationSection";
-import { ProgressPieChartZoneIsf } from "../isf-detail/ProgressPieChartZoneIsf";
+import { ProgressPieChart } from "../shared/ProgressPieChart";
 import { RevitalizationReportDatePicker } from "./RevitalizationReportDatePicker";
 import { getRevitalizationProgramLogById } from "@/features/revitalisasi/actions/revitalization-program-logs";
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,7 @@ export default function MonitoringRevitalizationDetailClient({
       {/* Konten Detail & Chart */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="flex flex-col items-center gap-4">
-          <ProgressPieChartZoneIsf
+          <ProgressPieChart
             progress={activeReportData?.progress || 0}
             size={176}
           />

@@ -12,14 +12,14 @@ import { ArrowRightIcon, FolderXIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, startTransition } from "react";
-import { useQueryState, parseAsString } from "nuqs";
+import { useQueryState } from "nuqs";
 import { useGetMonitoringLocationByTypeAndId } from "../api/getMonitoringLocationByTypeAndId";
 import { getLocationsQueryKey } from "../api/getMonitoringLocationsByType";
 import type { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
-import BioflocDetailSheet from "./biofloc-detail/BioflocDetailSheet";
 import { LoadingPublicMonitoringDetail } from "@/components/shared/LoadingPublicMonitoringDetail";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import MonitoringThematicDetailSheet from "./thematic/MonitoringThematicDetailSheet";
 
 export default function MapDetailSheet({
   type,
@@ -29,12 +29,11 @@ export default function MapDetailSheet({
   isAuthenticated: boolean;
 }) {
   const queryClient = useQueryClient();
-  const [detailIdUrl, setDetailIdUrl] = useQueryState(
-    "detailId",
-    parseAsString,
-  );
+  const [detailIdUrl, setDetailIdUrl] = useQueryState("detailId");
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const currentId = detailIdUrl || activeId;
 
   if (detailIdUrl && (!isOpen || detailIdUrl !== activeId)) {
     setActiveId(detailIdUrl);
@@ -45,8 +44,12 @@ export default function MapDetailSheet({
 
   const { data: detailData, isPending } = useGetMonitoringLocationByTypeAndId(
     type,
-    activeId ?? "",
+    currentId ?? "",
   );
+
+  if (!detailData?.data) {
+    return null;
+  }
 
   const activeLocations =
     queryClient.getQueryData<PublicAvailableLocation[]>(
@@ -60,8 +63,8 @@ export default function MapDetailSheet({
 
   const locations = [...activeLocations, ...potentialLocations];
 
-  const selectedLocation = activeId
-    ? locations.find((l) => l.id.toString() === activeId)
+  const selectedLocation = currentId
+    ? locations.find((l) => l.id.toString() === currentId)
     : null;
 
   const handleOpenChange = (open: boolean) => {
@@ -73,7 +76,7 @@ export default function MapDetailSheet({
     }
   };
 
-  const hrefDetail = `/${type.replace("_", "-")}/${detailIdUrl}`;
+  const hrefDetail = `/${type.replace("_", "-")}/${currentId}`;
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
@@ -94,9 +97,10 @@ export default function MapDetailSheet({
         {isPending ? (
           <LoadingPublicMonitoringDetail />
         ) : selectedLocation || detailData ? (
-          <BioflocDetailSheet
-            data={detailData!}
+          <MonitoringThematicDetailSheet
             isAuthenticated={isAuthenticated}
+            type={type}
+            data={detailData.data}
           />
         ) : (
           <div className="flex h-full items-center justify-center">

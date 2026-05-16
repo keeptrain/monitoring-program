@@ -1,10 +1,16 @@
 import { notFound } from "next/navigation";
 import { getPublicThematicProgram } from "@/features/thematic/actions/public-thematic-programs";
-import { LinkBackButton } from "@/components/shared/LinkBackButton";
 import { MapPinIcon, InfoIcon, TargetIcon, UserIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ProgressPieChartZoneIsf } from "@/features/monitoring/components/isf-detail/ProgressPieChartZoneIsf";
+import { ProgressPieChart } from "@/features/monitoring/components/shared/ProgressPieChart";
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
+import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
+
+const breadcrumbList = [
+  { label: "Monitoring", href: "/monitoring" },
+  { label: "Tematik Bioflok" },
+  { label: "Detail" },
+];
 
 export default async function PublicBioflocDetailPage({
   params,
@@ -14,7 +20,7 @@ export default async function PublicBioflocDetailPage({
   const { id } = await params;
 
   const program = await getPublicThematicProgram(id);
-  
+
   if (!program) {
     return notFound();
   }
@@ -22,19 +28,16 @@ export default async function PublicBioflocDetailPage({
   return (
     <div className="mx-auto max-w-6xl space-y-6 pt-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            Monitoring / Tematik Bioflok / Detail
-          </p>
+        <div className="space-y-2">
+          <BreadcrumbHeader items={breadcrumbList} />
           <div className="flex items-center gap-1">
-            <LinkBackButton href="/biofloc-thematic" />
-            <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-2xl">
+            <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
               {program.name}
             </h1>
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="flex items-start gap-2">
-              <MapPinIcon className="size-4 text-primary" />
+              <MapPinIcon className="size-4" />
               <p className="text-muted-foreground">
                 {program.available_locations?.name || "Lokasi tidak diketahui"}
               </p>
@@ -53,8 +56,8 @@ export default async function PublicBioflocDetailPage({
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center p-6">
-            <ProgressPieChartZoneIsf progress={program.progress_percent} size={144} />
-            <p className="mt-4 text-sm font-semibold text-muted-foreground">
+            <ProgressPieChart progress={program.progress_percent} size={144} />
+            <p className="text-muted-foreground mt-4 text-sm font-semibold">
               {program.progress_percent}% Selesai
             </p>
           </CardContent>
@@ -70,12 +73,31 @@ export default async function PublicBioflocDetailPage({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <DetailItem label="Komoditas Bantuan" value={program.commodity_aid} />
-              <DetailItem label="Komoditas Potensi" value={program.commodity_potential || "-"} />
+              <DetailItem
+                label="Komoditas Bantuan"
+                value={program.commodity_aid}
+              />
+              <DetailItem
+                label="Komoditas Potensi"
+                value={program.commodity_potential || "-"}
+              />
               <DetailItem label="Luas Lahan" value={program.land_area} />
-              <DetailItem label="Mitra SPPG" value={program.sppg_partner || "-"} />
-              <DetailItem label="Nilai Produksi" value={program.production_value || "-"} />
-              <DetailItem label="Jumlah Bantuan" value={program.distribution_amount ? `Rp ${program.distribution_amount.toLocaleString('id-ID')}` : "-"} />
+              <DetailItem
+                label="Mitra SPPG"
+                value={program.sppg_partner || "-"}
+              />
+              <DetailItem
+                label="Nilai Produksi"
+                value={program.production_value || "-"}
+              />
+              <DetailItem
+                label="Jumlah Bantuan"
+                value={
+                  program.distribution_amount
+                    ? `Rp ${program.distribution_amount.toLocaleString("id-ID")}`
+                    : "-"
+                }
+              />
             </div>
           </CardContent>
         </Card>
@@ -90,8 +112,14 @@ export default async function PublicBioflocDetailPage({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              <DetailItem label="Total Pengurus" value={`${program.total_management} Orang`} />
-              <DetailItem label="Total Anggota" value={`${program.total_members} Orang`} />
+              <DetailItem
+                label="Total Pengurus"
+                value={`${program.total_management} Orang`}
+              />
+              <DetailItem
+                label="Total Anggota"
+                value={`${program.total_members} Orang`}
+              />
             </div>
           </CardContent>
         </Card>
@@ -99,7 +127,10 @@ export default async function PublicBioflocDetailPage({
         {/* Dokumentasi */}
         <div className="md:col-span-3">
           <h2 className="mb-4 text-lg font-semibold">Galeri Dokumentasi</h2>
-          <DocumentationCarouselGallery type="biofloc_thematic" id={program.id} />
+          <DocumentationCarouselGallery
+            type="biofloc_thematic"
+            id={program.id}
+          />
         </div>
       </div>
     </div>

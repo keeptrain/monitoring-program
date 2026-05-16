@@ -73,3 +73,37 @@ export type MonitoringRevitalization = {
   total_workers: number;
   latest_documentation_urls?: string[];
 };
+
+export type ThematicProgram = {
+  id: string;
+  location_id: number;
+  progress_percent: number;
+  commodity_aid: string;
+  commodity_potential: string | null;
+  land_area: string;
+  production_value: string;
+  distribution_amount: number;
+  sppg_partner: string;
+  s_curve_path: string;
+  updated_at: string;
+  kdmp_entities: {
+    name: string;
+    kusuka_number: string | null;
+    nib: string | null;
+    legal_entity_number: string | null;
+    board_member_count: number | null;
+    member_count: number | null;
+  } | null;
+  available_locations:
+    | {
+        name: string | null;
+        latitude: number | null;
+        longitude: number | null;
+      }
+    | Array<{
+        name: string | null;
+        latitude: number | null;
+        longitude: number | null;
+      }>
+    | null;
+};

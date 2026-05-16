@@ -4,36 +4,37 @@ import { STEPS } from "@/features/isf/constants/isf-step";
 import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
 import { LocationType } from "@/features/dashboard/actions/available-locations";
-import { getPublicThematicProgram } from "@/features/thematic/actions/public-thematic-programs";
-import {
-  MonitoringDetailTypeMap,
-  MonitoringIsf,
-} from "../types/monitoring-types";
+import { MonitoringIsf } from "../types/monitoring-types";
 
-export async function getMonitoringLocationDetail<T extends LocationType>(
-  type: T,
-  id: number | string,
-): Promise<MonitoringDetailTypeMap[T] | null> {
-  if (!id || id === 0 || id === "") {
-    return null;
+export async function getMonitoringLocationDetail(
+  type: LocationType,
+  id: string,
+) {
+  const { isLoggedIn } = await getSession();
+
+  const programTableName =
+    THEMATIC_CONFIG[type as keyof typeof THEMATIC_CONFIG].programTable;
+
+  try {
+    const data = await getMonitoringLocationDetailService(
+      isLoggedIn,
+      id,
+      programTableName,
+    );
+
+    return {
+      success: true,
+      message: "Data loaded successfully",
+      data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Internal system error",
+      data: null,
+    };
   }
-
-  if (
-    type === "biofloc_thematic" ||
-    type === "minapadi_thematic" ||
-    type === "revitalization"
-  ) {
-    const data = await getPublicThematicProgram(id);
-    return data as MonitoringDetailTypeMap[T] | null;
-  }
-
-  // Placeholder for ISF
-  if (type === "isf") {
-    // return getPublicIsfProgram(id);
-    return null;
-  }
-
-  return null;
 }
 
 export async function getBiofloc(id: number): Promise<{ data: any }> {
@@ -106,6 +107,9 @@ export async function getBiofloc(id: number): Promise<{ data: any }> {
 }
 
 import { toPreviewUrl } from "@/lib/utils";
+import { THEMATIC_CONFIG } from "@/features/thematic/constants/thematic-constants";
+import { getMonitoringLocationDetailService } from "../services/monitoring-location-service";
+import { getSession } from "@/features/auth/session";
 
 export async function getMonitoringIsf(): Promise<MonitoringIsf> {
   const supabase = await createClient();

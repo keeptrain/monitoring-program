@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Label } from "recharts";
 
-export function ProgressPieChartZoneIsf({
+export function ProgressPieChart({
   progress,
   size = 176,
 }: {
@@ -39,14 +39,9 @@ export function ProgressPieChartZoneIsf({
                 y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
+                className="fill-foreground text-2xl font-bold"
               >
-                <tspan
-                  x={cx}
-                  y={cy}
-                  className="fill-primary text-3xl font-black tracking-tighter italic"
-                >
-                  {progress}%
-                </tspan>
+                {progress}%
               </text>
             );
           }}

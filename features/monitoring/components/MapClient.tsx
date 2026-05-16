@@ -20,7 +20,6 @@ import {
 } from "../constants/monitoring-map-constants";
 import { MapContainer, Marker, Popup, TileLayer, GeoJSON } from "react-leaflet";
 import type { PublicAvailableLocation } from "../../dashboard/actions/public-available-locations";
-import { ProgressPercentage } from "./ProgressPercentage";
 import { Button } from "@/components/ui/button";
 import { LocationType } from "../../dashboard/actions/available-locations";
 import { MapPin, iconThematic, iconPotential } from "./MapPinIcon";
@@ -32,6 +31,7 @@ import MapDetailSheet from "./MapDetailSheet";
 import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePathname } from "next/navigation";
+import { Progress } from "@/components/ui/progress";
 
 export default function MapClient({
   isAuthenticated = false,
@@ -230,7 +230,7 @@ function MapMarker({
 }: {
   type: "biofloc_thematic" | "minapadi_thematic";
 }) {
-  const [, setDetailIdUrl] = useQueryState("detailId", parseAsString);
+  const [, setDetailIdUrl] = useQueryState("detailId");
   const [statuses] = useQueryState(
     "status",
     parseAsArrayOf(parseAsString).withDefault(["active"]),
@@ -280,7 +280,12 @@ function MapPopUpContent({
         {location.location_name} <br />
         <span className="text-muted-foreground">{location.province_name}</span>
       </h3>
-      <ProgressPercentage value={location.progress_percent} />
+      <div className="flex items-center justify-between gap-4">
+        <Progress value={location.progress_percent} className="h-3 flex-1" />
+        <span className="font-bold tabular-nums">
+          {location.progress_percent}%
+        </span>
+      </div>
       <Button onClick={() => onDetailClick(location)} variant="outline">
         Detail
         <ArrowRightIcon />
