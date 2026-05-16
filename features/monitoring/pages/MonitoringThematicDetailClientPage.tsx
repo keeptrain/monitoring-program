@@ -20,7 +20,7 @@ export default function MonitoringThematicDetailClientPage({
   const hasCoords = lat !== 0 && lng !== 0;
 
   return (
-    <div className="space-y-8">
+    <>
       {/* Map */}
       <div className="overflow-hidden border">
         {hasCoords ? (
@@ -41,6 +41,6 @@ export default function MonitoringThematicDetailClientPage({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

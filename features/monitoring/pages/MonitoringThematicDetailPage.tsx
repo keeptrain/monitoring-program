@@ -4,7 +4,9 @@ import {
   UserIcon,
   CameraIcon,
   PercentIcon,
-  TextSearchIcon,
+  LayersIcon,
+  ChartAreaIcon,
+  FileXIcon,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -16,8 +18,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressPieChart } from "@/features/monitoring/components/shared/ProgressPieChart";
 import { DetailItem } from "@/components/shared/DetailItem";
 import { Separator } from "@/components/ui/separator";
-import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
-import { getDocumentationGroupsByTypeAndId } from "@/features/documentation/actions";
+import { DocumentationGroupGallery } from "@/features/monitoring/components/DocumentationGroupGallery";
+import SCurveDownloadButton from "@/features/thematic/components/SCurveDownloadButton";
 
 export default function MonitoringThematicDetailPage({
   params,
@@ -45,7 +47,6 @@ async function MonitoringThematicDetailContent({
   const isAuthenticated = session.isLoggedIn;
 
   const result = await getMonitoringLocationDetail(type, id);
-  const groups = await getDocumentationGroupsByTypeAndId(type, id);
 
   if (!result.data) {
     return notFound();
@@ -84,23 +85,14 @@ async function MonitoringThematicDetailContent({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TextSearchIcon className="size-4" />
+                <LayersIcon className="size-4" />
                 Data Siklus
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-3">
-              <DetailItem
-                label="Padat Tebar"
-                value={entity?.kusuka_number ?? "-"}
-              />
-              <DetailItem
-                label="Jumlah Tebar"
-                value={entity?.kusuka_number ?? "-"}
-              />
-              <DetailItem
-                label="Jumlah Panen"
-                value={entity?.kusuka_number ?? "-"}
-              />
+              <DetailItem label="Padat Tebar" value={"-"} />
+              <DetailItem label="Jumlah Tebar" value={"-"} />
+              <DetailItem label="Jumlah Panen" value={"-"} />
             </CardContent>
           </Card>
         </div>
@@ -129,17 +121,87 @@ async function MonitoringThematicDetailContent({
             <CardContent className="space-y-3">
               <DetailItem
                 label="Komoditas Bantuan"
-                value={data.commodity_aid}
+                value={
+                  <span className="capitalize">
+                    {data.commodity_aid || "-"}
+                  </span>
+                }
               />
               <DetailItem
                 label="Komoditas Potensi"
-                value={data.commodity_potential || "-"}
+                value={
+                  <span className="capitalize">
+                    {data.commodity_potential || "-"}
+                  </span>
+                }
               />
               <DetailItem label="Luas Lahan" value={data.land_area} />
-              <DetailItem label="Mitra SPPG" value={data.sppg_partner || "-"} />
+              <DetailItem
+                label="Nilai Produksi"
+                value={data.production_value || "-"}
+              />
+              <DetailItem
+                label="Jumlah Distribusi"
+                value={
+                  data.distribution_amount
+                    ? `Rp ${data.distribution_amount.toLocaleString("id-ID")}`
+                    : "-"
+                }
+              />
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Public membership & production info — server rendered */}
+      <div className="col-span-3 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <UserIcon className="size-4" />
+              Informasi Kelembagaan
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <DetailItem
+                label="Total Pengurus"
+                value={`${entity?.board_member_count ?? 0} Orang`}
+              />
+              <DetailItem
+                label="Total Anggota"
+                value={`${entity?.member_count ?? 0} Orang`}
+              />
+
+              <DetailItem label="Mitra SPPG" value={data.sppg_partner || "-"} />
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ChartAreaIcon className="size-4" />
+              Kurva S
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.s_curve_path ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground text-sm">
+                  Berkas tersedia untuk diunduh.
+                </p>
+                <SCurveDownloadButton id={data.id} />
+              </div>
+            ) : (
+              <div className="bg-muted/20 flex h-15 items-center justify-center gap-2 border">
+                <FileXIcon className="text-muted-foreground size-4" />
+                <p className="text-muted-foreground text-xs italic">
+                  Belum diunggah
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Authenticated-only sensitive info — server rendered */}
@@ -148,7 +210,7 @@ async function MonitoringThematicDetailContent({
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-sm">
               <UserIcon className="size-4" />
-              Informasi Sensitif (Internal)
+              Informasi Internal
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -162,50 +224,6 @@ async function MonitoringThematicDetailContent({
                 label="Nama Badan Hukum"
                 value={entity?.legal_entity_number ?? "-"}
               />
-              <DetailItem
-                label="Jumlah Pengurus"
-                value={`${entity?.board_member_count ?? 0} Orang`}
-              />
-              <DetailItem
-                label="Jumlah Anggota"
-                value={`${entity?.member_count ?? 0} Orang`}
-              />
-              <DetailItem
-                label="Nilai Produksi"
-                value={data.production_value || "-"}
-              />
-              <DetailItem
-                label="Jumlah Distribusi"
-                value={
-                  data.distribution_amount
-                    ? `Rp ${data.distribution_amount.toLocaleString("id-ID")}`
-                    : "-"
-                }
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Public membership info (when NOT authenticated) — server rendered */}
-      {!isAuthenticated && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <UserIcon className="size-4" />
-              Informasi Keanggotaan
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <DetailItem
-                label="Total Pengurus"
-                value={`${entity?.board_member_count ?? 0} Orang`}
-              />
-              <DetailItem
-                label="Total Anggota"
-                value={`${entity?.member_count ?? 0} Orang`}
-              />
             </div>
           </CardContent>
         </Card>
@@ -213,23 +231,12 @@ async function MonitoringThematicDetailContent({
 
       <Separator />
 
-      <div className="space-y-4 pb-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-2">
           <CameraIcon className="size-4" />
           <h2 className="font-semibold">Dokumentasi</h2>
         </div>
-        <div className="space-y-8">
-          {groups.map((group, index) => (
-            <div key={group.groupId ?? index} className="space-y-4">
-              {index > 0 && (
-                <div className="text-muted-foreground text-xs font-medium">
-                  Periode {index + 1}
-                </div>
-              )}
-              <DocumentationCarouselGallery type={type} id={id} />
-            </div>
-          ))}
-        </div>
+        <DocumentationGroupGallery type={type} id={id} />
       </div>
     </div>
   );

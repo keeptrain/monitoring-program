@@ -18,7 +18,7 @@ export default function SingleLocationMap({
       center={[lat, lng]}
       zoom={13}
       scrollWheelZoom={true}
-      className="h-full w-full"
+      className="h-full w-full z-5"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
