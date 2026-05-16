@@ -1,3 +1,11 @@
+import {
+  MapPinIcon,
+  InfoIcon,
+  UserIcon,
+  CameraIcon,
+  PercentIcon,
+  TextSearchIcon,
+} from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getMonitoringLocationDetail } from "@/features/monitoring/actions/public-location";
@@ -7,55 +15,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProgressPieChart } from "@/features/monitoring/components/shared/ProgressPieChart";
 import { DetailItem } from "@/components/shared/DetailItem";
-import {
-  MapPinIcon,
-  TargetIcon,
-  InfoIcon,
-  UserIcon,
-  CameraIcon,
-} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import DocumentationCarouselGallery from "@/components/shared/DocumentationCarouselGallery";
 import { getDocumentationGroupsByTypeAndId } from "@/features/documentation/actions";
-
-function FullPageSkeleton() {
-  return (
-    <div className="space-y-6">
-      {/* Header Skeleton */}
-      <div className="space-y-3">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-4 w-48" />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          {/* Map Skeleton */}
-          <Skeleton className="aspect-video w-full rounded-lg" />
-        </div>
-
-        <div className="space-y-6">
-          {/* Cards Skeleton */}
-          <Skeleton className="h-48 w-full rounded-xl" />
-          <Skeleton className="h-64 w-full rounded-xl" />
-        </div>
-      </div>
-
-      {/* Info Sensitive Skeleton */}
-      <Skeleton className="h-48 w-full rounded-xl" />
-
-      {/* Documentation Skeleton */}
-      <div className="space-y-4">
-        <Skeleton className="h-6 w-32" />
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Skeleton className="aspect-square w-full rounded-lg" />
-          <Skeleton className="aspect-square w-full rounded-lg" />
-          <Skeleton className="aspect-square w-full rounded-lg" />
-          <Skeleton className="aspect-square w-full rounded-lg" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function MonitoringThematicDetailPage({
   params,
@@ -105,41 +67,61 @@ async function MonitoringThematicDetailContent({
           <h1 className="text-foreground text-lg font-semibold tracking-tight md:text-xl">
             {name}
           </h1>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="flex items-start gap-2">
-              <MapPinIcon className="size-4" />
-              <p className="text-muted-foreground">
-                {data.full_location || "Lokasi tidak diketahui"}
-              </p>
-            </span>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <MapPinIcon className="size-4" />
+            <p className="text-muted-foreground">
+              {data.full_location || "Lokasi tidak diketahui"}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left 2/3 — Map + Docs (client) */}
-        <div className="lg:col-span-2">
+        {/* Left 2/3 — Map (client) */}
+        <div className="space-y-6 lg:col-span-2">
           <MonitoringThematicDetailClientPage lat={lat} lng={lng} name={name} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TextSearchIcon className="size-4" />
+                Data Siklus
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-3">
+              <DetailItem
+                label="Padat Tebar"
+                value={entity?.kusuka_number ?? "-"}
+              />
+              <DetailItem
+                label="Jumlah Tebar"
+                value={entity?.kusuka_number ?? "-"}
+              />
+              <DetailItem
+                label="Jumlah Panen"
+                value={entity?.kusuka_number ?? "-"}
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right 1/3 — Progress & Info (server rendered) */}
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <TargetIcon className="size-4" />
+              <CardTitle className="flex items-center gap-2">
+                <PercentIcon className="size-4" />
                 Progres
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center p-4">
+            <CardContent className="flex items-center justify-center">
               <ProgressPieChart progress={data.progress_percent} size={144} />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
+              <CardTitle className="flex items-center gap-2">
                 <InfoIcon className="size-4" />
                 Informasi Program
               </CardTitle>
@@ -247,6 +229,45 @@ async function MonitoringThematicDetailContent({
               <DocumentationCarouselGallery type={type} id={id} />
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FullPageSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header Skeleton */}
+      <div className="space-y-3">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-48" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          {/* Map Skeleton */}
+          <Skeleton className="aspect-video w-full rounded-lg" />
+        </div>
+
+        <div className="space-y-6">
+          {/* Cards Skeleton */}
+          <Skeleton className="h-48 w-full rounded-xl" />
+          <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
+      </div>
+
+      {/* Info Sensitive Skeleton */}
+      <Skeleton className="h-48 w-full rounded-xl" />
+
+      {/* Documentation Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-32" />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Skeleton className="aspect-square w-full rounded-lg" />
+          <Skeleton className="aspect-square w-full rounded-lg" />
+          <Skeleton className="aspect-square w-full rounded-lg" />
+          <Skeleton className="aspect-square w-full rounded-lg" />
         </div>
       </div>
     </div>
