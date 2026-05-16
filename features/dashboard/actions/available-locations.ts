@@ -12,6 +12,7 @@ import {
   getActiveLocationsService,
   getPotentialLocationsService,
 } from "@/features/thematic/services/thematic-locations-services";
+import { getSession } from "@/features/auth/session";
 
 export interface AvailableLocation {
   id: number;
@@ -41,7 +42,7 @@ export async function getAvailableLocations() {
 export type ActionResult<T> = {
   success: boolean;
   message?: string;
-  data: T;
+  data: T | null;
 };
 
 export async function getAvailableLocationsByType(
@@ -50,14 +51,13 @@ export async function getAvailableLocationsByType(
 ): Promise<ActionResult<PublicAvailableLocation[]>> {
   // Check session for potential status
   if (status === "potential") {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session_id")?.value === "true";
+    const session = await getSession();
 
-    if (!session) {
+    if (!session || !session.isLoggedIn) {
       return {
         success: false,
-        message: "Silakan masuk terlebih dahulu untuk melihat data potensi",
-        data: [],
+        message: "Unauthorized",
+        data: null,
       };
     }
   }

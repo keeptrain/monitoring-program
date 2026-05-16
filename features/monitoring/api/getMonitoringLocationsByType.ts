@@ -22,8 +22,9 @@ const getLocationsQueryOptions = (type: LocationType, status: LocationStatus) =>
       const result = await getAvailableLocationsByType(type, status);
       if (!result.success && result.message) {
         toast.error(result.message);
+        return [];
       }
-      return result.data;
+      return result.data || [];
     },
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
@@ -73,10 +74,11 @@ export const useGetMonitoringLocationsCombined = (
   };
 };
 
-export const getMonitoringIsfQueryKey = () => [
-  "monitoring",
-  "isf",
-];
+/**
+ * Gets the query key for monitoring ISF data.
+ * @returns Monitoring isf data
+ */
+export const getMonitoringIsfQueryKey = () => ["monitoring", "isf"];
 
 export const useGetMonitoringIsf = () =>
   useQuery({
