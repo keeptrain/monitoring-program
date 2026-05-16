@@ -1,4 +1,4 @@
-import { FishIcon, LucideIcon, WavesIcon } from "lucide-react";
+import { FishIcon, LucideIcon, WavesIcon, AlertCircleIcon } from "lucide-react";
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cn } from "@/lib/utils";
@@ -49,8 +49,6 @@ export const IsfPin = (props: { className?: string }) => (
     {...props}
   />
 );
-
-import { AlertCircleIcon } from "lucide-react";
 
 export const PotentialPin = (props: { className?: string }) => (
   <MapPin

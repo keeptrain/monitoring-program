@@ -2,7 +2,7 @@
 
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { iconThematic } from "./MapPinIcon";
+import { iconThematic } from "./thematic/map/MapPinIcon";
 
 export default function SingleLocationMap({
   lat,
