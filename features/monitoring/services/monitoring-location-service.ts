@@ -1,5 +1,87 @@
 import { createClient } from "@/utils/supabase";
 import { ThematicProgram } from "../types/monitoring-types";
+import { LocationType } from "@/features/dashboard/actions/available-locations";
+import { TABLES } from "@/lib/constants/tables";
+import { LocationStatus } from "../api/getMonitoringLocationsByType";
+
+export async function getMonitoringLocationsByType(
+  programTableName: string,
+  type: LocationType,
+  status: LocationStatus | null,
+) {
+  const supabase = await createClient();
+
+  const programJoin = status
+    ? `${programTableName}!inner(id, status, progress_percent)`
+    : `${programTableName}(id, status, progress_percent)`;
+
+  const regencyJoin = (status === "potential" && type === "biofloc_thematic")
+    ? "ref_regencies (name),"
+    : "";
+
+  let query = supabase
+    .from(TABLES.AVAILABLE_LOCATIONS)
+    .select(
+      `
+      id,
+      province_code,
+      province_name,
+      name,
+      latitude,
+      longitude,
+      ${regencyJoin}
+      ${programJoin}
+      `,
+    )
+    .eq("type", type);
+
+  if (status) {
+    query = query.eq(`${programTableName}.status`, status);
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    query = query.limit(10);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(
+      `Error fetching locations for ${type} with status ${status}:`,
+      error,
+    );
+    throw new Error(`Failed to fetch monitoring locations: ${error.message}`);
+  }
+
+  type LocationRow = {
+    id: number;
+    province_code: string;
+    province_name: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    ref_regencies?: { name: string } | null;
+  } & Record<string, any>;
+
+  return ((data as unknown as LocationRow[]) ?? []).map((item) => {
+    const program = Array.isArray(item[programTableName])
+      ? item[programTableName][0]
+      : item[programTableName];
+
+    return {
+      id: program?.id,
+      location_name: item.name,
+      province_name: item.province_name,
+      province_code: item.province_code,
+      regency_name: item.ref_regencies?.name,
+      progress_percent: program?.progress_percent ?? 0,
+      position: {
+        latitude: item.latitude ?? 0,
+        longitude: item.longitude ?? 0,
+      },
+    };
+  });
+}
 
 /**
  * @param isAuthenticated

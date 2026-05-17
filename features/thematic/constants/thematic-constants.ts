@@ -10,11 +10,12 @@ export interface ThematicMetadata {
   basePath: string;
   label: string;
   groupLabel: string;
+  legendLabel: string;
+  potentialValue: string;
 }
 
 /**
- * Konfigurasi statis untuk program tematik.
- * Memusatkan semua metadata tabel dan label agar mudah dikelola.
+ * Static Configs of Thematic Programs.
  */
 export const THEMATIC_CONFIG: Record<ThematicProgramType, ThematicMetadata> = {
   biofloc_thematic: {
@@ -25,6 +26,8 @@ export const THEMATIC_CONFIG: Record<ThematicProgramType, ThematicMetadata> = {
     basePath: "/biofloc-thematic",
     label: "Bioflok",
     groupLabel: "Nama KDMP",
+    legendLabel: "KDMP",
+    potentialValue: "30.000",
   },
   minapadi_thematic: {
     programType: "minapadi_thematic",
@@ -34,6 +37,8 @@ export const THEMATIC_CONFIG: Record<ThematicProgramType, ThematicMetadata> = {
     basePath: "/minapadi-thematic",
     label: "Minapadi",
     groupLabel: "Nama Pokdaka",
+    legendLabel: "POKDAKA",
+    potentialValue: "10.000",
   },
 };
 
