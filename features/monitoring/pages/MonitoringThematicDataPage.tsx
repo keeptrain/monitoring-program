@@ -2,7 +2,10 @@ import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
 import MonitoringThematicDataTable from "../components/thematic/MonitoringThematicDataTable";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { THEMATIC_CONFIG, ThematicProgramType } from "@/features/thematic/constants/thematic-constants";
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "@/features/thematic/constants/thematic-constants";
 
 export default function MonitoringThematicDataPage({
   programType,
@@ -56,7 +59,7 @@ function SuspenseFallback() {
         </div>
         {/* Table Rows */}
         <div className="divide-border divide-y">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center justify-between p-4">
               <Skeleton className="h-5 w-1/3" />
               <Skeleton className="h-5 w-1/6" />
