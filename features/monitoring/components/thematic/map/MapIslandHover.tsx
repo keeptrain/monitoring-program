@@ -1,6 +1,6 @@
 "use client";
 
-import { JAVA_PROVINCE_REGIONS } from "@/features/monitoring/constants/monitoring-map-islands-constants";
+import { PROVINCE_REGIONS } from "@/features/monitoring/constants/monitoring-map-islands-constants";
 import { memo } from "react";
 import { Polygon, Tooltip } from "react-leaflet";
 
@@ -9,36 +9,14 @@ import { Polygon, Tooltip } from "react-leaflet";
  * Uses Polygon component for a more declarative React-style approach.
  * Optimized with memo to prevent heavy re-renders.
  */
-const MapIslandHover = memo(function MapIslandHover() {
-  
-  const stats = {
-    "36": {
-      count: 19,
-      regencies: [
-        "Kab. Tangerang",
-        "Kota Tangerang Selatan",
-        "Kab. Lebak",
-        "Kab. Pandeglang",
-        "Kab. Serang",
-      ],
-    },
-    "32": {
-      count: 12,
-      regencies: ["Kab. Bogor", "Kab. Bandung", "Kab. Bekasi"],
-    },
-    "33": {
-      count: 8,
-      regencies: ["Kab. Banyumas", "Kab. Cilacap"],
-    },
-    "35": {
-      count: 15,
-      regencies: ["Kab. Malang", "Kab. Sidoarjo"],
-    },
-  };
-
+const MapIslandHover = memo(function MapIslandHover({
+  stats,
+}: {
+  stats: Record<string, { count: number; regencies: string[] }>;
+}) {
   return (
     <>
-      {JAVA_PROVINCE_REGIONS.map((region) => {
+      {PROVINCE_REGIONS.map((region) => {
         const data = stats[region.code] || { count: 0, regencies: [] };
         const regencyList =
           data.regencies.length > 0
@@ -46,7 +24,7 @@ const MapIslandHover = memo(function MapIslandHover() {
             : "Belum ada data";
 
         // Leaflet Polygon expects [lat, lng], but GeoJSON constants are [lng, lat]
-        const positions = region.geometry.coordinates[0].map(([lng, lat]) => [
+        const positions = region.coordinates.map(([lng, lat]) => [
           lat,
           lng,
         ]) as [number, number][];

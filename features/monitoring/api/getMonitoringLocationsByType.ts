@@ -1,78 +1,81 @@
-import {
-  getAvailableLocationsByType,
-  LocationType,
-} from "@/features/dashboard/actions/available-locations";
+import { LocationType } from "@/features/dashboard/actions/available-locations";
 import { PublicAvailableLocation } from "@/features/dashboard/actions/public-available-locations";
 import { getMonitoringIsf } from "@/features/monitoring/actions/public-location";
 import { MonitoringIsf } from "../types/monitoring-types";
-import { useQuery, useQueries, queryOptions } from "@tanstack/react-query";
+import { useQuery, queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  getMonitoringLocationsThematic,
+  MonitoringLocationsThematicResult,
+  ProvincePotentialData,
+} from "../actions/monitoring-thematic-actions";
 
 export type LocationStatus = "potential" | "active";
 
-export const getLocationsQueryKey = (
-  type: LocationType,
-  status: LocationStatus,
-) => ["locations", type, status];
+export const getMonitoringThematicLocationsQueryKey = (type: LocationType) => [
+  "monitoring-thematic-locations",
+  type,
+];
 
-const getLocationsQueryOptions = (type: LocationType, status: LocationStatus) =>
+const getMonitoringThematicLocationsQueryOptions = (type: LocationType) =>
   queryOptions({
-    queryKey: getLocationsQueryKey(type, status),
-    queryFn: async (): Promise<PublicAvailableLocation[]> => {
-      const result = await getAvailableLocationsByType(type, status);
+    queryKey: getMonitoringThematicLocationsQueryKey(type),
+    queryFn: async (): Promise<MonitoringLocationsThematicResult> => {
+      const result = await getMonitoringLocationsThematic(type);
       if (!result.success && result.message) {
         toast.error(result.message);
-        return [];
+        return { active: [], potential: [] };
       }
-      return result.data || [];
+      return result.data ?? { active: [], potential: [] };
     },
     staleTime: 3 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
   });
 
-export const useGetMonitoringLocationsByType = (
-  type: LocationType,
-  status: LocationStatus,
-  enabled: boolean = true,
-) =>
-  useQuery({
-    ...getLocationsQueryOptions(type, status),
-    enabled,
-  });
+export interface MapMarkerLocation extends PublicAvailableLocation {
+  isPotential?: boolean;
+}
 
-export const useGetMonitoringLocationsCombined = (
+export const useGetMonitoringLocationsThematic = (
   type: LocationType,
-  statuses: LocationStatus[],
+  statuses: string[],
 ) => {
-  const results = useQueries({
-    queries: statuses.map((status) => getLocationsQueryOptions(type, status)),
+  return useQuery({
+    ...getMonitoringThematicLocationsQueryOptions(type),
+    select: (data) => {
+      const activeData: MapMarkerLocation[] = statuses.includes("active")
+        ? data.active
+        : [];
+
+      const potentialData = statuses.includes("potential")
+        ? type === "biofloc_thematic" && Array.isArray(data.potential)
+          ? (data.potential as ProvincePotentialData[]).reduce<
+              Record<string, { count: number; regencies: string[] }>
+            >((acc, curr) => {
+              acc[curr.province_code] = {
+                count: curr.count,
+                regencies: curr.regencies,
+              };
+              return acc;
+            }, {})
+          : type === "minapadi_thematic" && Array.isArray(data.potential)
+            ? (data.potential as PublicAvailableLocation[]).map((l) => ({
+                ...l,
+                isPotential: true,
+              }))
+            : []
+        : type === "biofloc_thematic"
+          ? {}
+          : [];
+
+      return {
+        active: activeData,
+        potential: potentialData,
+      };
+    },
   });
-
-  const isLoading = results.some((r) => r.isLoading);
-  const isError = results.some((r) => r.isError);
-
-  const combinedData = results.flatMap((result, index) => {
-    const status = statuses[index];
-    const data = result.data ?? [];
-    return data.map((l) => ({
-      ...l,
-      isPotential: status === "potential",
-    }));
-  });
-
-  return {
-    data: combinedData,
-    isLoading,
-    isError,
-    results: statuses.reduce(
-      (acc, status, index) => {
-        acc[status] = results[index];
-        return acc;
-      },
-      {} as Record<LocationStatus, (typeof results)[0]>,
-    ),
-  };
 };
+
 
 /**
  * Gets the query key for monitoring ISF data.

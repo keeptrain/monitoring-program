@@ -20,10 +20,10 @@ export default function MonitoringThematicDetailSheet({
       {/* Details Grid */}
       <div className="mb-8 grid grid-cols-2 gap-4">
         <div className="flex items-center gap-4">
-          <p className="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase">
+          <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             Progress
           </p>
-          <ProgressPieChart progress={data.progress_percent} size={125} />
+          <ProgressPieChart progress={data.progress_percent} size={100} />
         </div>
         <div className="flex flex-col justify-center space-y-4">
           <DetailItem label="Komoditas Bantuan" value={data.commodity_aid} />
