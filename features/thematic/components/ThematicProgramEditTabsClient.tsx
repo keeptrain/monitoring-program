@@ -21,14 +21,20 @@ import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useRouter } from "next/navigation";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import { ProposalThematicDetailClient } from "@/features/proposal/components/ProposalThematicDetailClient";
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "../constants/thematic-constants";
 
 export default function ThematicProgramEditTabsClient({
   id,
   programType,
 }: {
   id: string;
-  programType: string;
+  programType: ThematicProgramType;
 }) {
+  const config = THEMATIC_CONFIG[programType];
+  const basePath = config.basePath;
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState(0);
@@ -95,7 +101,9 @@ export default function ThematicProgramEditTabsClient({
     try {
       await updateKdmpEntity(program.entity_id, data);
       toast.success("Informasi Kelompok berhasil diperbarui");
-      router.push(`/dashboard/thematic/biofloc`);
+      router.push(
+        `/dashboard/thematic/${programType === "biofloc_thematic" ? "biofloc" : "minapadi"}`,
+      );
     } catch (error) {
       toast.error("Gagal memperbarui informasi Kelompok");
     } finally {
@@ -112,7 +120,9 @@ export default function ThematicProgramEditTabsClient({
         program.proposal_id ?? undefined,
       );
       toast.success("Lokasi Program berhasil diperbarui");
-      router.push(`/dashboard/thematic/biofloc`);
+      router.push(
+        `/dashboard/thematic/${programType === "biofloc_thematic" ? "biofloc" : "minapadi"}`,
+      );
     } catch (error) {
       toast.error("Gagal memperbarui lokasi Program");
     } finally {
@@ -158,16 +168,16 @@ export default function ThematicProgramEditTabsClient({
           <CardHeader>
             <CardTitle>Informasi Kelompok</CardTitle>
             <CardDescription>
-              Perbarui informasi identitas kelompok yang terhubung dengan program
-              ini
+              Perbarui informasi identitas kelompok yang terhubung dengan
+              program ini
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ProposalIdentityForm
               initialData={identityData}
               onSubmit={handleIdentitySubmit}
-              programType="biofloc_thematic"
-              basePath="/biofloc-thematic"
+              programType={programType}
+              basePath={basePath}
             />
           </CardContent>
           <CardFooter className="justify-end">
@@ -176,7 +186,9 @@ export default function ThematicProgramEditTabsClient({
               form="step-1-form"
               disabled={isIdentitySubmitting}
             >
-              {isIdentitySubmitting ? "Menyimpan..." : "Simpan Informasi Kelompok"}
+              {isIdentitySubmitting
+                ? "Menyimpan..."
+                : "Simpan Informasi Kelompok"}
             </Button>
           </CardFooter>
         </Card>
@@ -195,8 +207,8 @@ export default function ThematicProgramEditTabsClient({
               initialData={locationData}
               onSubmit={handleLocationSubmit}
               hideLandSlope={!program.proposal_id}
-              programType="biofloc_thematic"
-              basePath="/biofloc-thematic"
+              programType={programType}
+              basePath={basePath}
             />
           </CardContent>
           <CardFooter className="justify-end">

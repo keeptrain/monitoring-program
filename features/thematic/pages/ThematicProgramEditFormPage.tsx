@@ -7,12 +7,10 @@ import { getThematicProgramQueryOptions } from "../api/getThematicProgram";
 import { notFound } from "next/navigation";
 import ThematicProgramEditTabsClient from "../components/ThematicProgramEditTabsClient";
 import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
-
-const breadcrumbItems = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Tematik Bioflok", href: "/dashboard/thematic/biofloc" },
-  { label: "Edit", href: "/dashboard/thematic/biofloc/edit" },
-];
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "../constants/thematic-constants";
 
 export default async function ThematicProgramEditFormPage({
   params,
@@ -21,16 +19,29 @@ export default async function ThematicProgramEditFormPage({
 }) {
   const { type, id } = await params;
 
-  if (type !== "biofloc" && type !== "minapadi") {
+  // Map URL type to thematic program type
+  const programType: ThematicProgramType | null =
+    type === "biofloc"
+      ? "biofloc_thematic"
+      : type === "minapadi"
+        ? "minapadi_thematic"
+        : null;
+
+  if (!programType || !THEMATIC_CONFIG[programType]) {
     return notFound();
   }
+
+  const config = THEMATIC_CONFIG[programType];
 
   const queryClient = new QueryClient();
   queryClient.prefetchQuery(getThematicProgramQueryOptions(id));
   const dehydratedState = dehydrate(queryClient);
 
-  const programType =
-    type === "biofloc" ? "biofloc_thematic" : "minapadi_thematic";
+  const breadcrumbItems = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: `Tematik ${config.label}`, href: `/dashboard/thematic/${type}` },
+    { label: "Edit" },
+  ];
 
   return (
     <div className="mx-auto max-w-6xl space-y-4">

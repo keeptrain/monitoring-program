@@ -219,27 +219,71 @@ export async function getThematicProgramsPaginatedService(
   };
 }
 
-export async function getBioflocThematicProgramByIdService(
+import { ThematicMetadata } from "../constants/thematic-constants";
+
+export async function getThematicProgramByIdService(
   id: string | number,
+  config: ThematicMetadata,
 ): Promise<ThematicProgramDetail> {
   const supabase = await createClient();
 
+  const programTable = config.programTable;
+  const proposalTableName = config.proposalTable;
+  const docType = config.programType;
+
+  const dynamicSelect = `
+      *,
+      kdmp_entities (
+        name,
+        kusuka_number,
+        nib,
+        legal_entity_number,
+        board_member_count,
+        member_count,
+        chairman_name,
+        chairman_phone,
+        companion_name,
+        companion_phone
+      ),
+      available_locations (
+        name,
+        latitude,
+        longitude,
+        province_code,
+        province_name,
+        regency_code,
+        district_code,
+        village_code
+      ),
+      ${proposalTableName} (
+        land_slope
+      )
+    `;
+
   // 1. Fetch program data
   const { data: program, error: programError } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
-    .select(DETAIL_SELECT)
+    .from(programTable)
+    .select(dynamicSelect)
     .eq("id", id)
     .single();
 
   if (programError) {
-    throw programError;
+    console.error("[getBioflocThematicProgramByIdService] Query error:", {
+      table: programTable,
+      id,
+      error: programError,
+      docType,
+    });
+    throw new Error(
+      `Failed to fetch program from ${programTable} with id ${id}: ${programError.message}`,
+    );
   }
 
   // 2. Fetch documentations from the documentations table
   const { data: docs, error: docsError } = await supabase
     .from("documentations")
     .select("*")
-    .eq("program_type", "biofloc_thematic")
+    .eq("program_type", docType)
     .eq("program_id", id);
 
   if (docsError) {
@@ -273,11 +317,13 @@ export async function getBioflocThematicProgramByIdService(
     }
   });
 
-  const entity = program.kdmp_entities;
-  const location = program.available_locations;
+  // Type cast program to access nested relations
+  const typedProgram = program as any;
+  const entity = typedProgram.kdmp_entities;
+  const location = typedProgram.available_locations;
 
   return {
-    ...program,
+    ...typedProgram,
     name: entity?.name ?? "Tidak Diketahui",
     kusuka_number: entity?.kusuka_number ?? "",
     nib: entity?.nib ?? "",

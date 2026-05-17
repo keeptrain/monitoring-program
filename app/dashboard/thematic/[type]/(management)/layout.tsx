@@ -7,11 +7,6 @@ const PAGE_CONFIG: Record<string, { label: string }> = {
   minapadi: { label: "Minapadi" },
 };
 
-const breadcrumbItems = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Tematik Bioflok", href: "/dashboard/thematic/biofloc" },
-];
-
 export default async function ThematicTypeLayout({
   children,
   params,
@@ -21,6 +16,11 @@ export default async function ThematicTypeLayout({
 }) {
   const { type } = await params;
   const config = PAGE_CONFIG[type] || { label: type };
+
+  const breadcrumbItems = [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: `Tematik ${config.label}`, href: `/dashboard/thematic/${type}` },
+  ];
 
   return (
     <div className="mx-auto max-w-6xl">

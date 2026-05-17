@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   BioflocProgramListItem,
   ThematicProgramStatus,
+  ThematicProgramType,
 } from "@/features/thematic/types/thematic";
 import { Progress } from "@/components/ui/progress";
 import { formatDateWithTime } from "@/lib/utils";
@@ -83,6 +84,7 @@ export const BioflocProgramsPublicTableColumns =
 export const BioflocProgramsInternalTableColumns = (opts: {
   onOpenProgress?: (row: BioflocProgramListItem) => void;
   onDelete?: (id: string) => Promise<unknown>;
+  programType: ThematicProgramType;
 }): ColumnDef<BioflocProgramListItem>[] => {
   const handleDelete = async (item: BioflocProgramListItem) => {
     if (!opts.onDelete) {
@@ -122,7 +124,7 @@ export const BioflocProgramsInternalTableColumns = (opts: {
             type: "link",
             key: "edit",
             label: "Ubah",
-            href: `/dashboard/thematic/biofloc/${item.id}/edit`,
+            href: `/dashboard/thematic/${opts.programType}/${item.id}/edit`,
             icon: PencilIcon,
           },
           {

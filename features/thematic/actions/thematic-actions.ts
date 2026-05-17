@@ -13,6 +13,12 @@ import {
 import { ProposalIdentityFormValues } from "@/features/proposal/forms/proposal-identity-schema";
 import { ProposalLocationValues } from "@/features/proposal/forms/proposal-location-schema";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
+import {
+  THEMATIC_CONFIG,
+  resolveThematicMetadata,
+} from "../constants/thematic-constants";
+import { getSession } from "@/features/auth/session";
+import { ThematicProgramType } from "../types/thematic";
 
 export async function getThematicProgramsPaginated(
   thematicType: string,
@@ -27,7 +33,21 @@ export async function getThematicProgramsPaginated(
 }
 
 export async function getThematicProgramById(id: string) {
-  return db.getBioflocThematicProgramByIdService(id);
+  // Get user session to determine program scope
+  const session = await getSession();
+
+  if (!session.isLoggedIn) {
+    throw new Error("Unauthorized: User must be logged in");
+  }
+
+  const programType =
+    session.programScope === "biofloc"
+      ? "biofloc_thematic"
+      : "minapadi_thematic";
+
+  const config = THEMATIC_CONFIG[programType];
+
+  return db.getThematicProgramByIdService(id, config);
 }
 
 export async function createThematicProgram(

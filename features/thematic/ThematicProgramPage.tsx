@@ -104,8 +104,9 @@ export default function ThematicProgramPage({
       BioflocProgramsInternalTableColumns({
         onOpenProgress: openForRow,
         onDelete: mutateAsync,
+        programType,
       }),
-    [openForRow, mutateAsync],
+    [openForRow, mutateAsync, programType],
   );
 
   const handleRowClick = useCallback(

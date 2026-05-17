@@ -10,15 +10,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
 
-const breadcrumbItems = [
-  { label: "Dashboard", href: "/dashboard" },
-  {
-    label: "Proposal Tematik Bioflok",
-    href: "/dashboard/thematic/biofloc/proposals",
-  },
-  { label: "Tambah" },
-];
-
 export default async function CreateThematicProgramPage({
   params,
   searchParams,
@@ -32,6 +23,16 @@ export default async function CreateThematicProgramPage({
   if (type !== "biofloc" && type !== "minapadi") {
     return notFound();
   }
+
+  const label = type === "biofloc" ? "Bioflok" : "Minapadi";
+  const breadcrumbItems = [
+    { label: "Dashboard", href: "/dashboard" },
+    {
+      label: `Proposal Tematik ${label}`,
+      href: `/dashboard/thematic/${type}/proposals`,
+    },
+    { label: "Tambah" },
+  ];
 
   if (!proposalId) {
     return notFound();
