@@ -40,9 +40,7 @@ export default async function CreateThematicProgramPage({
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery(
-    getProposalThematicQueryOptions(proposalId),
-  );
+  await queryClient.prefetchQuery(getProposalThematicQueryOptions(proposalId));
 
   const dehydratedState = dehydrate(queryClient);
 

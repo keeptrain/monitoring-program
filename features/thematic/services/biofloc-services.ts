@@ -548,14 +548,24 @@ export async function updateLocationService(
 export async function updateBioflocThematicProgramProgressService(
   id: string,
   progress_percent: number,
+  status?: string,
+  tableName?: string,
 ) {
   const supabase = await createClient();
+  const programTable = tableName ?? TABLES.BIOFLOC_THEMATIC_PROGRAMS;
+
+  const updateData: { progress_percent: number; status?: string; updated_at: string } = {
+    progress_percent,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (status) {
+    updateData.status = status;
+  }
+
   const { error } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
-    .update({
-      progress_percent,
-      updated_at: new Date().toISOString(),
-    })
+    .from(programTable)
+    .update(updateData)
     .eq("id", id);
 
   if (error) {

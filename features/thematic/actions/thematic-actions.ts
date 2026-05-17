@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import * as db from "../services/biofloc-services";
 import { createClient } from "@/utils/supabase";
 import { TABLES } from "@/lib/constants/tables";
-import { UpdateProgressFormValues } from "../forms/update-progress-schema";
+
 import {
   BioflocProgramsPaginatedInput,
   bioflocProgramsPaginatedSchema,
@@ -13,12 +13,8 @@ import {
 import { ProposalIdentityFormValues } from "@/features/proposal/forms/proposal-identity-schema";
 import { ProposalLocationValues } from "@/features/proposal/forms/proposal-location-schema";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
-import {
-  THEMATIC_CONFIG,
-  resolveThematicMetadata,
-} from "../constants/thematic-constants";
+import { THEMATIC_CONFIG } from "../constants/thematic-constants";
 import { getSession } from "@/features/auth/session";
-import { ThematicProgramType } from "../types/thematic";
 
 export async function getThematicProgramsPaginated(
   thematicType: string,
@@ -124,24 +120,6 @@ export async function updateLocation(
     console.error("Error updating location:", error);
     throw error;
   }
-}
-
-export async function updateThematicProgramProgress(
-  id: string,
-  data: UpdateProgressFormValues,
-) {
-  try {
-    await db.updateBioflocThematicProgramProgressService(
-      id,
-      data.progress_percent,
-    );
-  } catch (error) {
-    console.error("Error updating thematic program progress:", error);
-    throw error;
-  }
-
-  revalidatePath("/dashboard/thematic");
-  revalidatePath(`/dashboard/thematic/${id}`);
 }
 
 export async function deleteThematicProgram(
