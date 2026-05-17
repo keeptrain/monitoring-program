@@ -68,9 +68,20 @@ export async function updateThematicProgram(
   id: string,
   data: ThematicProgramFormValues,
 ): Promise<{ success: boolean; message: string }> {
+  const session = await getSession();
+  if (!session.isLoggedIn) {
+    throw new Error("Unauthorized: User must be logged in");
+  }
+
+  const programType =
+    session.programScope === "minapadi"
+      ? "minapadi_thematic"
+      : "biofloc_thematic";
+  const config = THEMATIC_CONFIG[programType];
+
   const supabase = await createClient();
   const { error } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .from(config.programTable)
     .update({
       progress_percent: data.progress_percent,
       commodity_aid: data.commodity_aid,
@@ -91,7 +102,7 @@ export async function updateThematicProgram(
 
   return {
     success: true,
-    message: "Proposal berhasil diperbarui",
+    message: "Program berhasil diperbarui",
   };
 }
 
@@ -101,7 +112,9 @@ export async function updateKdmpEntity(
 ) {
   try {
     await db.updateKdmpEntityService(entityId, data);
-    revalidatePath("/dashboard/thematic/biofloc");
+    const session = await getSession();
+    const scope = session.programScope === "minapadi" ? "minapadi" : "biofloc";
+    revalidatePath(`/dashboard/thematic/${scope}`);
   } catch (error) {
     console.error("Error updating KDMP entity:", error);
     throw error;
@@ -115,7 +128,9 @@ export async function updateLocation(
 ) {
   try {
     await db.updateLocationService(locationId, data, proposalId);
-    revalidatePath("/dashboard/thematic/biofloc");
+    const session = await getSession();
+    const scope = session.programScope === "minapadi" ? "minapadi" : "biofloc";
+    revalidatePath(`/dashboard/thematic/${scope}`);
   } catch (error) {
     console.error("Error updating location:", error);
     throw error;
@@ -126,8 +141,21 @@ export async function deleteThematicProgram(
   id: string,
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    await db.deleteBioflocThematicProgramService(id);
-    // revalidatePath("/dashboard/thematic/biofloc");
+    const session = await getSession();
+    if (!session.isLoggedIn) {
+      throw new Error("Unauthorized: User must be logged in");
+    }
+
+    const programType =
+      session.programScope === "minapadi"
+        ? "minapadi_thematic"
+        : "biofloc_thematic";
+    const config = THEMATIC_CONFIG[programType];
+
+    await db.deleteBioflocThematicProgramService(id, config);
+    
+    const scope = session.programScope === "minapadi" ? "minapadi" : "biofloc";
+    revalidatePath(`/dashboard/thematic/${scope}`);
     return { success: true };
   } catch (error) {
     console.error("Error deleting thematic program:", error);

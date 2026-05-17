@@ -573,12 +573,19 @@ export async function updateBioflocThematicProgramProgressService(
   }
 }
 
-export async function deleteBioflocThematicProgramService(id: string) {
+export async function deleteBioflocThematicProgramService(
+  id: string,
+  config?: ThematicMetadata,
+) {
   const supabase = await createClient();
+  const programTable = config?.programTable ?? TABLES.BIOFLOC_THEMATIC_PROGRAMS;
+  const proposalTable =
+    config?.proposalTable ?? TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
+  const docType = config?.programType ?? "biofloc_thematic";
 
   // Ambil data program untuk mengecek keberadaan proposal_id dan tahun pengajuan
   const { data: program, error: fetchError } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .from(programTable)
     .select("proposal_id, fiscal_year")
     .eq("id", id)
     .single();
@@ -597,7 +604,7 @@ export async function deleteBioflocThematicProgramService(id: string) {
   // Jika ada proposal_id, kembalikan status proposal ke 'approved'
   if (program?.proposal_id) {
     const { error: updateProposalError } = await supabase
-      .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+      .from(proposalTable)
       .update({ status: "approved" })
       .eq("id", program.proposal_id);
 
@@ -610,7 +617,7 @@ export async function deleteBioflocThematicProgramService(id: string) {
   const { error: deleteDocsError } = await supabase
     .from("documentations")
     .delete()
-    .eq("program_type", "biofloc_thematic")
+    .eq("program_type", docType)
     .eq("program_id", id);
 
   if (deleteDocsError) {
@@ -620,7 +627,7 @@ export async function deleteBioflocThematicProgramService(id: string) {
 
   // Hapus program (diberlakukan untuk semua yang lolos validasi)
   const { error } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .from(programTable)
     .delete()
     .eq("id", id);
 
