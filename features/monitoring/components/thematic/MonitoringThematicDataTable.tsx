@@ -10,14 +10,22 @@ import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { PaginationState } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { BioflocProgramsPublicTableColumns } from "./BioflocProgramsTableColumns";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useGetThematicProgramsPaginated } from "@/features/thematic/api/getBioflocProgramsPaginated";
+import { THEMATIC_CONFIG, ThematicProgramType } from "@/features/thematic/constants/thematic-constants";
+import { getMonitoringThematicDataTableColumns } from "./MonitoringThematicDataTableColumns";
 
 const YEAR_OPTIONS = [2026, 2025] as const;
 
-export default function PublicBioflocTable() {
+interface MonitoringThematicDataTableProps {
+  programType: ThematicProgramType;
+}
+
+export default function MonitoringThematicDataTable({
+  programType,
+}: MonitoringThematicDataTableProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const config = THEMATIC_CONFIG[programType];
 
   // URL-based state management
   const [params, setParams] = useQueryStates({
@@ -48,8 +56,11 @@ export default function PublicBioflocTable() {
     }
   }, [debouncedSearchQuery, searchQuery, setParams]);
 
+  // Map "biofloc_thematic" -> "biofloc", "minapadi_thematic" -> "minapadi"
+  const thematicType = programType === "biofloc_thematic" ? "biofloc" : "minapadi";
+
   const { data, isPending } = useGetThematicProgramsPaginated(
-    "biofloc",
+    thematicType,
     "public",
     {
       page,
@@ -65,7 +76,10 @@ export default function PublicBioflocTable() {
     pageSize,
   };
 
-  const columns = useMemo(() => BioflocProgramsPublicTableColumns(), []);
+  const columns = useMemo(
+    () => getMonitoringThematicDataTableColumns(programType),
+    [programType]
+  );
 
   return (
     <Datatable
@@ -115,7 +129,7 @@ export default function PublicBioflocTable() {
             />
           </div>
           <Input
-            placeholder="Cari nama KDMP..."
+            placeholder={`Cari ${config.groupLabel.toLowerCase()}...`}
             className="w-[250px]"
             value={localSearchQuery}
             onChange={(event) => {

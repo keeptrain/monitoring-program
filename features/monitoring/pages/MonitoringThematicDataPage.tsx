@@ -1,30 +1,37 @@
 import BreadcrumbHeader from "@/components/shared/BreadcrumbHeader";
-import PublicBioflocTable from "../components/biofloc/PublicBioflocTable";
+import MonitoringThematicDataTable from "../components/thematic/MonitoringThematicDataTable";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { THEMATIC_CONFIG, ThematicProgramType } from "@/features/thematic/constants/thematic-constants";
 
-const breadcrumbItems = [
-  {
-    label: "Bioflok Tematik",
-    href: "/biofloc-thematic",
-  },
-  {
-    label: "Data Bioflok Tematik",
-    href: "/biofloc-thematic/data",
-  },
-];
+export default function MonitoringThematicDataPage({
+  programType,
+}: {
+  programType: ThematicProgramType;
+}) {
+  const config = THEMATIC_CONFIG[programType];
 
-export default function BioflocThematicDataPage() {
+  const breadcrumbItems = [
+    {
+      label: `${config.label} Tematik`,
+      href: config.basePath,
+    },
+    {
+      label: `Data ${config.label} Tematik`,
+      href: `${config.basePath}/data`,
+    },
+  ];
+
   return (
     <div className="mx-auto my-6 max-w-6xl space-y-4">
       <div className="space-y-2">
         <BreadcrumbHeader items={breadcrumbItems} />
         <h1 className="text-xl font-bold tracking-tight">
-          Penerima Bantuan Bioflok Tematik
+          Penerima Bantuan {config.label} Tematik
         </h1>
       </div>
       <Suspense fallback={<SuspenseFallback />}>
-        <PublicBioflocTable />
+        <MonitoringThematicDataTable programType={programType} />
       </Suspense>
     </div>
   );
