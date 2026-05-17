@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   Carousel,
   CarouselContent,
@@ -7,6 +6,7 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageOff } from "lucide-react";
+import { toPreviewUrl } from "@/lib/utils";
 
 export default function MonitoringDocumentationCarousel({
   images = [],
@@ -41,12 +41,11 @@ export default function MonitoringDocumentationCarousel({
           <CarouselItem key={index}>
             <div className="overflow-hidden border-none">
               <div className="relative aspect-4/3">
-                <Image
-                  src={src}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={toPreviewUrl(src)}
                   alt={`Dokumentasi ${index + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 336px"
-                  className="object-cover transition-transform duration-500 hover:scale-110"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
               </div>
