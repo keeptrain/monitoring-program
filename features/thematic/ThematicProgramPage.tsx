@@ -14,9 +14,6 @@ import {
 import Datatable from "@/components/datatable/datatable";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import UpdateProgressSheet from "./components/biofloc/UpdateProgressSheet";
-import { useUpdateProgressSheet } from "./hooks/useUpdateProgressSheet";
-import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { Input } from "@/components/ui/input";
 import { useGetThematicProgramsPaginated } from "./api/getBioflocProgramsPaginated";
@@ -25,8 +22,14 @@ import { PaginationState } from "@tanstack/react-table";
 import { BioflocProgramsInternalTableColumns } from "@/features/monitoring/components/biofloc/BioflocProgramsTableColumns";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useDeleteThematicProgram } from "./api/deleteThematicProgram";
-import { ThematicProgramStatus, ThematicProgramType } from "./types/thematic";
+import {
+  BioflocProgramListItem,
+  ThematicProgramStatus,
+  ThematicProgramType,
+} from "./types/thematic";
+import ManageDocumentationsSheet from "../documentation/components/ManageDocumentationsSheet";
 
+type UpdateProgressRow = Pick<BioflocProgramListItem, "id">;
 const YEAR_OPTIONS = [2026, 2025] as const;
 
 export default function ThematicProgramPage({
@@ -36,6 +39,10 @@ export default function ThematicProgramPage({
 }) {
   const router = useRouter();
   const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const [selectedRow, setSelectedRow] = useState<UpdateProgressRow | null>(
+    null,
+  );
+  const sheetOpen = selectedRow !== null;
 
   // URL-based state management
   const [params, setParams] = useQueryStates({
@@ -86,27 +93,16 @@ export default function ThematicProgramPage({
     pageSize,
   };
 
-  const {
-    form,
-    onSubmit,
-    sheetOpen,
-    setSheetOpen,
-    openForRow,
-    submitError,
-    isPending: isUpdatingProgress,
-    selectedRow,
-  } = useUpdateProgressSheet();
-
   const { mutateAsync } = useDeleteThematicProgram();
 
   const columns = useMemo(
     () =>
       BioflocProgramsInternalTableColumns({
-        onOpenProgress: openForRow,
+        onOpenDocumentation: setSelectedRow,
         onDelete: mutateAsync,
         programType,
       }),
-    [openForRow, mutateAsync, programType],
+    [setSelectedRow, mutateAsync, programType],
   );
 
   const handleRowClick = useCallback(
@@ -196,29 +192,25 @@ export default function ThematicProgramPage({
         )}
       />
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <Sheet open={sheetOpen} onOpenChange={() => setSelectedRow(null)}>
         <SheetContent
           side="right"
           className="data-[side=right]:sm:max-w-[600px]"
         >
           <SheetHeader>
-            <SheetTitle>Update Progress & Dokumentasi</SheetTitle>
-            <SheetDescription>
-              Ubah persentase capaian lalu kelola dokumentasi program.
-            </SheetDescription>
+            <SheetTitle>Update Dokumentasi</SheetTitle>
+            <SheetDescription>Update dokumentasi program</SheetDescription>
           </SheetHeader>
-          <UpdateProgressSheet
-            form={form}
-            setSheetOpen={setSheetOpen}
-            onSubmit={onSubmit}
-            submitError={submitError}
-            isPending={isUpdatingProgress}
-          />
+
           {selectedRow && (
             <ManageDocumentationsSheet
-              programType="biofloc_thematic"
+              programType={
+                programType === "biofloc"
+                  ? "biofloc_thematic"
+                  : "minapadi_thematic"
+              }
               programId={selectedRow.id}
-              onSuccess={() => setSheetOpen(false)}
+              onSuccess={() => setSelectedRow(null)}
             />
           )}
         </SheetContent>

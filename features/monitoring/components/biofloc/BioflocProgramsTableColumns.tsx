@@ -82,7 +82,7 @@ export const BioflocProgramsPublicTableColumns =
   ];
 
 export const BioflocProgramsInternalTableColumns = (opts: {
-  onOpenProgress?: (row: BioflocProgramListItem) => void;
+  onOpenDocumentation?: (row: BioflocProgramListItem) => void;
   onDelete?: (id: string) => Promise<unknown>;
   programType: ThematicProgramType;
 }): ColumnDef<BioflocProgramListItem>[] => {
@@ -130,8 +130,8 @@ export const BioflocProgramsInternalTableColumns = (opts: {
           {
             type: "action",
             key: "progress-update",
-            label: "Update Progress",
-            onClick: () => opts.onOpenProgress?.(item),
+            label: "Update Dokumentasi",
+            onClick: () => opts.onOpenDocumentation?.(item),
             icon: ConstructionIcon,
           },
           {

@@ -73,7 +73,7 @@ export function MoreButton({
           <MoreHorizontalIcon className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className={cn("w-36", contentClassName)}>
+      <DropdownMenuContent align="end" className={cn("w-40", contentClassName)}>
         {menuItems.map((item) => {
           if ("type" in item && item.type === "separator") {
             return <DropdownMenuSeparator key={item.key} />;
