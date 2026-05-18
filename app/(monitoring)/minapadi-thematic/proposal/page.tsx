@@ -1,9 +1,9 @@
-import ProposalThematicFormPage from "@/features/proposal/ProposalThematicFormPage";
+import ProposalThematicFormPage from "@/features/proposal/pages/ProposalThematicFormPage";
 
 /**
  * (monitoring)/biofloc-thematic/minapadi-thematic/proposal
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export default function Page(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

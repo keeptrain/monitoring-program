@@ -1,4 +1,4 @@
-import ProposalThematicRevisionPage from "@/features/proposal/ProposalThematicRevisionPage";
+import ProposalThematicRevisionPage from "@/features/proposal/pages/ProposalThematicRevisionPage";
 
 export default async function BioflocProposalRevisionRoute({
   params,

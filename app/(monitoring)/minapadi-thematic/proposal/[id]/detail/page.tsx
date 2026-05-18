@@ -1,4 +1,4 @@
-import ProposalThematicDetailPage from "@/features/proposal/ProposalThematicDetailPage";
+import ProposalThematicDetailPage from "@/features/proposal/pages/ProposalThematicDetailPage";
 
 export default async function MinapadiProposalDetailPage({
   params,

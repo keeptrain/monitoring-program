@@ -1,4 +1,4 @@
-import ProposalThematicFormPage from "@/features/proposal/ProposalThematicFormPage";
+import ProposalThematicFormPage from "@/features/proposal/pages/ProposalThematicFormPage";
 
 /**
  * (monitoring)/biofloc-thematic/proposal

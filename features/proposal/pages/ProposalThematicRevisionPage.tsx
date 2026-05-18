@@ -1,5 +1,5 @@
 import z from "zod";
-import { getRevisionProposal } from "./api/proposal-actions";
+import { getRevisionProposal } from "../api/proposal-actions";
 import { redirect } from "next/navigation";
 import ProposalThematicFormPage from "./ProposalThematicFormPage";
 

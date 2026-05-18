@@ -15,7 +15,7 @@ import React from "react";
 import StepNavigation from "@/features/proposal/components/StepNavigation";
 import DraftHandler from "@/features/proposal/components/DraftHandler";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RevisionProposalData } from "./api/proposal-actions";
+import { RevisionProposalData } from "../api/proposal-actions";
 import PublicPageHeader from "@/components/PublicPageHeader";
 import { AlertTriangleIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
