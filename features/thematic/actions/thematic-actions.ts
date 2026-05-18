@@ -4,7 +4,6 @@ import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { revalidatePath } from "next/cache";
 import * as db from "../services/biofloc-services";
 import { createClient } from "@/utils/supabase";
-import { TABLES } from "@/lib/constants/tables";
 
 import {
   BioflocProgramsPaginatedInput,
@@ -67,16 +66,15 @@ export async function downloadSCurveFile(id: string) {
 export async function updateThematicProgram(
   id: string,
   data: ThematicProgramFormValues,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; data?: { href?: string } }> {
   const session = await getSession();
   if (!session.isLoggedIn) {
     throw new Error("Unauthorized: User must be logged in");
   }
 
-  const programType =
-    session.programScope === "minapadi"
-      ? "minapadi_thematic"
-      : "biofloc_thematic";
+  const isBiofloc = session.programScope === "biofloc";
+
+  const programType = isBiofloc ? "biofloc_thematic" : "minapadi_thematic";
   const config = THEMATIC_CONFIG[programType];
 
   const supabase = await createClient();
@@ -103,6 +101,9 @@ export async function updateThematicProgram(
   return {
     success: true,
     message: "Program berhasil diperbarui",
+    data: {
+      href: `/dashboard/thematic/${isBiofloc ? "biofloc" : "minapadi"}`,
+    },
   };
 }
 
@@ -153,7 +154,7 @@ export async function deleteThematicProgram(
     const config = THEMATIC_CONFIG[programType];
 
     await db.deleteBioflocThematicProgramService(id, config);
-    
+
     const scope = session.programScope === "minapadi" ? "minapadi" : "biofloc";
     revalidatePath(`/dashboard/thematic/${scope}`);
     return { success: true };

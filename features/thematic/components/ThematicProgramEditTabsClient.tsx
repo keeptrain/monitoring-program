@@ -160,6 +160,7 @@ export default function ThematicProgramEditTabsClient({
           onSubmit={onEditSubmit}
           isPending={isEditPending}
           isEdit={true}
+          documentationsStorageBasePath={config.storagePath}
         />
       )}
 
