@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { useGetProposalThematic } from "../api/getProposalThematic";
 import { ProposalBioflocDetail } from "@/features/proposal/types/proposal-biofloc";
-import { Loader2 } from "lucide-react";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
@@ -21,7 +20,7 @@ export default function CreateThematicProgramClientPage({
 }) {
   const config = THEMATIC_CONFIG[thematicType];
 
-  const { data: result, isLoading } = useGetProposalThematic(proposalId);
+  const { data: result } = useGetProposalThematic(proposalId);
 
   const proposal = result?.data as ProposalBioflocDetail | undefined;
 
@@ -47,14 +46,6 @@ export default function CreateThematicProgramClientPage({
     proposalId,
     true,
   );
-
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="text-muted-foreground size-8 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <ThematicProgramForm
