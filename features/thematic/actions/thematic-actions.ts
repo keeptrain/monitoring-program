@@ -4,7 +4,6 @@ import { BioflocProgramFormValues } from "../forms/biofloc-program-schema";
 import { revalidatePath } from "next/cache";
 import * as db from "../services/biofloc-services";
 import { createClient } from "@/utils/supabase";
-
 import {
   BioflocProgramsPaginatedInput,
   bioflocProgramsPaginatedSchema,
@@ -58,7 +57,18 @@ export async function createThematicProgram(
 }
 
 export async function downloadSCurveFile(id: string) {
-  const { blob, originalPath } = await db.downloadSCurveFileService(id);
+  const session = await getSession();
+  if (!session.isLoggedIn) {
+    throw new Error("Unauthorized: User must be logged in");
+  }
+
+  const programType =
+    session.programScope === "biofloc"
+      ? "biofloc_thematic"
+      : "minapadi_thematic";
+  const config = THEMATIC_CONFIG[programType];
+
+  const { blob, originalPath } = await db.downloadSCurveFileService(id, config);
   const fileName = originalPath.split("/").pop();
   return { blob, fileName };
 }

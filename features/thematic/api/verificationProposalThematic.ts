@@ -8,13 +8,19 @@ export const useVerificationProposalThematic = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       id,
       data,
     }: {
       id: string;
       data: ProposalVerificationFormValues;
-    }) => verifyProposalThematic(id, data),
+    }) => {
+      const res = await verifyProposalThematic(id, data);
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      return res;
+    },
     onSuccess: () =>
       queryClient.invalidateQueries({
         queryKey: getProposalThematicQueryKey(),

@@ -44,8 +44,6 @@ export default function ProposalProgramPage({
   programType: string;
 }) {
   const router = useRouter();
-
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedProposal, setSelectedProposal] =
     useState<ProposalBioflocThematicProgram | null>(null);
 
@@ -75,10 +73,9 @@ export default function ProposalProgramPage({
     ) => {
       if (action === "verify") {
         setSelectedProposal(proposal);
-        setIsOpen(true);
       }
     },
-    [setSelectedProposal, setIsOpen],
+    [setSelectedProposal],
   );
 
   const columns = useMemo(
@@ -132,7 +129,14 @@ export default function ProposalProgramPage({
         )}
       />
 
-      <Sheet open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
+      <Sheet
+        open={!!selectedProposal}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedProposal(null);
+          }
+        }}
+      >
         <SheetContent className="sm:max-w-md">
           <SheetHeader>
             <SheetTitle>Verifikasi Proposal</SheetTitle>
@@ -141,17 +145,19 @@ export default function ProposalProgramPage({
             </SheetDescription>
           </SheetHeader>
           {selectedProposal?.rejection_reason && (
-            <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
-              <AlertTriangleIcon className="size-4" />
-              <AlertTitle>Permohonan ini pernah ditolak</AlertTitle>
-              <AlertDescription>
-                Dengan catatan: {selectedProposal.rejection_reason}
-              </AlertDescription>
-            </Alert>
+            <div className="px-4">
+              <Alert className="mb-4 border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50">
+                <AlertTriangleIcon className="size-4" />
+                <AlertTitle>Permohonan ini pernah ditolak</AlertTitle>
+                <AlertDescription>
+                  Dengan catatan: {selectedProposal.rejection_reason}
+                </AlertDescription>
+              </Alert>
+            </div>
           )}
           <VerificationForm
             id={selectedProposal?.id || null}
-            onCloseSheet={() => setIsOpen(false)}
+            onCloseSheet={() => setSelectedProposal(null)}
           />
         </SheetContent>
       </Sheet>

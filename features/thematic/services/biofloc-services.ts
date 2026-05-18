@@ -5,7 +5,6 @@ import {
   BioflocProgramListItem,
   BioflocProgramsPaginatedResult,
   ThematicProgramDetail,
-  ThematicProgramIndex,
 } from "../types/thematic";
 import { BioflocProgramsPaginatedParams } from "../forms/biofloc-program-query-schema";
 import { saveDocumentationsAction } from "@/features/documentation/actions";
@@ -17,71 +16,6 @@ type NormalizedDocumentation = {
   image_before_path: string;
   image_after_path: string;
 };
-
-const LIST_SELECT = `
-      id,
-      location_id,
-      name,
-      progress_percent,
-      updated_at,
-      available_locations (
-        name
-      )
-      ` as const;
-
-const DETAIL_SELECT = `
-      *,
-      kdmp_entities (
-        name,
-        kusuka_number,
-        nib,
-        legal_entity_number,
-        board_member_count,
-        member_count,
-        chairman_name,
-        chairman_phone,
-        companion_name,
-        companion_phone
-      ),
-      available_locations (
-        name,
-        latitude,
-        longitude,
-        province_code,
-        province_name,
-        regency_code,
-        district_code,
-        village_code
-      ),
-      proposal_biofloc_thematic_programs (
-        land_slope
-      )
-    ` as const;
-
-export function normalizeDocumentations(
-  data: BioflocProgramFormValues["documentations"],
-): NormalizedDocumentation[] {
-  return (data ?? []).map((doc) => ({
-    id: crypto.randomUUID(),
-    image_before_path: doc.image_before_paths?.[0]?.path ?? "",
-    image_after_path: doc.image_after_paths?.[0]?.path ?? "",
-  }));
-}
-
-export async function getBioflocThematicProgramsService() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
-    .select(LIST_SELECT)
-    .order("updated_at", { ascending: false })
-    .limit(10);
-
-  if (error) {
-    throw error;
-  }
-
-  return data as unknown as ThematicProgramIndex[];
-}
 
 const INTERNAL_PAGINATED_SELECT = `
   id,
@@ -345,10 +279,13 @@ export async function getThematicProgramByIdService(
   } as unknown as ThematicProgramDetail;
 }
 
-export async function downloadSCurveFileService(id: string) {
+export async function downloadSCurveFileService(
+  id: string,
+  config: ThematicMetadata,
+) {
   const supabase = await createClient();
   const { data: program, error: programError } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .from(config.programTable)
     .select("s_curve_path")
     .eq("id", id)
     .single();
@@ -554,7 +491,11 @@ export async function updateBioflocThematicProgramProgressService(
   const supabase = await createClient();
   const programTable = tableName ?? TABLES.BIOFLOC_THEMATIC_PROGRAMS;
 
-  const updateData: { progress_percent: number; status?: string; updated_at: string } = {
+  const updateData: {
+    progress_percent: number;
+    status?: string;
+    updated_at: string;
+  } = {
     progress_percent,
     updated_at: new Date().toISOString(),
   };
@@ -626,10 +567,7 @@ export async function deleteBioflocThematicProgramService(
   }
 
   // Hapus program (diberlakukan untuk semua yang lolos validasi)
-  const { error } = await supabase
-    .from(programTable)
-    .delete()
-    .eq("id", id);
+  const { error } = await supabase.from(programTable).delete().eq("id", id);
 
   if (error) {
     throw error;

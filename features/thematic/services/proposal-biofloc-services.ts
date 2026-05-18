@@ -21,7 +21,7 @@ function normalizeProvinceName(province: string): string {
  * Server-paginated fetch with search (using name_search lowercase column)
  * and province filter. Reusable for both public and admin views.
  */
-export async function getProposalBioflocPaginatedService(
+export async function getProposalThematicPaginatedService(
   params: ProposalBioflocPaginationParams,
   userId?: string,
 ): Promise<PaginatedProposalBioflocResult> {
@@ -96,28 +96,6 @@ export async function getProposalBioflocPaginatedService(
   };
 }
 
-/** Simple: get all (legacy, for backward compat) */
-export async function getProposalBioflocThematicProgramsService() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error("Failed to fetch program data");
-  }
-
-  return (data ?? []) as ProposalBioflocThematicProgram[];
-}
-
-export async function getProposalBioflocTotal(
-  supabase: SupabaseClient,
-): Promise<number> {
-  const summary = await getProposalBioflocProvinceSummary(supabase);
-  return summary.proposal_total;
-}
-
 export async function getProposalBioflocProvinceSummary(
   supabase: SupabaseClient,
   programType?: string,
@@ -168,29 +146,37 @@ export async function getProposalBioflocProvinceSummary(
   };
 }
 
-/** Update proposal status (admin action) with smart metadata handling */
+/** Update proposal status
+ * PMO Action
+ * with smart metadata handling
+ */
 export async function verifyProposalThematicService(
   id: string,
   verifierId: string,
   data: ProposalVerificationFormValues,
-  programType: string,
-) {
+  thematicMetadata: ThematicMetadata,
+): Promise<void> {
   const supabase = await createClient();
-  const targetTable =
-    programType === "minapadi_thematic"
-      ? TABLES.PROPOSAL_MINAPADI_THEMATIC_PROGRAMS
-      : TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS;
 
   // Get current data proposal
   const { data: existingProposal, error: errorExistingProposal } =
     await supabase
-      .from(targetTable)
+      .from(thematicMetadata.proposalTable)
       .select("reviewed_at, rejection_reason")
       .eq("id", id)
       .single();
 
-  if (errorExistingProposal || !existingProposal) {
-    return { success: false, message: "Proposal tidak ditemukan" };
+  if (errorExistingProposal) {
+    if (errorExistingProposal.code === "PGRST116") {
+      throw new Error("Proposal not found");
+    }
+    throw new Error(
+      `Failed to retrieve proposal: ${errorExistingProposal.message}`,
+    );
+  }
+
+  if (!existingProposal) {
+    throw new Error("Proposal not found");
   }
 
   const now = new Date().toISOString();
@@ -213,21 +199,15 @@ export async function verifyProposalThematicService(
     reviewed_at: now,
   };
 
-  const { error } = await supabase
-    .from(targetTable)
+  const { error: errorUpdateProposal } = await supabase
+    .from(thematicMetadata.proposalTable)
     .update(updatePayload)
     .eq("id", id);
 
-  if (error) {
-    console.error("Error update proposal status:", error);
-    return { success: false, message: error.message };
+  if (errorUpdateProposal) {
+    console.error("Error update proposal status:", errorUpdateProposal);
+    throw new Error(errorUpdateProposal.message);
   }
-
-  return {
-    success: true,
-    message: "Verifikasi proposal berhasil disimpan",
-    programType,
-  };
 }
 
 export async function getProposalThematicFileService(
@@ -344,7 +324,7 @@ export async function convertProposalToThematicProgramService(
   proposalId: string,
   value: ThematicProgramFormValues,
   thematicConfig: ThematicMetadata,
-): Promise<{ success: boolean; message: string }> {
+): Promise<void> {
   const supabase = await createClient();
 
   // Get the approved proposal with relationship IDs
@@ -356,12 +336,12 @@ export async function convertProposalToThematicProgramService(
 
   if (proposalError || !proposal) {
     throw new Error(
-      "Proposal tidak ditemukan atau belum disetujui untuk dikonversi.",
+      "Proposal not found or has not been approved for conversion.",
     );
   }
 
   if (proposal.status !== "approved") {
-    throw new Error("Proposal belum di setujui.");
+    throw new Error("Proposal has not been approved.");
   }
 
   // Fetch location name for address
@@ -372,7 +352,9 @@ export async function convertProposalToThematicProgramService(
     .single();
 
   if (locationError) {
-    throw new Error("Gagal mendapatkan data lokasi: " + locationError.message);
+    throw new Error(
+      "Failed to retrieve location data: " + locationError.message,
+    );
   }
 
   // Create new thematic program with normalized references
@@ -391,14 +373,14 @@ export async function convertProposalToThematicProgramService(
       production_value: value.production_value,
       distribution_amount: value.distribution_amount,
       sppg_partner: value.sppg_partner,
-      address: locationData?.name || "Alamat tidak diketahui",
+      address: locationData?.name || "Unknown address",
       s_curve_path: value.s_curve_path,
       fiscal_year: new Date().getFullYear(),
     });
 
   if (bioflocInsertError) {
     throw new Error(
-      `Gagal membuat program tematik: ${bioflocInsertError.message}`,
+      `Failed to create thematic program: ${bioflocInsertError.message}`,
     );
   }
 
@@ -409,12 +391,7 @@ export async function convertProposalToThematicProgramService(
 
   if (updateProposalError) {
     throw new Error(
-      `Gagal memperbarui status proposal: ${updateProposalError.message}`,
+      `Failed to update proposal status: ${updateProposalError.message}`,
     );
   }
-
-  return {
-    success: true,
-    message: `Program tematik berhasil dibuat dari proposal.`,
-  };
 }

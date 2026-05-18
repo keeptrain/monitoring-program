@@ -25,37 +25,55 @@ export async function getProposalThematicPaginated(
   const userIdFilter =
     isLoggedIn && (role === "pmo" || role === "admin") ? undefined : sub;
 
-  return db.getProposalBioflocPaginatedService(params, userIdFilter);
+  return db.getProposalThematicPaginatedService(params, userIdFilter);
 }
 
 export async function verifyProposalThematic(
   id: string,
   values: ProposalVerificationFormValues,
-) {
+): Promise<{ success: boolean; message: string }> {
   const { role, sub, programScope } = await getSession();
 
   if (role !== "pmo") {
-    throw new Error("Anda tidak memiliki akses untuk memverifikasi proposal");
+    return {
+      success: false,
+      message: "Anda tidak memiliki akses untuk memverifikasi proposal",
+    };
   }
 
   const validateStatus = proposalVerificationSchema.safeParse(values);
 
   if (!validateStatus.success) {
-    throw new Error("Status proposal tidak valid");
+    return {
+      success: false,
+      message: "Status proposal tidak valid",
+    };
   }
 
-  const programType = programScope?.includes("minapadi")
-    ? "minapadi_thematic"
-    : "biofloc_thematic";
+  const programType =
+    programScope === "biofloc" ? "biofloc_thematic" : "minapadi_thematic";
+  const thematicMetadata = THEMATIC_CONFIG[programType];
 
-  const result = await db.verifyProposalThematicService(
-    id,
-    sub,
-    validateStatus.data,
-    programType,
-  );
+  try {
+    await db.verifyProposalThematicService(
+      id,
+      sub,
+      validateStatus.data,
+      thematicMetadata,
+    );
 
-  return result;
+    return {
+      success: true,
+      message: "Verifikasi proposal berhasil disimpan",
+    };
+  } catch (error) {
+    console.error("Error verifying proposal thematic:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Gagal memverifikasi proposal",
+    };
+  }
 }
 
 export async function downloadProposalThematic(id: string) {
