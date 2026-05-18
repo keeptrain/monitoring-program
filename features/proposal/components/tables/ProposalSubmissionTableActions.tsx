@@ -1,10 +1,9 @@
+"use client";
+
 import { UserRole } from "@/features/auth/types/user";
-import { ConvertProposalButton } from "@/features/thematic/components/biofloc/ConvertProposalButton";
-import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import Link from "next/link";
+import { Check, PencilIcon, Plus, DownloadIcon, RotateCcw } from "lucide-react";
 import { ProposalBioflocThematicProgram } from "../../types/proposal-biofloc";
-import { ProposalDownloadButton } from "./ProposalDownloadButton";
+import { MoreButton, MoreButtonMenuItem } from "@/components/shared/MoreButton";
 
 export default function ProposalSubmissionTableActions({
   data,
@@ -17,51 +16,79 @@ export default function ProposalSubmissionTableActions({
   basePath: string;
   onAction?: (
     data: ProposalBioflocThematicProgram,
-    action: "verify" | "convert",
+    action: "verify" | "rollback" | "download",
   ) => void;
 }) {
   const isPmo = role === "pmo";
+  const thematicType = basePath === "biofloc-thematic" ? "biofloc" : "minapadi";
 
-  return (
-    <div className="flex items-center gap-2">
-      {/* Verifikasi hanya untuk PMO dan status pending */}
-      {data.status === "pending" && isPmo && onAction && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAction(data, "verify");
-          }}
-          title="Verifikasi"
-        >
-          <Check className="size-4" />
-          Verifikasi
-        </Button>
-      )}
+  const menuItems: MoreButtonMenuItem[] = [];
 
-      {/* Perbaikan hanya untuk Officer dan status rejected */}
-      {data.status === "rejected" && role === "officer" && (
-        <Button asChild size="sm" variant="outline">
-          <Link
-            href={`${basePath}/proposal/${data.id}/revision`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            Perbaiki
-          </Link>
-        </Button>
-      )}
+  // Verifikasi hanya untuk PMO dan status pending
+  if (data.status === "pending" && isPmo && onAction) {
+    menuItems.push({
+      type: "action",
+      key: "verify",
+      label: "Verifikasi",
+      icon: Check,
+      onClick: () => onAction(data, "verify"),
+    });
+  }
 
-      {/* Potensial (Convert) hanya untuk PMO dan status approved */}
-      {data.status === "approved" && isPmo && onAction && (
-        <ConvertProposalButton
-          proposalId={data.id}
-          proposalName={data.kdmp_entities.name}
-        />
-      )}
+  // Perbaikan hanya untuk Officer dan status rejected
+  if (data.status === "rejected" && role === "officer") {
+    menuItems.push({
+      type: "link",
+      key: "revision",
+      label: "Perbaiki",
+      icon: PencilIcon,
+      href: `${basePath}/proposal/${data.id}/revision`,
+    });
+  }
 
-      {/* Download untuk semua yang login */}
-      <ProposalDownloadButton id={data.id} />
-    </div>
-  );
+  // Potensial (Convert) hanya untuk PMO dan status approved
+  if (data.status === "approved" && isPmo) {
+    menuItems.push({
+      type: "link",
+      key: "convert",
+      label: "Potensial",
+      icon: Plus,
+      href: `/dashboard/thematic/${thematicType}/create?proposalId=${data.id}`,
+    });
+  }
+
+  // Kembalikan ke Pending (Rollback) hanya untuk PMO dan status approved/rejected
+  if (
+    (data.status === "approved" || data.status === "rejected") &&
+    isPmo &&
+    onAction
+  ) {
+    menuItems.push({
+      type: "action",
+      key: "rollback",
+      label: "Kembalikan ke Pending",
+      icon: RotateCcw,
+      onClick: () => {
+        const confirm = window.confirm(
+          `Apakah Anda yakin ingin membatalkan verifikasi untuk kelompok "${data.kdmp_entities.name}"? Status proposal ini akan dikembalikan ke pending.`,
+        );
+        if (confirm) {
+          onAction(data, "rollback");
+        }
+      },
+    });
+  }
+
+  // Download proposal (tersedia untuk semua user yang login)
+  if (onAction) {
+    menuItems.push({
+      type: "action",
+      key: "download",
+      label: "Unduh Proposal",
+      icon: DownloadIcon,
+      onClick: () => onAction(data, "download"),
+    });
+  }
+
+  return <MoreButton menuItems={menuItems} />;
 }

@@ -20,7 +20,10 @@ import { Input } from "@/components/ui/input";
 import { PaginationState } from "@tanstack/react-table";
 import { ProposalSubmissionTableColumns } from "@/features/proposal/components/tables/ProposalSubmissionTableColumns";
 import { ProposalVerificationFormValues } from "@/features/thematic/forms/proposal-verification-schema";
-import { useVerificationProposalThematic } from "@/features/thematic/api/verificationProposalThematic";
+import {
+  useVerificationProposalThematic,
+  useRollbackProposalThematic,
+} from "@/features/thematic/api/verificationProposalThematic";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { ProposalStatusSelect } from "@/features/proposal/components/ProposalStatusSelect";
 import { useRouter } from "next/navigation";
@@ -33,6 +36,7 @@ import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangleIcon, Loader2Icon } from "lucide-react";
 import { UserRole } from "@/features/auth/types/user";
+import { useDownloadProposal } from "@/features/proposal/components/tables/ProposalDownloadButton";
 
 export default function ProposalProgramPage({
   role = undefined,
@@ -65,17 +69,27 @@ export default function ProposalProgramPage({
     programType: programType,
   });
 
+  const { mutate: downloadProposal } = useDownloadProposal();
+  const { mutate: rollbackProposal } = useRollbackProposalThematic();
+
   // Action Handlers
   const handleAction = useCallback(
     (
       proposal: ProposalBioflocThematicProgram,
-      action: "verify" | "convert",
+      action: "verify" | "rollback" | "download",
     ) => {
       if (action === "verify") {
         setSelectedProposal(proposal);
+      } else if (action === "rollback") {
+        rollbackProposal(proposal.id, {
+          onSuccess: (res) => toast.success(res.message),
+          onError: (err) => toast.error(err.message),
+        });
+      } else if (action === "download") {
+        downloadProposal(proposal.id);
       }
     },
-    [setSelectedProposal],
+    [setSelectedProposal, rollbackProposal, downloadProposal],
   );
 
   const columns = useMemo(

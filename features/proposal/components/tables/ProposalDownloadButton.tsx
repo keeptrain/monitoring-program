@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-const useDownloadProposal = () => {
+export const useDownloadProposal = () => {
   return useMutation({
     mutationFn: (id: string) => downloadProposalThematic(id),
     onSuccess: (result) => {

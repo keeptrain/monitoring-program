@@ -31,12 +31,7 @@ const ActionButtons = dynamic(
   () =>
     import("@/features/proposal/components/tables/ProposalSubmissionTableActions"),
   {
-    loading: () => (
-      <div className="flex gap-2">
-        <Skeleton className="h-8 w-24" />
-        <Skeleton className="h-8 w-8" />
-      </div>
-    ),
+    loading: () => <Skeleton className="h-8 w-8" />,
   },
 );
 
@@ -45,7 +40,7 @@ export const ProposalSubmissionTableColumns = (
   role: UserRole | undefined = undefined,
   onAction?: (
     data: ProposalBioflocThematicProgram,
-    action: "verify" | "convert",
+    action: "verify" | "rollback" | "download",
   ) => void,
 ): ColumnDef<ProposalBioflocThematicProgram>[] => [
   {
@@ -88,12 +83,14 @@ export const ProposalSubmissionTableColumns = (
           }: {
             row: { original: ProposalBioflocThematicProgram };
           }) => (
-            <ActionButtons
-              data={original}
-              role={role}
-              onAction={onAction}
-              basePath={basePath}
-            />
+            <div onClick={(e) => e.stopPropagation()}>
+              <ActionButtons
+                data={original}
+                role={role}
+                onAction={onAction}
+                basePath={basePath}
+              />
+            </div>
           ),
         },
       ]
