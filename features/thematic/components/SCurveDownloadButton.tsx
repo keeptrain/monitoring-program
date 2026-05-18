@@ -1,38 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { downloadSCurveFile } from "@/features/thematic/actions/thematic-actions";
-import { useMutation } from "@tanstack/react-query";
+import { useDownloadScurve } from "@/features/thematic/api/downloadSCurve";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
-import { toast } from "sonner";
 
 export default function SCurveDownloadButton({ id }: { id: string }) {
-  const { mutate, isPending } = useMutation({
-    mutationFn: () => downloadSCurveFile(id),
-    onSuccess: (data) => {
-      if (!data || !data.blob || !data.fileName) {
-        toast.error("Gagal mendapatkan data file");
-        return;
-      }
-
-      const url = URL.createObjectURL(data.blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = data.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast.success("Berhasil mengunduh Kurva S");
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error(
-        error instanceof Error ? error.message : "Gagal mengunduh Kurva S",
-      );
-    },
-  });
+  const { mutate, isPending } = useDownloadScurve(id);
 
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
