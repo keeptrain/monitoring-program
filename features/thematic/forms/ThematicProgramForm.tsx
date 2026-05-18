@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ThematicInformationBasicFormSection from "../components/ThematicInformationBasicFormSection";
-import { Loader2 } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
+import { useIsMutating } from "@tanstack/react-query";
+import { getDocumentationsUploadMutationKey } from "@/features/documentation/hooks/useDocumentationsUpload";
 
 export default function ThematicProgramForm({
   form,
@@ -69,10 +71,30 @@ export default function ThematicProgramForm({
         </Card>
       )}
 
-      <Button type="submit" disabled={isPending} className="w-full">
-        {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
-        {isEdit ? "Simpan Perubahan" : "Simpan"}
-      </Button>
+      <SubmitButton isPending={isPending} isEdit={isEdit} />
     </form>
+  );
+}
+
+function SubmitButton({
+  isPending,
+  isEdit,
+}: {
+  isPending: boolean;
+  isEdit: boolean;
+}) {
+  const isDocumentationUploading =
+    useIsMutating({
+      mutationKey: getDocumentationsUploadMutationKey(),
+    }) > 0;
+  return (
+    <Button
+      type="submit"
+      disabled={isPending || isDocumentationUploading}
+      className="w-full"
+    >
+      {isPending && <Loader2Icon className="size-4 animate-spin" />}
+      {isEdit ? "Simpan Perubahan" : "Simpan"}
+    </Button>
   );
 }
