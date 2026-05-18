@@ -156,7 +156,6 @@ export default function ThematicProgramEditTabsClient({
           form={editForm}
           onSubmit={onEditSubmit}
           isEdit={true}
-          documentationsStorageBasePath={config.storagePath}
         />
       )}
 

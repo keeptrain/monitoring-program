@@ -174,11 +174,12 @@ export async function convertProposalToProgram(
       message: "Unauthorized: Only PMO can convert proposal to program",
     };
   }
-  try {
-    const isBiofloc = session.programScope === "biofloc";
-    const programType = isBiofloc ? "biofloc_thematic" : "minapadi_thematic";
-    const config = THEMATIC_CONFIG[programType];
 
+  const isBiofloc = session.programScope === "biofloc";
+  const programType = isBiofloc ? "biofloc_thematic" : "minapadi_thematic";
+  const config = THEMATIC_CONFIG[programType];
+
+  try {
     await db.convertProposalToThematicProgramService(
       proposalId,
       values,
@@ -212,7 +213,8 @@ export async function rollbackProposalThematic(
   if (role !== "pmo") {
     return {
       success: false,
-      message: "Anda tidak memiliki akses untuk membatalkan verifikasi proposal",
+      message:
+        "Anda tidak memiliki akses untuk membatalkan verifikasi proposal",
     };
   }
 

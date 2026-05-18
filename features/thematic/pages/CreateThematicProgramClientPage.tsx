@@ -6,20 +6,12 @@ import { ProposalBioflocDetail } from "@/features/proposal/types/proposal-bioflo
 import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
-import {
-  THEMATIC_CONFIG,
-  ThematicProgramType,
-} from "../constants/thematic-constants";
 
 export default function CreateThematicProgramClientPage({
   proposalId,
-  thematicType,
 }: {
   proposalId: string;
-  thematicType: ThematicProgramType;
 }) {
-  const config = THEMATIC_CONFIG[thematicType];
-
   const { data: result } = useGetProposalThematic(proposalId);
 
   const proposal = result?.data as ProposalBioflocDetail | undefined;
@@ -47,12 +39,5 @@ export default function CreateThematicProgramClientPage({
     true,
   );
 
-  return (
-    <ThematicProgramForm
-      form={form}
-      onSubmit={onSubmit}
-      isEdit={false}
-      documentationsStorageBasePath={config.storagePath}
-    />
-  );
+  return <ThematicProgramForm form={form} onSubmit={onSubmit} isEdit={false} />;
 }

@@ -21,7 +21,9 @@ export default function ProposalSubmissionTableActions({
 }) {
   const isPmo = role === "pmo";
   const isOfficer = role === "officer";
-  const thematicType = basePath === "biofloc-thematic" ? "biofloc" : "minapadi";
+  const thematicType = basePath.includes("biofloc-thematic")
+    ? "biofloc"
+    : "minapadi";
 
   const menuItems: MoreButtonMenuItem[] = [];
 
