@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS biofloc_thematic_programs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   entity_id BIGINT NOT NULL REFERENCES kdmp_entities(id),
   location_id BIGINT REFERENCES available_locations(id),
-  proposal_id UUID REFERENCES proposal_biofloc_thematic_programs(id),
+  proposal_id UUID UNIQUE REFERENCES proposal_biofloc_thematic_programs(id),
 
   -- Status & Tahun
   status VARCHAR(20) NOT NULL CHECK (status IN ('potential','active','inactive')),
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS biofloc_thematic_programs (
 -- Index for relationship
 CREATE INDEX idx_biofloc_programs_location ON biofloc_thematic_programs (location_id);
 CREATE INDEX idx_biofloc_programs_entity ON biofloc_thematic_programs (entity_id);
-CREATE INDEX idx_biofloc_programs_proposal ON biofloc_thematic_programs (proposal_id);
+CREATE INDEX idx_biofloc_programs_proposal_unique ON biofloc_thematic_programs (proposal_id);
 
 -- Index for searching and filtering
 CREATE INDEX idx_biofloc_programs_status ON biofloc_thematic_programs (status);
