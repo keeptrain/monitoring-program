@@ -67,7 +67,7 @@ export const useThematicProgramForm = (
       try {
         if (isEdit && initialData?.id) {
           // Update existing program
-          const { success, message } = await updateThematicProgram(
+          const { success, message, data } = await updateThematicProgram(
             initialData.id,
             values,
           );
@@ -79,11 +79,11 @@ export const useThematicProgramForm = (
             queryClient.invalidateQueries({
               queryKey: getThematicProgramQueryKey(initialData.id),
             });
-            router.push("/dashboard/thematic/biofloc");
+            router.push(data?.href || "/dashboard/thematic/biofloc");
           }
         } else if (isConvertingFromProposal && proposalId) {
           // Convert proposal to program
-          const { success, message } = await convertProposalToProgram(
+          const { success, message, data } = await convertProposalToProgram(
             proposalId,
             values,
           );
@@ -95,7 +95,7 @@ export const useThematicProgramForm = (
               queryKey: getProposalThematicQueryKey(),
             });
             toast.success(message);
-            router.push("/dashboard/thematic/biofloc");
+            router.push(data?.href || "/dashboard/thematic/biofloc");
           } else {
             console.error("Failed to convert proposal:", message);
           }

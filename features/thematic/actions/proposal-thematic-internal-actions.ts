@@ -8,7 +8,10 @@ import {
   proposalVerificationSchema,
 } from "../forms/proposal-verification-schema";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
-import { resolveThematicMetadata } from "../constants/thematic-constants";
+import {
+  resolveThematicMetadata,
+  THEMATIC_CONFIG,
+} from "../constants/thematic-constants";
 
 export async function getProposalThematicPaginated(
   params: ProposalBioflocPaginationParams,
@@ -134,14 +137,51 @@ export async function getProposalThematic(id: string) {
 export async function convertProposalToProgram(
   proposalId: string,
   values: ThematicProgramFormValues,
-): Promise<{ success: boolean; message: string }> {
+): Promise<{
+  success: boolean;
+  message: string;
+  data?: { href: string };
+}> {
+  const session = await getSession();
+  if (!session.isLoggedIn) {
+    return {
+      success: false,
+      message: "Unauthorized: User must be logged in",
+    };
+  }
+
+  if (session.role !== "pmo") {
+    return {
+      success: false,
+      message: "Unauthorized: Only PMO can convert proposal to program",
+    };
+  }
   try {
-    await db.convertProposalToThematicProgramService(proposalId, values);
+    const isBiofloc = session.programScope === "biofloc";
+    const programType = isBiofloc ? "biofloc_thematic" : "minapadi_thematic";
+    const config = THEMATIC_CONFIG[programType];
+
+    await db.convertProposalToThematicProgramService(
+      proposalId,
+      values,
+      config,
+    );
+
     return {
       success: true,
-      message: "Proposal berhasil diubah menjadi program",
+      message: "Proposal berhasil dikonversi menjadi potensi",
+      data: {
+        href: `/dashboard/thematic/${session.programScope}/proposals`,
+      },
     };
   } catch (error) {
-    return { success: false, message: "Error convert proposal: " + error };
+    console.error("Error converting proposal to program:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to convert proposal to program",
+    };
   }
 }

@@ -11,6 +11,7 @@ import {
 import { ProposalVerificationFormValues } from "../forms/proposal-verification-schema";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
 import { uuidv7 } from "uuidv7";
+import { ThematicMetadata } from "../constants/thematic-constants";
 
 function normalizeProvinceName(province: string): string {
   return province.trim().toLowerCase();
@@ -229,9 +230,12 @@ export async function verifyProposalThematicService(
   };
 }
 
-export async function getProposalThematicFileService(id: string, targetTable: string) {
+export async function getProposalThematicFileService(
+  id: string,
+  targetTable: string,
+) {
   const supabase = await createClient();
-  
+
   const { data: proposal, error: proposalError } = await supabase
     .from(targetTable)
     .select("proposal_path")
@@ -239,7 +243,9 @@ export async function getProposalThematicFileService(id: string, targetTable: st
     .single();
 
   if (proposalError) {
-    throw new Error(`Failed to retrieve proposal record: ${proposalError.message}`);
+    throw new Error(
+      `Failed to retrieve proposal record: ${proposalError.message}`,
+    );
   }
 
   if (!proposal?.proposal_path) {
@@ -251,11 +257,15 @@ export async function getProposalThematicFileService(id: string, targetTable: st
     .download(proposal.proposal_path);
 
   if (downloadError) {
-    throw new Error(`Failed to download the document from storage: ${downloadError.message}`);
+    throw new Error(
+      `Failed to download the document from storage: ${downloadError.message}`,
+    );
   }
 
   if (!blob || blob.size === 0) {
-    throw new Error("The downloaded document appears to be empty or corrupted.");
+    throw new Error(
+      "The downloaded document appears to be empty or corrupted.",
+    );
   }
 
   return { blob, originalPath: proposal.proposal_path };
@@ -333,12 +343,13 @@ export async function getProposalThematicService(
 export async function convertProposalToThematicProgramService(
   proposalId: string,
   value: ThematicProgramFormValues,
+  thematicConfig: ThematicMetadata,
 ): Promise<{ success: boolean; message: string }> {
   const supabase = await createClient();
 
   // Get the approved proposal with relationship IDs
   const { data: proposal, error: proposalError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(thematicConfig.proposalTable)
     .select("id, entity_id, location_id, status")
     .eq("id", proposalId)
     .single();
@@ -366,7 +377,7 @@ export async function convertProposalToThematicProgramService(
 
   // Create new thematic program with normalized references
   const { error: bioflocInsertError } = await supabase
-    .from(TABLES.BIOFLOC_THEMATIC_PROGRAMS)
+    .from(thematicConfig.programTable)
     .insert({
       id: uuidv7(),
       proposal_id: proposalId,
@@ -392,7 +403,7 @@ export async function convertProposalToThematicProgramService(
   }
 
   const { error: updateProposalError } = await supabase
-    .from(TABLES.PROPOSAL_BIOFLOC_THEMATIC_PROGRAMS)
+    .from(thematicConfig.proposalTable)
     .update({ status: "converted" })
     .eq("id", proposalId);
 
