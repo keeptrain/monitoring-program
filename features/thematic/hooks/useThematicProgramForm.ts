@@ -7,15 +7,10 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ThematicProgramDetail } from "../types/thematic";
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
-import { updateThematicProgram } from "../actions/thematic-actions";
-import { convertProposalToProgram } from "../actions/proposal-thematic-internal-actions";
-import { getThematicProgramsPaginatedQueryKey } from "../api/getBioflocProgramsPaginated";
-import { getThematicProgramQueryKey } from "../api/getThematicProgram";
 import { toast } from "sonner";
-import { getProposalThematicQueryKey } from "../api/getProposalThematicPaginated";
+import { useConvertProposalToPotential } from "@/features/proposal/api/convertProposalToPotential";
+import { useUpdateThematicProgram } from "../api/updateThematicProgram";
 
 const getDefaultValues = (
   initialData: Partial<ThematicProgramDetail> | undefined,
@@ -40,9 +35,6 @@ export const useThematicProgramForm = (
   isConvertingFromProposal?: boolean,
 ) => {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const [isPending, startTransition] = useTransition();
-
   const isEdit = !!initialData?.id;
 
   const form = useForm<
@@ -55,6 +47,7 @@ export const useThematicProgramForm = (
   });
 
   const initialDataRef = useRef(initialData);
+
   useEffect(() => {
     if (initialData && initialData !== initialDataRef.current) {
       form.reset(getDefaultValues(initialData));
@@ -62,49 +55,45 @@ export const useThematicProgramForm = (
     }
   }, [initialData, form]);
 
+  const {
+    mutateAsync: convertProposalToPotential,
+    isPending: isPendingConvert,
+  } = useConvertProposalToPotential();
+
+  const { mutateAsync: updateThematicProgram, isPending: isPendingUpdate } =
+    useUpdateThematicProgram();
+
   const onSubmit = (values: ThematicProgramFormValues) => {
-    startTransition(async () => {
-      try {
-        if (isEdit && initialData?.id) {
-          // Update existing program
-          const { success, message, data } = await updateThematicProgram(
-            initialData.id,
-            values,
-          );
-          if (success) {
-            toast.success(message);
-            queryClient.invalidateQueries({
-              queryKey: getThematicProgramsPaginatedQueryKey(),
-            });
-            queryClient.invalidateQueries({
-              queryKey: getThematicProgramQueryKey(initialData.id),
-            });
-            router.push(data?.href || "/dashboard/thematic/biofloc");
-          }
-        } else if (isConvertingFromProposal && proposalId) {
-          // Convert proposal to program
-          const { success, message, data } = await convertProposalToProgram(
-            proposalId,
-            values,
-          );
-          if (success) {
-            queryClient.removeQueries({
-              queryKey: getThematicProgramsPaginatedQueryKey(),
-            });
-            queryClient.invalidateQueries({
-              queryKey: getProposalThematicQueryKey(),
-            });
-            toast.success(message);
-            router.push(data?.href || "/dashboard/thematic/biofloc");
-          } else {
-            console.error("Failed to convert proposal:", message);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to submit form:", error);
-      }
-    });
+    if (isConvertingFromProposal && proposalId) {
+      convertProposalToPotential(
+        { id: proposalId, values },
+        {
+          onSuccess: (data) => {
+            toast.success("Proposal berhasil dikonversi menjadi program");
+            if (data.success && data.data?.href) {
+              router.push(data.data.href);
+            }
+          },
+          onError: () => toast.error("Gagal mengkonversi proposal"),
+        },
+      );
+    } else if (isEdit) {
+      updateThematicProgram(
+        { id: initialData?.id, values },
+        {
+          onSuccess: () => {
+            toast.success("Program berhasil diperbarui");
+            router.back();
+          },
+          onError: () => toast.error("Gagal memperbarui program"),
+        },
+      );
+    }
   };
 
-  return { form, onSubmit: form.handleSubmit(onSubmit), isPending };
+  return {
+    form,
+    onSubmit: form.handleSubmit(onSubmit),
+    isPending: isPendingConvert || isPendingUpdate,
+  };
 };

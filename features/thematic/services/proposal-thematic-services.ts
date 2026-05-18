@@ -334,14 +334,29 @@ export async function convertProposalToThematicProgramService(
     .eq("id", proposalId)
     .single();
 
-  if (proposalError || !proposal) {
+  if (proposalError) {
+    console.error(
+      "Database error fetching proposal for convertProposalToThematicProgramService:",
+      proposalError,
+    );
+
     throw new Error(
-      "Proposal not found or has not been approved for conversion.",
+      `Failed to fetch proposal: ${proposalError.message || "A system error occurred."}`,
     );
   }
 
+  if (!proposal) {
+    throw new Error("Proposal not found");
+  }
+
+  if (proposal.status === "converted") {
+    throw new Error("Proposal has been converted");
+  }
+
   if (proposal.status !== "approved") {
-    throw new Error("Proposal has not been approved.");
+    throw new Error(
+      `Proposal status is "${proposal.status}". Only approved proposals can be converted.`,
+    );
   }
 
   // Fetch location name for address
@@ -352,6 +367,10 @@ export async function convertProposalToThematicProgramService(
     .single();
 
   if (locationError) {
+    console.error(
+      "Database error fetching location for convertProposalToThematicProgramService:",
+      locationError,
+    );
     throw new Error(
       "Failed to retrieve location data: " + locationError.message,
     );
@@ -379,6 +398,7 @@ export async function convertProposalToThematicProgramService(
     });
 
   if (bioflocInsertError) {
+    console.error("Error creating thematic program:", bioflocInsertError);
     throw new Error(
       `Failed to create thematic program: ${bioflocInsertError.message}`,
     );
@@ -390,8 +410,9 @@ export async function convertProposalToThematicProgramService(
     .eq("id", proposalId);
 
   if (updateProposalError) {
+    console.error("Error updating proposal status:", updateProposalError);
     throw new Error(
-      `Failed to update proposal status: ${updateProposalError.message}`,
+      `Program created but failed to update proposal status: ${updateProposalError.message}`,
     );
   }
 }

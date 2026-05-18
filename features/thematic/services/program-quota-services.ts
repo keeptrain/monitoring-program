@@ -1,6 +1,6 @@
 import { TABLES } from "@/lib/constants/tables";
 import { createClient } from "@/utils/supabase";
-import { getProposalBioflocProvinceSummary } from "./proposal-biofloc-services";
+import { getProposalBioflocProvinceSummary } from "./proposal-thematic-services";
 
 export type ProgramQuotaRow = {
   id: number;

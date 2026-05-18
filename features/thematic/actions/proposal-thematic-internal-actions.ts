@@ -1,6 +1,6 @@
 "use server";
 
-import * as db from "../services/proposal-biofloc-services";
+import * as db from "../services/proposal-thematic-services";
 import { ProposalBioflocPaginationParams } from "@/features/proposal/types/proposal-biofloc";
 import { getSession } from "@/features/auth/session";
 import {
