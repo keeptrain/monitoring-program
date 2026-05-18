@@ -3,7 +3,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError } from "@/components/ui/field";
-import { Loader2, FileIcon, X } from "lucide-react";
+import { FileIcon, X, Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { SCurveFormInput, SCurveFormValue } from "./forms/scurve-schema";
 import useDocumentationsUpload from "./hooks/useDocumentationsUpload";
@@ -54,24 +54,25 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
   return (
     <div className="space-y-4">
       <Field>
-        <div className="relative">
+        <div>
           {!currentPath ? (
             <div className="relative flex items-center">
               <Input
                 type="file"
-                accept=".pdf,.xls,.xlsx,image/*"
+                accept=".pdf,.xls,.xlsx"
+                className="pr-10"
                 aria-invalid={!!errors.s_curve_path}
                 onChange={handleOnChange}
                 disabled={uploading}
               />
               {uploading && (
-                <div className="absolute top-1/2 left-[45%] -translate-y-1/2">
-                  <Loader2 className="text-muted-foreground size-4 animate-spin" />
+                <div className="absolute top-1/2 right-3 -translate-y-1/2">
+                  <Loader2Icon className="text-muted-foreground size-4 animate-spin" />
                 </div>
               )}
             </div>
           ) : (
-            <div className="border-border flex items-center justify-between border bg-zinc-50/50 px-3 text-sm">
+            <div className="border-border flex h-8 items-center justify-between border bg-zinc-50/50 px-3 text-sm">
               <div className="flex items-center gap-2 overflow-hidden">
                 <FileIcon className="size-4 shrink-0 text-zinc-400" />
                 <span className="truncate font-medium text-zinc-700">
@@ -83,7 +84,7 @@ export default function SCurveFormSection({ form }: { form: unknown }) {
                 variant="ghost"
                 size="icon-sm"
                 onClick={handleRemove}
-                className="hover:text-destructive size-7"
+                className="hover:text-destructive size-7 shrink-0"
               >
                 <X className="size-3.5" />
               </Button>

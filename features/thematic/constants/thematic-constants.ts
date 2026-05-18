@@ -8,6 +8,7 @@ export interface ThematicMetadata {
   programTable: string;
   docType: string;
   basePath: string;
+  storagePath: string;
   label: string;
   groupLabel: string;
   legendLabel: string;
@@ -24,6 +25,7 @@ export const THEMATIC_CONFIG: Record<ThematicProgramType, ThematicMetadata> = {
     programTable: TABLES.BIOFLOC_THEMATIC_PROGRAMS,
     docType: "proposal_biofloc_thematic",
     basePath: "/biofloc-thematic",
+    storagePath: "/documentations/biofloc-thematic",
     label: "Bioflok",
     groupLabel: "Nama KDMP",
     legendLabel: "KDMP",
@@ -35,6 +37,7 @@ export const THEMATIC_CONFIG: Record<ThematicProgramType, ThematicMetadata> = {
     programTable: TABLES.MINAPADI_THEMATIC_PROGRAMS,
     docType: "proposal_minapadi_thematic",
     basePath: "/minapadi-thematic",
+    storagePath: "/documentations/minapadi-thematic",
     label: "Minapadi",
     groupLabel: "Nama Pokdaka",
     legendLabel: "POKDAKA",

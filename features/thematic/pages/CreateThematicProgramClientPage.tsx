@@ -7,12 +7,20 @@ import { Loader2 } from "lucide-react";
 import ThematicProgramForm from "../forms/ThematicProgramForm";
 import { useThematicProgramForm } from "../hooks/useThematicProgramForm";
 import { ThematicProgramFormValues } from "../forms/thematic-program-schema";
+import {
+  THEMATIC_CONFIG,
+  ThematicProgramType,
+} from "../constants/thematic-constants";
 
 export default function CreateThematicProgramClientPage({
   proposalId,
+  thematicType,
 }: {
   proposalId: string;
+  thematicType: ThematicProgramType;
 }) {
+  const config = THEMATIC_CONFIG[thematicType];
+
   const { data: result, isLoading } = useGetProposalThematic(proposalId);
 
   const proposal = result?.data as ProposalBioflocDetail | undefined;
@@ -54,6 +62,7 @@ export default function CreateThematicProgramClientPage({
       onSubmit={onSubmit}
       isPending={isPending}
       isEdit={false}
+      documentationsStorageBasePath={config.storagePath}
     />
   );
 }

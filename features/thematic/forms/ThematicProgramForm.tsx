@@ -18,11 +18,13 @@ export default function ThematicProgramForm({
   onSubmit,
   isPending,
   isEdit,
+  documentationsStorageBasePath,
 }: {
   form: any;
   onSubmit: any;
   isPending: boolean;
   isEdit: boolean;
+  documentationsStorageBasePath: string;
 }) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -61,7 +63,7 @@ export default function ThematicProgramForm({
             <DocumentationsFormSection
               mode="create"
               form={form}
-              storageBasePath="documentations/biofloc-thematic"
+              storageBasePath={documentationsStorageBasePath}
             />
           </CardContent>
         </Card>

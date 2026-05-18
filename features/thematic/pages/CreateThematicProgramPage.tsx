@@ -56,7 +56,12 @@ export default async function CreateThematicProgramPage({
         </AlertDescription>
       </Alert>
       <HydrationBoundary state={dehydratedState}>
-        <CreateThematicProgramClientPage proposalId={proposalId} />
+        <CreateThematicProgramClientPage
+          proposalId={proposalId}
+          thematicType={
+            type === "biofloc" ? "biofloc_thematic" : "minapadi_thematic"
+          }
+        />
       </HydrationBoundary>
     </div>
   );
