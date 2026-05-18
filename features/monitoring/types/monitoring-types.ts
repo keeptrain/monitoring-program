@@ -77,6 +77,7 @@ export type MonitoringRevitalization = {
 export type ThematicProgram = {
   id: string;
   location_id: number;
+  proposal_id: string | null;
   progress_percent: number;
   commodity_aid: string;
   commodity_potential: string | null;

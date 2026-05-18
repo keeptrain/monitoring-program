@@ -15,9 +15,10 @@ export async function getMonitoringLocationsByType(
     ? `${programTableName}!inner(id, status, progress_percent)`
     : `${programTableName}(id, status, progress_percent)`;
 
-  const regencyJoin = (status === "potential" && type === "biofloc_thematic")
-    ? "ref_regencies (name),"
-    : "";
+  const regencyJoin =
+    status === "potential" && type === "biofloc_thematic"
+      ? "ref_regencies (name),"
+      : "";
 
   let query = supabase
     .from(TABLES.AVAILABLE_LOCATIONS)
@@ -114,6 +115,7 @@ export async function getMonitoringLocationDetailService(
       `
       id,
       location_id,
+      proposal_id,
       progress_percent,
       commodity_aid,
       commodity_potential,

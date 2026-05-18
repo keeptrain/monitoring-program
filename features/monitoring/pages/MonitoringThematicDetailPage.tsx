@@ -20,6 +20,10 @@ import { DetailItem } from "@/components/shared/DetailItem";
 import { Separator } from "@/components/ui/separator";
 import { DocumentationGroupGallery } from "@/features/monitoring/components/DocumentationGroupGallery";
 import SCurveDownloadButton from "@/features/thematic/components/SCurveDownloadButton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { THEMATIC_CONFIG } from "@/features/thematic/constants/thematic-constants";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function MonitoringThematicDetailPage({
   params,
@@ -52,6 +56,8 @@ async function MonitoringThematicDetailContent({
     return notFound();
   }
 
+  const config = THEMATIC_CONFIG[type];
+
   const data = result.data;
   const location = data.available_locations;
   const entity = data.kdmp_entities;
@@ -76,6 +82,23 @@ async function MonitoringThematicDetailContent({
           </div>
         </div>
       </div>
+      {data.proposal_id && (
+        <Alert>
+          <InfoIcon />
+          <AlertTitle>Informasi {config.legendLabel}</AlertTitle>
+          <AlertDescription>
+            Program ini lewat melalui proposal, silahkan lihat detailnya{" "}
+            <Button variant="link" className="h-fit p-0" asChild>
+              <Link
+                href={`${config.basePath}/proposal/${data.proposal_id}/detail`}
+              >
+                di sini
+              </Link>
+            </Button>
+            .
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
