@@ -20,6 +20,7 @@ export default function ProposalSubmissionTableActions({
   ) => void;
 }) {
   const isPmo = role === "pmo";
+  const isOfficer = role === "officer";
   const thematicType = basePath === "biofloc-thematic" ? "biofloc" : "minapadi";
 
   const menuItems: MoreButtonMenuItem[] = [];
@@ -35,8 +36,8 @@ export default function ProposalSubmissionTableActions({
     });
   }
 
-  // Perbaikan hanya untuk Officer dan status rejected
-  if (data.status === "rejected" && role === "officer") {
+  // Perbaikan hanya untuk Officer dan status rejected atau revision
+  if ((data.status === "rejected" || data.status === "revision") && isOfficer) {
     menuItems.push({
       type: "link",
       key: "revision",
@@ -79,7 +80,6 @@ export default function ProposalSubmissionTableActions({
     });
   }
 
-  // Download proposal (tersedia untuk semua user yang login)
   if (onAction) {
     menuItems.push({
       type: "action",

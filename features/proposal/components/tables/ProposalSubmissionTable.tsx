@@ -1,7 +1,8 @@
 "use client";
 
 import Datatable from "@/components/datatable/datatable";
-import { useMemo, useState } from "react";
+import { useDownloadProposal } from "./ProposalDownloadButton";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProvinceSelect from "@/components/shared/ProvinceSelect";
 import { useGetProposalThematicPaginated } from "@/features/thematic/api/getProposalThematicPaginated";
@@ -45,14 +46,28 @@ export default function ProposalSubmissionTable({
     enabled,
   );
 
+  const { mutate: downloadProposal } = useDownloadProposal();
+
+  const handleAction = useCallback(
+    (
+      proposal: ProposalBioflocThematicProgram,
+      action: "verify" | "rollback" | "download",
+    ) => {
+      if (action === "download") {
+        downloadProposal(proposal.id);
+      }
+    },
+    [downloadProposal],
+  );
+
   const basePath =
     programType === "minapadi_thematic"
       ? "/minapadi-thematic"
       : "/biofloc-thematic";
 
   const columns = useMemo(
-    () => ProposalSubmissionTableColumns(basePath, role),
-    [basePath, role],
+    () => ProposalSubmissionTableColumns(basePath, role, handleAction),
+    [basePath, role, handleAction],
   );
 
   return (
