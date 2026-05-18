@@ -203,3 +203,38 @@ export async function convertProposalToProgram(
     };
   }
 }
+
+export async function rollbackProposalThematic(
+  id: string,
+): Promise<{ success: boolean; message: string }> {
+  const { role, programScope } = await getSession();
+
+  if (role !== "pmo") {
+    return {
+      success: false,
+      message: "Anda tidak memiliki akses untuk membatalkan verifikasi proposal",
+    };
+  }
+
+  const programType =
+    programScope === "biofloc" ? "biofloc_thematic" : "minapadi_thematic";
+  const thematicMetadata = THEMATIC_CONFIG[programType];
+
+  try {
+    await db.rollbackProposalThematicService(id, thematicMetadata);
+
+    return {
+      success: true,
+      message: "Status proposal berhasil dikembalikan ke pending",
+    };
+  } catch (error) {
+    console.error("Error rolling back proposal thematic:", error);
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Gagal mengembalikan status proposal",
+    };
+  }
+}

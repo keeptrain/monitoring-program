@@ -395,3 +395,25 @@ export async function convertProposalToThematicProgramService(
     );
   }
 }
+
+export async function rollbackProposalThematicService(
+  id: string,
+  thematicMetadata: ThematicMetadata,
+): Promise<void> {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from(thematicMetadata.proposalTable)
+    .update({
+      status: "pending",
+      rejection_reason: null,
+      reviewed_by: null,
+      reviewed_at: null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error rolling back proposal status:", error);
+    throw new Error(error.message);
+  }
+}
