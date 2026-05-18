@@ -18,6 +18,8 @@ import {
 } from "../api/proposal-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { getProposalThematicQueryKey } from "@/features/thematic/api/getProposalThematicPaginated";
 
 const CREATE_DEFAULT_VALUES: DefaultValues<ProposalDetailFormInput> = {
   has_letter_of_land_preparation_and_use: undefined,
@@ -35,6 +37,7 @@ export const useProposalDetailForm = (
   basePath: string,
 ) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [step, setStep] = useQueryState(
     "step",
     parseAsInteger.withDefault(3).withOptions({
@@ -129,6 +132,9 @@ export const useProposalDetailForm = (
         setStep(result.step!); // Kembali ke step yang error
       } else {
         toast.success(result.message);
+        queryClient.invalidateQueries({
+          queryKey: getProposalThematicQueryKey(),
+        });
         clearDraft();
         router.push(basePath);
       }
