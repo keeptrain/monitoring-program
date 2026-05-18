@@ -41,7 +41,7 @@ export default function CreateThematicProgramClientPage({
     [proposal],
   );
 
-  const { form, onSubmit, isPending } = useThematicProgramForm(
+  const { form, onSubmit } = useThematicProgramForm(
     initialData,
     proposalId,
     true,
@@ -51,7 +51,6 @@ export default function CreateThematicProgramClientPage({
     <ThematicProgramForm
       form={form}
       onSubmit={onSubmit}
-      isPending={isPending}
       isEdit={false}
       documentationsStorageBasePath={config.storagePath}
     />

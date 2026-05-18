@@ -4,10 +4,15 @@ import { getProposalThematicQueryKey } from "@/features/thematic/api/getProposal
 import { ThematicProgramFormValues } from "@/features/thematic/forms/thematic-program-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+export const getConvertProposalToPotentialMutationKey = () => [
+  "convert-proposal-to-potential",
+];
+
 export const useConvertProposalToPotential = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: getConvertProposalToPotentialMutationKey(),
     mutationFn: ({
       id,
       values,

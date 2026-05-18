@@ -4,10 +4,15 @@ import { updateThematicProgram } from "../actions/thematic-actions";
 import { getThematicProgramQueryKey } from "./getThematicProgram";
 import { getThematicProgramsPaginatedQueryKey } from "./getBioflocProgramsPaginated";
 
+export const getUpdateThematicProgramMutationKey = () => [
+  "update-thematic-program",
+];
+
 export const useUpdateThematicProgram = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: getUpdateThematicProgramMutationKey(),
     mutationFn: ({
       id,
       values,

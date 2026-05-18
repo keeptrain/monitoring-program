@@ -14,17 +14,17 @@ import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 import DocumentationsFormSection from "@/features/documentation/DocumentationsFormSection";
 import { useIsMutating } from "@tanstack/react-query";
 import { getDocumentationsUploadMutationKey } from "@/features/documentation/hooks/useDocumentationsUpload";
+import { getConvertProposalToPotentialMutationKey } from "@/features/proposal/api/convertProposalToPotential";
+import { getUpdateThematicProgramMutationKey } from "@/features/thematic/api/updateThematicProgram";
 
 export default function ThematicProgramForm({
   form,
   onSubmit,
-  isPending,
   isEdit,
   documentationsStorageBasePath,
 }: {
   form: any;
   onSubmit: any;
-  isPending: boolean;
   isEdit: boolean;
   documentationsStorageBasePath: string;
 }) {
@@ -71,22 +71,27 @@ export default function ThematicProgramForm({
         </Card>
       )}
 
-      <SubmitButton isPending={isPending} isEdit={isEdit} />
+      <SubmitButton isEdit={isEdit} />
     </form>
   );
 }
 
-function SubmitButton({
-  isPending,
-  isEdit,
-}: {
-  isPending: boolean;
-  isEdit: boolean;
-}) {
+function SubmitButton({ isEdit }: { isEdit: boolean }) {
+  const isConverting =
+    useIsMutating({
+      mutationKey: getConvertProposalToPotentialMutationKey(),
+    }) > 0;
+  const isUpdating =
+    useIsMutating({
+      mutationKey: getUpdateThematicProgramMutationKey(),
+    }) > 0;
+  const isPending = isConverting || isUpdating;
+
   const isDocumentationUploading =
     useIsMutating({
       mutationKey: getDocumentationsUploadMutationKey(),
     }) > 0;
+
   return (
     <Button
       type="submit"

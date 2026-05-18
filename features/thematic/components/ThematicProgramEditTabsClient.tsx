@@ -44,11 +44,8 @@ export default function ThematicProgramEditTabsClient({
 
   const { data: program, isLoading } = useGetThematicProgram(id);
 
-  const {
-    form: editForm,
-    onSubmit: onEditSubmit,
-    isPending: isEditPending,
-  } = useThematicProgramForm(program);
+  const { form: editForm, onSubmit: onEditSubmit } =
+    useThematicProgramForm(program);
 
   const identityData = useMemo<ProposalIdentityFormValues>(
     () =>
@@ -158,7 +155,6 @@ export default function ThematicProgramEditTabsClient({
         <ThematicProgramForm
           form={editForm}
           onSubmit={onEditSubmit}
-          isPending={isEditPending}
           isEdit={true}
           documentationsStorageBasePath={config.storagePath}
         />
