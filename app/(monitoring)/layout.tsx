@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import MonitoringNavbar from "@/components/navbar/MonitoringNavbar";
 
 export default function MonitoringLayout({
   children,
@@ -7,7 +7,7 @@ export default function MonitoringLayout({
 }) {
   return (
     <>
-      <Navbar />
+      <MonitoringNavbar />
       {children}
     </>
   );

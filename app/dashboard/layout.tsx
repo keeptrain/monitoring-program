@@ -1,4 +1,4 @@
-import DashboardNavbar from "@/components/DashboardNavbar";
+import DashboardNavbar from "@/components/navbar/DashboardNavbar";
 import { getSessionCached } from "@/features/auth/session";
 import { redirect } from "next/navigation";
 

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { UserDropdown } from "./UserDropdown";
+import { UserDropdown } from "../UserDropdown";
 import { cookies } from "next/headers";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { LogInIcon } from "lucide-react";
 
 export default async function Navbar() {
