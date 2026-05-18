@@ -1,4 +1,4 @@
-import { MenuDashboardTriggerClient } from "@/components/MenuDashboardTriggerClient";
+import { DropdownMonitoringMenu } from "@/components/dropdown/DropdownMonitoringMenu";
 import PublicPageHeader from "@/components/PublicPageHeader";
 import { Button } from "@/components/ui/button";
 import { getSessionCached } from "@/features/auth/session";
@@ -18,7 +18,7 @@ export default async function PublicLayout({
     <div className="grid min-h-screen grid-rows-[auto_auto_1fr]">
       <PublicPageHeader label="Monitoring" title="Dashboard Program Prioritas" >
         {!isLoggedIn ? (
-          <MenuDashboardTriggerClient
+          <DropdownMonitoringMenu
             isAuthenticated={isLoggedIn}
             userRole={userRole}
           />

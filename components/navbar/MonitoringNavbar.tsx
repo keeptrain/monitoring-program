@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { UserDropdown } from "../UserDropdown";
+import { DropdownUser } from "../dropdown/DropdownUser";
 import { cookies } from "next/headers";
 import { Button } from "../ui/button";
 import { LogInIcon } from "lucide-react";
@@ -34,7 +34,7 @@ export default async function Navbar() {
 
         {/* Right actions */}
         {isAuthenticated ? (
-          <UserDropdown />
+          <DropdownUser />
         ) : (
           <Button size="sm" asChild>
             <Link href="/login">

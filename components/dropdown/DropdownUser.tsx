@@ -15,7 +15,7 @@ import { useQueryState } from "nuqs";
 import { usePathname, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function UserDropdown() {
+export function DropdownUser() {
   const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();

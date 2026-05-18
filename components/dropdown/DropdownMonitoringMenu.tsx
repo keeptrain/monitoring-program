@@ -13,7 +13,7 @@ import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export const MenuDashboardTriggerClient = ({
+export const DropdownMonitoringMenu = ({
   isAuthenticated,
   userRole,
 }: {

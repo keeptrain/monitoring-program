@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { UserDropdown } from "../UserDropdown";
+import { DropdownUser } from "../dropdown/DropdownUser";
 
 export default async function DashboardNavbar({
   homeHref,
@@ -37,7 +37,7 @@ export default async function DashboardNavbar({
             <div className="size-10 animate-pulse rounded-full bg-white/10" />
           }
         >
-          <UserDropdown />
+          <DropdownUser />
         </Suspense>
       </nav>
     </header>
