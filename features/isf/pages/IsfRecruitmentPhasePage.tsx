@@ -1,10 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ImageIcon, Loader2, MapIcon, UploadIcon, X } from "lucide-react";
-import { STEP_COLORS } from "./constants/isf-step";
-import { IsfStepSummary } from "./types/isf";
-import ProgramAreaItemCard from "@/components/shared/ProgramAreaItemCard";
 import { useState, useTransition } from "react";
 import {
   Sheet,
@@ -13,9 +8,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import useDocumentationsUpload from "@/features/documentation/hooks/useDocumentationsUpload";
+import { ImageIcon, Loader2, UploadIcon, X } from "lucide-react";
 import Image from "next/image";
+import useDocumentationsUpload from "@/features/documentation/hooks/useDocumentationsUpload";
+import { upsertIsfRecruitmentDocumentations } from "../actions/isf-recruitment-actions";
 
 const RECRUITMENT_PHASES = [
   {
@@ -28,73 +26,7 @@ const RECRUITMENT_PHASES = [
   { id: 4, title: "Penempatan", description: "Tenaga Kerja Siap Ditempatkan" },
 ];
 
-type Tab = "zona" | "recruitment";
-
-export default function IsfProgramPage({ data }: { data: IsfStepSummary[] }) {
-  const [activeTab, setActiveTab] = useState<Tab>("zona");
-
-  return (
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
-        <div>
-          <p className="text-muted-foreground mb-1 text-xs font-medium tracking-widest uppercase">
-            Dashboard / Isf
-          </p>
-          <h1 className="text-foreground text-2xl font-semibold tracking-tight">
-            Program ISF
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Monitoring Integrated Shrimp Farming (ISF).
-          </p>
-        </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="mb-6 flex gap-2">
-        <Button
-          variant={activeTab === "zona" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setActiveTab("zona")}
-          className="gap-2"
-        >
-          <MapIcon className="size-4" />
-          Update Progress per Zona
-        </Button>
-        <Button
-          variant={activeTab === "recruitment" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setActiveTab("recruitment")}
-          className="gap-2"
-        >
-          <ImageIcon className="size-4" />
-          Update Recruitment
-        </Button>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "zona" ? (
-        <div className="grid gap-4">
-          {data.map((program) => (
-            <ProgramAreaItemCard
-              key={program.step_id}
-              href={`/dashboard/isf/${program.step_id}`}
-              badgeLabel="Zona"
-              badgeNumber={program.step_id}
-              badgeColorClass={STEP_COLORS[program.step_id] || "bg-primary"}
-              title={program.name}
-              lastUpdatedAt={program.updated_at}
-              progressPercent={program.progress_percent}
-            />
-          ))}
-        </div>
-      ) : (
-        <RecruitmentPhaseList />
-      )}
-    </div>
-  );
-}
-
-function RecruitmentPhaseList() {
+export default function IsfRecruitmentPhasePage() {
   const [selectedPhase, setSelectedPhase] = useState<
     (typeof RECRUITMENT_PHASES)[0] | null
   >(null);
@@ -235,21 +167,17 @@ function RecruitmentUploadForm({
 
     startTransition(async () => {
       try {
-        // Save to database
-        const response = await fetch("/api/recruitment-documentations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phase: phase.id,
-            images: uploadedImages.map((img) => ({
-              file_path: img.path,
-              file_name: img.file_name,
-            })),
-          }),
-        });
+        // Save to database using Server Action directly
+        const result = await upsertIsfRecruitmentDocumentations(
+          phase.id,
+          uploadedImages.map((img) => ({
+            file_path: img.path,
+            file_name: img.file_name,
+          })),
+        );
 
-        if (!response.ok) {
-          throw new Error("Gagal menyimpan dokumentasi.");
+        if (!result.success) {
+          throw new Error(result.error || "Gagal menyimpan dokumentasi.");
         }
 
         onSuccess();

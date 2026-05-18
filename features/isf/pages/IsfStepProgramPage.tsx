@@ -7,10 +7,10 @@ import Datatable from "@/components/datatable/datatable";
 import {
   IsfReport,
   IsfStepProgramTableColumns,
-} from "./components/IsfStepProgramTableColumns";
-import { STEPS } from "./constants/isf-step";
+} from "../components/IsfStepProgramTableColumns";
+import { STEPS } from "../constants/isf-step";
 import { useRouter } from "next/navigation";
-import { IsfReportDateWindow } from "./utils/report-date-window";
+import { IsfReportDateWindow } from "../utils/report-date-window";
 import ManageDocumentationsSheet from "@/features/documentation/components/ManageDocumentationsSheet";
 import { deleteIsfProgramLog } from "@/features/isf/actions/isf-program-logs";
 import {

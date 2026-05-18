@@ -8,6 +8,7 @@ export const TABLES = {
   PROPOSAL_MINAPADI_THEMATIC_PROGRAMS: "proposal_minapadi_thematic_programs",
   PROGRAM_QUOTAS: "program_quotas",
   LOGS: "monitoring_logs",
+  ISF_RECRUITMENT_DOCUMENTATIONS: "isf_recruitment_documentations",
   REVITALIZATION_LOGS: "revitalization_program_logs",
   DOCUMENTATIONS: "documentations",
   KDMP_ENTITIES: "kdmp_entities",

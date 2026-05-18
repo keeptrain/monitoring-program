@@ -1,4 +1,4 @@
-import IsfStepProgramPage from "@/features/isf/IsfStepProgramPage";
+import IsfStepProgramPage from "@/features/isf/pages/IsfStepProgramPage";
 import { getIsfProgramLogsByStep } from "@/features/isf/actions/isf-program-logs";
 import { notFound } from "next/navigation";
 
