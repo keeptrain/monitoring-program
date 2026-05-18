@@ -67,7 +67,7 @@ const BASE_COLUMNS: ColumnDef<BioflocProgramListItem>[] = [
   },
 ];
 
-export const BioflocProgramsPublicTableColumns =
+export const ThematicProgramsTableColumnsPublic =
   (): ColumnDef<BioflocProgramListItem>[] => [
     ...BASE_COLUMNS,
     {
@@ -81,7 +81,7 @@ export const BioflocProgramsPublicTableColumns =
     },
   ];
 
-export const BioflocProgramsInternalTableColumns = (opts: {
+export const ThematicProgramsTableColumnsInternal = (opts: {
   onOpenDocumentation?: (row: BioflocProgramListItem) => void;
   onDelete?: (id: string) => Promise<unknown>;
   programType: ThematicProgramType;

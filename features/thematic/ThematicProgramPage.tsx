@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useGetThematicProgramsPaginated } from "./api/getBioflocProgramsPaginated";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { PaginationState } from "@tanstack/react-table";
-import { BioflocProgramsInternalTableColumns } from "@/features/monitoring/components/biofloc/BioflocProgramsTableColumns";
+import { ThematicProgramsTableColumnsInternal } from "@/features/monitoring/components/biofloc/ThematicProgramsTableColumns";
 import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
 import { useDeleteThematicProgram } from "./api/deleteThematicProgram";
 import {
@@ -97,7 +97,7 @@ export default function ThematicProgramPage({
 
   const columns = useMemo(
     () =>
-      BioflocProgramsInternalTableColumns({
+      ThematicProgramsTableColumnsInternal({
         onOpenDocumentation: setSelectedRow,
         onDelete: mutateAsync,
         programType,
