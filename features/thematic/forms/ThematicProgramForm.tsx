@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ThematicInformationBasicFormSection from "../components/ThematicInformationBasicFormSection";
+import ThematicInformationBasicFormSection from    "../components/ThematicInformationBasicFormSection";
 import { Loader2Icon } from "lucide-react";
 import SCurveFormSection from "@/features/documentation/SCurveFormSection";
 import { useIsMutating } from "@tanstack/react-query";
