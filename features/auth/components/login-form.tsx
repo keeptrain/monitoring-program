@@ -60,7 +60,7 @@ export function LoginForm() {
           id="password"
           name="password"
           type="password"
-          defaultValue={"password123"}
+          placeholder="******"
           required
           aria-invalid={!!errorsPassword}
         />
