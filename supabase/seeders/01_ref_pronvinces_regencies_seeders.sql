@@ -37,7 +37,7 @@ INSERT INTO ref_provinces (code, name) VALUES
   ('93', 'Papua Selatan'),
   ('94', 'Papua Tengah'),
   ('95', 'Papua Pegunungan'),
-  ('96', 'Papua Barat Daya'),
+  ('96', 'Papua Barat Daya')
 ON CONFLICT (code) DO NOTHING;
 
 -- Seed data for regencies (Standard Kemendagri dot-separated)
@@ -555,5 +555,5 @@ INSERT INTO ref_regencies (code, province_code, name) VALUES
   ('96.03', '96', 'Kabupaten Raja Ampat'),
   ('96.04', '96', 'Kabupaten Tambrauw'),
   ('96.05', '96', 'Kabupaten Maybrat'),
-  ('96.71', '96', 'Kota Sorong'),
+  ('96.71', '96', 'Kota Sorong')
 ON CONFLICT (code) DO NOTHING;
